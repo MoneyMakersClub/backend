@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="cbbb2f53-614e-49c7-8883-4e82e3fbc95d" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/alarm/entity/Alarm.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/alarm/entity/AlarmType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/badge/entity/Badge.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/badge/entity/BadgeType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/badge/entity/UserBadge.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/book/entity/BookInfo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/book/entity/Genre.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/book/entity/ReadStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/book/entity/UserBook.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/character/entity/Character.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/character/entity/CharacterType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/character/entity/UserCharacter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/excerpt/entity/Excerpt.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/folder/entity/Folder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/folder/entity/FolderBook.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/friend/entity/Friend.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/friend/entity/FriendRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/friend/entity/FriendRequestStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/review/entity/Review.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/review/entity/Visibility.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/reviewheart/entity/ReviewHeart.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/user/controller/UserController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/user/dto/common/UserUnitDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/user/dto/request/UserInfoUpdateRequestDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/user/dto/response/UserInfoResponseDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/user/entity/LoginType.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/user/entity/Role.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/user/entity/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/user/entity/UserHome.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/user/entity/UserSettings.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/user/entity/UserStats.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/user/entity/UserStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/user/repository/UserRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/domain/user/service/UserService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/global/common/BaseTimeEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/global/common/CreatedTimeEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/global/config/RedisConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/global/config/SecurityConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/global/exception/CustomException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/global/exception/ErrorCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/global/exception/ErrorDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/global/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/bookduck/src/main/java/com/mmc/bookduck/global/security/JwtFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/mmc-backend.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$/bookduck">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Record" />
+        <option value="Class" />
+        <option value="Enum" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2mlisJELIFTwlSQxMASE1dkCvBV" />
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/SAMSUNG/Documents/GitHub/mmc-backend/bookduck",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "project.structure.last.edited": "Problems",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.mmc.bookduck.domain.user.entity" />
+      <recent name="com.mmc.bookduck.domain.book.entity" />
+      <recent name="com.mmc.bookduck.domain.friend.entity" />
+      <recent name="com.mmc.bookduck.domain.character.entity" />
+      <recent name="com.mmc.bookduck.domain.alarm.entity" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="BookduckApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="bookduck.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.mmc.bookduck.BookduckApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cbbb2f53-614e-49c7-8883-4e82e3fbc95d" name="Changes" comment="" />
+      <created>1727657769048</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1727657769048</updated>
+      <workItem from="1727657770484" duration="21978000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
