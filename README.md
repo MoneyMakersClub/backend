@@ -37,11 +37,11 @@
 
 - PR 체크 리스트
   - PR 제목 형식 : `[Type] PR 제목`
-    - ex. `[Feat] 게시글 CRUD 기능 개발`
+    - ex. `[Feat] 회원가입 및 로그인 기능 개발`
     - 타입은 대문자로
   - label 설정
-  - Code Review 요청 / 작업자 Assign
-  - PR 확인한 사람은 확인 코멘트 달기. 작성자 외 1명 확인 후 마지막 사람이 merge
+  - 작업자 자신을 Assign하고, Code Review 요청
+  - 작성자 외 1명 확인 시 작성자가 merge
 
 <br>
 
@@ -54,7 +54,7 @@
 
 #### branch 규칙
 
-- 브랜치 네이밍 규칙: `feat/{도메인_혹은_큰_기능}` ex) `feat/place`
+- 브랜치 네이밍 규칙: `feat/{도메인_혹은_큰_기능}` ex) `feat/user`
 - `feat -> develop -> deploy -> main` 순으로 merge
 - `feat` : 각 기능을 개발하는 브랜치
 - `develop` : 각 기능의 개발을 완료하고 테스트 완료 후 병합하는 브랜치
