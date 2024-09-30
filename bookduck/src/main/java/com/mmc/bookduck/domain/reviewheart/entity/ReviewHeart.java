@@ -10,7 +10,6 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Entity
 public class ReviewHeart {
     @Id
@@ -28,4 +27,10 @@ public class ReviewHeart {
     @NotNull
     @OnDelete(action = OnDeleteAction.CASCADE) // 다대일 단방향이므로 설정
     private User user;
+
+    @Builder
+    public ReviewHeart (Review review, User user) {
+        this.review = review;
+        this.user = user;
+    }
 }

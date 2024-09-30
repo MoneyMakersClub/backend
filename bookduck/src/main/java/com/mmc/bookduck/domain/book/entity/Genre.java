@@ -6,7 +6,6 @@ import lombok.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Entity
 public class Genre {
     @Id
@@ -16,4 +15,9 @@ public class Genre {
 
     @NotNull
     private String genreName;
+
+    @Builder
+    public Genre (String genreName) {
+        this.genreName = genreName;
+    }
 }
