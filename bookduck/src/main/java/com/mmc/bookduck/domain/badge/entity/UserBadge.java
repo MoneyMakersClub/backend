@@ -27,7 +27,7 @@ public class UserBadge extends CreatedTimeEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "character_id", updatable = false)
+    @JoinColumn(name = "badge_id", updatable = false)
     @NotNull
     @OnDelete(action = OnDeleteAction.CASCADE) // 다대일 단방향이므로 설정
     private Badge badge;

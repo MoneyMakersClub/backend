@@ -1,5 +1,6 @@
-package com.mmc.bookduck.domain.badge.entity;
+package com.mmc.bookduck.domain.skin.entity;
 
+import com.mmc.bookduck.domain.badge.entity.UserBadge;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -11,18 +12,18 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Badge {
+public class Skin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
-    private Long badgeId;
+    private Long skinId;
 
     @NotNull
-    private String badgeName;
+    private String skinName;
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private BadgeType badgeType;
+    private SkinType skinType;
 
     @NotNull
     private String description;
@@ -34,9 +35,9 @@ public class Badge {
     private LocalDate releaseDate;
 
     @Builder
-    public Badge(String badgeName, BadgeType badgeType, String description, String unlockCondition, LocalDate releaseDate) {
-        this.badgeName = badgeName;
-        this.badgeType = badgeType;
+    public Skin(String skinName, SkinType skinType, String description, String unlockCondition, LocalDate releaseDate) {
+        this.skinName = skinName;
+        this.skinType = skinType;
         this.description = description;
         this.unlockCondition = unlockCondition;
         this.releaseDate = releaseDate;
