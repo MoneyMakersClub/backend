@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.excerpt.entity;
 
 import com.mmc.bookduck.domain.book.entity.UserBook;
+import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -27,6 +28,9 @@ public class Excerpt extends BaseTimeEntity {
     @NotNull
     private String memo;
 
+    @NotNull
+    private Visibility visibility;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", updatable = false)
     @NotNull
@@ -40,9 +44,10 @@ public class Excerpt extends BaseTimeEntity {
     private UserBook userBook;
 
     @Builder
-    public Excerpt(String excerptContent, String memo, User user, UserBook userBook) {
+    public Excerpt(String excerptContent, String memo, Visibility visibility, User user, UserBook userBook) {
         this.excerptContent = excerptContent;
         this.memo = memo;
+        this.visibility = visibility;
         this.user = user;
         this.userBook = userBook;
     }

@@ -1,4 +1,4 @@
-package com.mmc.bookduck.domain.review.entity;
+package com.mmc.bookduck.domain.common;
 
 public enum Visibility {
     PUBLIC,

@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.review.entity;
 
 import com.mmc.bookduck.domain.book.entity.UserBook;
+import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.reviewheart.entity.ReviewHeart;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
@@ -31,6 +32,7 @@ public class Review extends BaseTimeEntity {
     @NotNull
     private double rating;
 
+    @NotNull
     private Visibility visibility;
 
     @ManyToOne(fetch = FetchType.LAZY)
