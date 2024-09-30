@@ -1,6 +1,6 @@
 package com.mmc.bookduck.domain.excerpt.entity;
 
-import com.mmc.bookduck.domain.book.entity.BookInfo;
+import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -34,16 +34,16 @@ public class Excerpt extends BaseTimeEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_info_id", updatable = false)
+    @JoinColumn(name = "user_book_id", updatable = false)
     @NotNull
     @OnDelete(action = OnDeleteAction.CASCADE) // 다대일 단방향이므로 설정
-    private BookInfo bookInfo;
+    private UserBook userBook;
 
     @Builder
-    public Excerpt(String excerptContent, String memo, User user, BookInfo bookInfo) {
+    public Excerpt(String excerptContent, String memo, User user, UserBook userBook) {
         this.excerptContent = excerptContent;
         this.memo = memo;
         this.user = user;
-        this.bookInfo = bookInfo;
+        this.userBook = userBook;
     }
 }

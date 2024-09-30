@@ -1,6 +1,6 @@
 package com.mmc.bookduck.domain.review.entity;
 
-import com.mmc.bookduck.domain.book.entity.BookInfo;
+import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.reviewheart.entity.ReviewHeart;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
@@ -40,22 +40,22 @@ public class Review extends BaseTimeEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_info_id", updatable = false)
+    @JoinColumn(name = "user_book_id", updatable = false)
     @NotNull
     @OnDelete(action = OnDeleteAction.CASCADE) // 다대일 단방향이므로 설정
-    private BookInfo bookInfo;
+    private UserBook userBook;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewHeart> reviewHearts;
 
     @Builder
-    public Review(String content, String oneLine, double rating, Visibility visibility, User user, BookInfo bookInfo) {
+    public Review(String content, String oneLine, double rating, Visibility visibility, User user, UserBook userBook) {
         this.content = content;
         this.oneLine = oneLine;
         this.rating = rating;
         this.visibility = visibility;
         this.user = user;
-        this.bookInfo = bookInfo;
+        this.userBook = userBook;
         this.reviewHearts = new ArrayList<>();
     }
 
