@@ -24,10 +24,10 @@ public class FolderBook {
     private Folder folder;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", updatable = false)
+    @JoinColumn(name = "user_book_id", updatable = false)
     @NotNull
     @OnDelete(action = OnDeleteAction.CASCADE) // 다대일 단방향이므로 설정
-    private UserBook book;
+    private UserBook userBook;
 
     public void setFolder(Folder folder) {
         this.folder = folder;
