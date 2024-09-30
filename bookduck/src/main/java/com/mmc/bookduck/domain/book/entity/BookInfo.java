@@ -33,11 +33,13 @@ public class BookInfo {
 
     private String description;
 
+    private String category;
+
     private int pageCount;
 
     private String language; // CountryCode로 적힘
 
-    private String category;
+    private String imgPath;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "genre_id", updatable = false)
@@ -47,7 +49,7 @@ public class BookInfo {
 
     @Builder
     public BookInfo(String providerId, String title, String author, String publisher, String publishDate,
-                String description, int pageCount, String language, String category) {
+                String description, int pageCount, String language, String category, String imgPath) {
         this.providerId = providerId;
         this.title = title;
         this.author = author;
@@ -57,5 +59,6 @@ public class BookInfo {
         this.pageCount = pageCount;
         this.language = language;
         this.category = category;
+        this.imgPath = imgPath;
     }
 }
