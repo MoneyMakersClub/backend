@@ -1,16 +1,12 @@
 package com.mmc.bookduck.domain.book.entity;
 
 import com.mmc.bookduck.domain.user.entity.User;
-import com.mmc.bookduck.domain.excerpt.entity.Excerpt;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

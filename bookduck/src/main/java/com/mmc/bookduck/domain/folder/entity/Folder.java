@@ -38,9 +38,14 @@ public class Folder {
         this.folderBooks = new ArrayList<>();
     }
 
-    // folderBooks 리스트에 folderBook 추가
+    // folderBook 추가
     public void addFolderBook(FolderBook folderBook) {
         this.folderBooks.add(folderBook);
     }
 
+    // folderBook 삭제
+    public void removeFolderBook(FolderBook folderBook) {
+        folderBooks.remove(folderBook);
+        folderBook.setFolder(null);
+    }
 }

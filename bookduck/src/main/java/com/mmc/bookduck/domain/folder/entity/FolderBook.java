@@ -23,10 +23,13 @@ public class FolderBook {
     @NotNull
     private Folder folder;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", updatable = false)
     @NotNull
     @OnDelete(action = OnDeleteAction.CASCADE) // 다대일 단방향이므로 설정
     private UserBook book;
+
+    public void setFolder(Folder folder) {
+        this.folder = folder;
+    }
 }

@@ -33,4 +33,8 @@ public class ReviewHeart {
         this.review = review;
         this.user = user;
     }
+
+    public void setReview(Review review) {
+        this.review = review;
+    }
 }

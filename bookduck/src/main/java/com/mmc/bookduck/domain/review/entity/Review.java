@@ -1,6 +1,6 @@
 package com.mmc.bookduck.domain.review.entity;
+
 import com.mmc.bookduck.domain.book.entity.BookInfo;
-import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.reviewheart.entity.ReviewHeart;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
@@ -57,5 +57,16 @@ public class Review extends BaseTimeEntity {
         this.user = user;
         this.bookInfo = bookInfo;
         this.reviewHearts = new ArrayList<>();
+    }
+
+    // reviewHeart 추가
+    public void addReviewHeart(ReviewHeart reviewHeart) {
+        reviewHearts.add(reviewHeart);
+    }
+
+    // reviewHeart 삭제
+    public void removeReviewHeart(ReviewHeart reviewHeart) {
+        reviewHearts.remove(reviewHeart);
+        reviewHeart.setReview(null);
     }
 }

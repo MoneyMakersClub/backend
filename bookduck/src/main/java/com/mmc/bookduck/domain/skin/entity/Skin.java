@@ -1,13 +1,10 @@
 package com.mmc.bookduck.domain.skin.entity;
 
-import com.mmc.bookduck.domain.badge.entity.UserBadge;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
