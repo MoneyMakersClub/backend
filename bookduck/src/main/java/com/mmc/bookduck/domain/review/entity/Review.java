@@ -24,13 +24,15 @@ public class Review extends BaseTimeEntity {
     private Long reviewId;
 
     @NotNull
+    private String title;
+
+    @NotNull
     private String content;
 
-    @NotNull
-    private String oneLine;
+    private Long pageNumber;
 
     @NotNull
-    private double rating;
+    private boolean isMain;
 
     @NotNull
     private Visibility visibility;
@@ -51,10 +53,12 @@ public class Review extends BaseTimeEntity {
     private List<ReviewHeart> reviewHearts;
 
     @Builder
-    public Review(String content, String oneLine, double rating, Visibility visibility, User user, UserBook userBook) {
+    public Review(String title, String content, Long pageNumber, boolean isMain,
+                  Visibility visibility, User user, UserBook userBook) {
+        this.title = title;
         this.content = content;
-        this.oneLine = oneLine;
-        this.rating = rating;
+        this.pageNumber = pageNumber;
+        this.isMain = isMain;
         this.visibility = visibility;
         this.user = user;
         this.userBook = userBook;

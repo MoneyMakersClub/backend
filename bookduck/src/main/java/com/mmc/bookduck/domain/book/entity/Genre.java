@@ -13,11 +13,12 @@ public class Genre {
     @Column(updatable = false)
     private Long genreId;
 
+    @Enumerated(EnumType.STRING)
     @NotNull
-    private String genreName;
+    private GenreName genreName;
 
     @Builder
-    public Genre (String genreName) {
+    public Genre(GenreName genreName) {
         this.genreName = genreName;
     }
 }

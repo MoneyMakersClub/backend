@@ -28,15 +28,11 @@ public class Skin {
     @NotNull
     private String unlockCondition; // 추후 수정 필요할 수 있음
 
-    @NotNull
-    private LocalDate releaseDate;
-
     @Builder
-    public Skin(String skinName, SkinType skinType, String description, String unlockCondition, LocalDate releaseDate) {
+    public Skin(String skinName, SkinType skinType, String description, String unlockCondition) {
         this.skinName = skinName;
         this.skinType = skinType;
         this.description = description;
         this.unlockCondition = unlockCondition;
-        this.releaseDate = releaseDate;
     }
 }

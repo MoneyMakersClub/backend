@@ -28,15 +28,12 @@ public class Badge {
     @NotNull
     private String unlockCondition; // 추후 수정 필요할 수 있음
 
-    @NotNull
-    private LocalDate releaseDate;
 
     @Builder
-    public Badge(String badgeName, BadgeType badgeType, String description, String unlockCondition, LocalDate releaseDate) {
+    public Badge(String badgeName, BadgeType badgeType, String description, String unlockCondition) {
         this.badgeName = badgeName;
         this.badgeType = badgeType;
         this.description = description;
         this.unlockCondition = unlockCondition;
-        this.releaseDate = releaseDate;
     }
 }
