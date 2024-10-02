@@ -35,7 +35,7 @@ public class BookInfo {
 
     private String category;
 
-    private int pageCount;
+    private Long pageCount;
 
     private String language; // CountryCode로 적힘
 
@@ -51,7 +51,7 @@ public class BookInfo {
 
     @Builder
     public BookInfo(String providerId, String title, String author, String publisher, String publishDate,
-                String description, int pageCount, String language, String category, String imgPath, Long createdUserId) {
+                String description, Long pageCount, String language, String category, String imgPath, Long createdUserId, Genre genre) {
         this.providerId = providerId;
         this.title = title;
         this.author = author;
@@ -63,5 +63,6 @@ public class BookInfo {
         this.category = category;
         this.imgPath = imgPath;
         this.createdUserId = createdUserId;
+        this.genre = genre;
     }
 }

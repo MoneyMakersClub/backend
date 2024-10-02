@@ -28,8 +28,9 @@ public class UserBook extends BaseTimeEntity {
     private User user;
 
     @Builder
-    public UserBook(ReadStatus readStatus) {
+    public UserBook(ReadStatus readStatus, User user) {
         this.readStatus = readStatus;
+        this.user = user;
     }
 
     public void changeReadStaus(ReadStatus readStatus) {
