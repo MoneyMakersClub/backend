@@ -13,12 +13,12 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class UserStats {
+public class UserGrowth {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
-    private Long userId;
+    private Long userGrowthId;
 
     @ColumnDefault("1")
     private int level;
@@ -30,7 +30,7 @@ public class UserStats {
     private User user;
 
     @Builder
-    public UserStats(User user) {
+    public UserGrowth(User user) {
         this.user = user;
         this.level = 1;
     }
