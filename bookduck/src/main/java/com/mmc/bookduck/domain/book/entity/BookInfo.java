@@ -41,6 +41,8 @@ public class BookInfo {
 
     private String imgPath;
 
+    private Long createdUserId; // 직접 등록한 경우, 등록한 userId
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "genre_id", updatable = false)
     @NotNull
@@ -49,7 +51,7 @@ public class BookInfo {
 
     @Builder
     public BookInfo(String providerId, String title, String author, String publisher, String publishDate,
-                String description, int pageCount, String language, String category, String imgPath) {
+                String description, int pageCount, String language, String category, String imgPath, Long createdUserId) {
         this.providerId = providerId;
         this.title = title;
         this.author = author;
@@ -60,5 +62,6 @@ public class BookInfo {
         this.language = language;
         this.category = category;
         this.imgPath = imgPath;
+        this.createdUserId = createdUserId;
     }
 }
