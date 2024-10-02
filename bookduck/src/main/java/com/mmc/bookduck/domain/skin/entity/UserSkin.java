@@ -5,6 +5,7 @@ import com.mmc.bookduck.global.common.CreatedTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -17,6 +18,7 @@ public class UserSkin extends CreatedTimeEntity {
     @Column(updatable = false)
     private Long userSkinId;
 
+    @ColumnDefault("false")
     private boolean isEquipped;
 
     @ManyToOne(fetch = FetchType.LAZY)
