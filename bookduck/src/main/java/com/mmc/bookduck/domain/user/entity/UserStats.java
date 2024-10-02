@@ -23,11 +23,6 @@ public class UserStats {
     @ColumnDefault("1")
     private int level;
 
-    /*
-    @ColumnDefault("0")
-    private int bookCount;
-    */
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", unique = true, updatable = false)
     @NotNull
