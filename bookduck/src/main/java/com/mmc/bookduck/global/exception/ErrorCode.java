@@ -30,6 +30,14 @@ public enum ErrorCode {
     LOGIN_FAILED(401, "로그인에 실패했습니다."),
     // 유효하지 않은 토큰
     INVALID_TOKEN(401, "유효하지 않은 토큰입니다."),
+    // 만료된 토큰
+    EXPIRED_ACCESS_TOKEN(401,"만료된 액세스 토큰입니다."),
+    EXPIRED_REFRESH_TOKEN(401, "만료된 리프레시 토큰입니다."),
+    // 액세스 토큰이 만료되지 않은 상황에서 재발급받으려는 경우
+    ACCESS_TOKEN_NOT_EXPIRED(401,"액세스 토큰이 아직 만료되지 않았습니다."),
+    // 쿠키에 리프레시 토큰이 들어있지 않은 경우
+    NO_COOKIE(401, "쿠키에 값이 존재하지 않습니다."),
+
 
     // 404 Not Found
     // 각 리소스를 찾지 못함
@@ -45,6 +53,10 @@ public enum ErrorCode {
     // 외부 API 사용 도중 에러
     REDIS_CONNECTION_ERROR(500, "서버에서 Redis 연결 중 문제가 발생했습니다."),
     EXTERNAL_API_ERROR(500, "외부 API 사용 중 문제가 발생했습니다."),
+
+    // Oauth2, JWT
+    ILLEGAL_REGISTRATION_ID(500, "잘못된 registrationId입니다."),
+
     ;
 
     private final int status;
