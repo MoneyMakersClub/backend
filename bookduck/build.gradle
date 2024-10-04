@@ -45,6 +45,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	//cache
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	//JSON 처리
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 tasks.named('test') {
