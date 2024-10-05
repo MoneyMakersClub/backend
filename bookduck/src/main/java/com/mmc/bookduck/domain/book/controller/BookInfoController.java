@@ -14,13 +14,22 @@ public class BookInfoController {
 
     private final BookInfoService bookInfoService;
 
-    // 도서검색 GET (일단 API)
+    // 도서목록 GET (API)
     @GetMapping("/search")
     public BookListResponseDto searchBookList(@RequestParam(name = "keyword") String keyword,
                                               @RequestParam Long page,
                                               @RequestParam Long size){
+
         return bookInfoService.searchBookList(keyword, page, size);
     }
+
+//    // 도서목록 GET (직접등록)
+//    @GetMapping("/search/custom")
+//    public BookListResponseDto searchCustomBookList(@RequestParam(name = "keyword") String keyword,
+//                                                    @RequestParam Long page,
+//                                                    @RequestParam Long size){
+//        return bookInfoService.searchCustomBookList(keyword, page, size);
+//    }
 
     // API 도서 상세 정보 GET - 기본 정보
     @GetMapping("/external/{providerId}")
@@ -28,7 +37,7 @@ public class BookInfoController {
         return bookInfoService.getApiBookBasic(providerId);
     }
 
-    // API 도서 상세 정보 GET - 상세 정보
+//    // API 도서 상세 정보 GET - 상세 정보
 //    @GetMapping("/external/{providerId}/additional")
 //    public BookAdditionalListResponseDto getApiBookAdditional(@PathVariable(name = "providerId") String providerId){
 //        return bookInfoService.getApiBoolAdditional(providerId);

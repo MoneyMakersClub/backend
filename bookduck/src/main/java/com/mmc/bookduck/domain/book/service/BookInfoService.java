@@ -6,6 +6,8 @@ import com.mmc.bookduck.domain.book.dto.common.BookInfoUnitDto;
 import com.mmc.bookduck.domain.book.dto.response.ApiBookBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
+import com.mmc.bookduck.domain.book.repository.BookInfoRepository;
+import com.mmc.bookduck.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -26,17 +28,22 @@ public class BookInfoService {
     @Value("${google.books.api.key}")
     private String apiKey;
 
+    private final BookInfoRepository bookInfoRepository;
+
 
     // api 도서 목록 조회
     public BookListResponseDto searchBookList(String keyword, Long page, Long size) {
 
+        // 한글 검색어 입력하면 잘 안되는 문제
         // 페이지 1부터 시작한다고 가정
-        String url = UriComponentsBuilder.fromHttpUrl("https://www.googleapis.com/books/v1/volumes")
-                .queryParam("q", keyword)
-                .queryParam("startIndex", (page-1))
-                .queryParam("maxResults", size)
-                .queryParam("key", apiKey)
-                .toUriString();
+//        String url = UriComponentsBuilder.fromHttpUrl("https://www.googleapis.com/books/v1/volumes")
+//                .queryParam("q", keyword)
+//                .queryParam("startIndex", (page-1))
+//                .queryParam("maxResults", size)
+//                .queryParam("key", apiKey)
+//                .toUriString();
+
+        String url = "https://www.googleapis.com/books/v1/volumes?q="+keyword+"&startIndex="+(page-1)+"&maxResults="+size+"&key"+apiKey;
 
         // 헤더 설정
         HttpHeaders headers = new HttpHeaders();
@@ -175,4 +182,28 @@ public class BookInfoService {
         }
         return null;
     }
+
+//    // 직접 등록한 책 검색
+//    public BookListResponseDto searchCustomBookList(String keyword, Long page, Long size) {
+//
+//        // 먼저 user 검색
+//        User user = userRepository.findById(userId);
+//
+//        List<BookInfo> bookInfos = bookInfoRepository.searchByCreatedUserIdAndKeyword(user.getUserId(), keyword);
+//        if(bookInfos != null){
+//
+//            List<BookInfoUnitDto> bookList = new ArrayList<>();
+//
+//            for(BookInfo bookinfo = bookInfos){
+//                Long publishedYear = extractYear(bookinfo.getPublishDate());
+//                // 저자를 리스트로 변환
+//                List<String> authors = Collections.singletonList(bookinfo.getAuthor());
+//                bookList.add(new BookInfoUnitDto(bookinfo.getTitle(), authors, bookinfo.getPublisher(), publishedYear, bookinfo.getImgPath(), bookinfo.getProviderId()));
+//            }
+//            return new BookListResponseDto(bookList);
+//        }else{
+//            // 검색결과 없는 경우
+//            return new BookListResponseDto(null);
+//        }
+//    }
 }
