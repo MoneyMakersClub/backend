@@ -14,6 +14,8 @@ public class BookInfoUnitDto {
     @NotNull
     private String title;
 
+    private String subtitle;
+
     private List<String> author;
 
     private String publisher;
@@ -25,9 +27,10 @@ public class BookInfoUnitDto {
     private String providerId;
 
     @Builder
-    public BookInfoUnitDto(String title, List<String> author, String publisher,
+    public BookInfoUnitDto(String title, String subtitle, List<String> author, String publisher,
                            Long publishedYear, String imgPath, String providerId) {
         this.title = title;
+        this.subtitle = subtitle;
         this.author = author;
         this.publisher = publisher;
         this.publishedYear = publishedYear;

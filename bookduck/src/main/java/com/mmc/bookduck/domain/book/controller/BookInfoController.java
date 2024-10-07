@@ -14,7 +14,7 @@ public class BookInfoController {
 
     private final BookInfoService bookInfoService;
 
-    // 도서목록 GET (API)
+    // 도서목록 GET(API)
     @GetMapping("/search")
     public BookListResponseDto searchBookList(@RequestParam(name = "keyword") String keyword,
                                               @RequestParam Long page,
@@ -23,13 +23,15 @@ public class BookInfoController {
         return bookInfoService.searchBookList(keyword, page, size);
     }
 
-//    // 도서목록 GET (직접등록)
-//    @GetMapping("/search/custom")
-//    public BookListResponseDto searchCustomBookList(@RequestParam(name = "keyword") String keyword,
-//                                                    @RequestParam Long page,
-//                                                    @RequestParam Long size){
-//        return bookInfoService.searchCustomBookList(keyword, page, size);
-//    }
+    /*
+    // 도서목록 GET (직접등록)
+    @GetMapping("/search/custom")
+    public BookListResponseDto searchCustomBookList(@RequestParam(name = "keyword") String keyword,
+                                                    @RequestParam Long page,
+                                                    @RequestParam Long size){
+        return bookInfoService.searchCustomBookList(keyword, page, size);
+    }
+    */
 
     // API 도서 상세 정보 GET - 기본 정보
     @GetMapping("/external/{providerId}")
@@ -37,14 +39,15 @@ public class BookInfoController {
         return bookInfoService.getApiBookBasic(providerId);
     }
 
-//    // API 도서 상세 정보 GET - 상세 정보
-//    @GetMapping("/external/{providerId}/additional")
-//    public BookAdditionalListResponseDto getApiBookAdditional(@PathVariable(name = "providerId") String providerId){
-//        return bookInfoService.getApiBoolAdditional(providerId);
-//    }
+    /*
+    // API 도서 상세 정보 GET - 상세 정보
+    @GetMapping("/external/{providerId}/additional")
+    public BookAdditionalListResponseDto getApiBookAdditional(@PathVariable(name = "providerId") String providerId){
+        return bookInfoService.getApiBoolAdditional(providerId);
+    }
+    */
+
 
     // 커스텀 도서 상세 정보 GET - 기본 정보 + 사용자의 한줄평,별점
-
     // 도서 직접 등록
-
 }

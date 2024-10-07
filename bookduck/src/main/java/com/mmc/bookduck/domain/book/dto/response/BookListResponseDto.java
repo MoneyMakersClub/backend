@@ -11,10 +11,12 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookListResponseDto {
+    private int bookCount;
     private List<BookInfoUnitDto> bookList;
 
     @Builder
     public BookListResponseDto(List<BookInfoUnitDto> bookList){
         this.bookList = bookList;
+        this.bookCount = (bookList != null) ? bookList.size() : 0;
     }
 }
