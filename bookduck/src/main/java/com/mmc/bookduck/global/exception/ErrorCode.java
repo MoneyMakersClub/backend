@@ -20,6 +20,8 @@ public enum ErrorCode {
     MISSING_PARAMETER(400, "필수 파라미터가 누락되었습니다."),
     // enum 값이 잘못됨
     INVALID_ENUM_VALUE(400, "enum 값이 잘못되었습니다."),
+    EMAIL_ALREADY_REGISTERED(400, "해당 이메일을 사용하는 다른 소셜 로그인 방법으로 가입되어 있습니다."),
+
 
     // 401 Unauthorized
     // 로그인 상태여야 하는 요청

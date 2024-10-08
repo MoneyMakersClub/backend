@@ -1,9 +1,8 @@
-package com.mmc.bookduck.global.jwt;
+package com.mmc.bookduck.global.security;
 
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
-import com.mmc.bookduck.global.oauth2.CustomOAuth2UserService;
-import com.mmc.bookduck.global.security.RedisService;
+import com.mmc.bookduck.global.exception.TokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -25,18 +24,16 @@ public class JwtUtil {
     private final Key accessKey;
     private final Key refreshKey;
     private final RedisService redisService;
-    private final CustomOAuth2UserService userDetailsService;
     private static final Duration ACCESS_TOKEN_EXPIRE_TIME = Duration.ofHours(2); //2시간
     private static final Duration REFRESH_TOKEN_EXPIRE_TIME = Duration.ofDays(7); //7일
 
     public JwtUtil(@Value("${jwt.secret.access}") String accessSecret, @Value("${jwt.secret.refresh}") String refreshSecret,
-                   CustomOAuth2UserService userDetailsService, RedisService redisService){
+                   RedisService redisService){
         byte[] keyBytes = Decoders.BASE64.decode(accessSecret);
         this.accessKey = Keys.hmacShaKeyFor(keyBytes);
         keyBytes = Decoders.BASE64.decode(refreshSecret);
         this.refreshKey = Keys.hmacShaKeyFor(keyBytes);
         this.redisService = redisService;
-        this.userDetailsService = userDetailsService;
     }
 
     public String generateAccessToken(Authentication authentication){
@@ -46,7 +43,7 @@ public class JwtUtil {
     public String generateRefreshToken(Authentication authentication){
         String refreshToken = generateToken(authentication, refreshKey, REFRESH_TOKEN_EXPIRE_TIME);
 
-        //refresh token을 redis에 저장
+        // 리프레시 토큰을 redis에 저장
         redisService.setValuesWithTimeout(authentication.getName(), refreshToken, REFRESH_TOKEN_EXPIRE_TIME);
         return refreshToken;
     }
@@ -64,15 +61,13 @@ public class JwtUtil {
                 .setExpiration(expireDate)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
-
         return token;
     }
 
-
-    public boolean validateAccessToken(String accessToken){
+    // 액세스 토큰이 유효한 경우에만 에러를 던지지 않음
+    public void validateAccessToken(String accessToken){
         try {
             Jwts.parserBuilder().setSigningKey(accessKey).build().parseClaimsJws(accessToken);
-            return true;
         } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e){
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
@@ -80,6 +75,7 @@ public class JwtUtil {
         }
     }
 
+    // 리프레시 토큰이 유효한 경우에만 에러를 던지지 않음
     public void validateRefreshToken(String refreshToken){
         try{
             Jwts.parserBuilder().setSigningKey(refreshKey).build().parseClaimsJws(refreshToken);
@@ -122,4 +118,7 @@ public class JwtUtil {
         }
     }
 
+    public int getRefreshTokenMaxAge() {
+        return (int) REFRESH_TOKEN_EXPIRE_TIME.toSeconds();
+    }
 }

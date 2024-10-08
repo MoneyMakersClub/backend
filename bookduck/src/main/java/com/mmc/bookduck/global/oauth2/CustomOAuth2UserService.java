@@ -2,6 +2,9 @@ package com.mmc.bookduck.global.oauth2;
 
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
+import com.mmc.bookduck.global.exception.CustomException;
+import com.mmc.bookduck.global.exception.CustomOAuth2AuthenticationException;
+import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -23,30 +27,46 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Override
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        // 1. 유저 정보(attributes) 가져오기
+        // OAuth2 제공업체의 유저 정보 가져오기
         Map<String, Object> oAuth2UserAttributes = super.loadUser(userRequest).getAttributes();
 
-        // 2. registrationId 가져오기 (third-party id)
+        // registrationId 가져오기 (google 또는 kakao)
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
-        // 3. userNameAttributeName 가져오기.
+        // userNameAttributeName 가져오기 (OAuth2 제공업체에서 사용자 식별을 위해 사용하는 고유 식별자의 속성명)
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
                 .getUserInfoEndpoint().getUserNameAttributeName();
 
-        // 4. 유저 정보 dto 생성
-        OAuth2Attributes oAuth2Attributes = OAuth2Attributes.ofKakao(registrationId, oAuth2UserAttributes);
+        // 유저 정보 dto 생성 (loginType, email을 DB에 저장해야)
+        OAuth2Attributes oAuth2Attributes = OAuth2Attributes.of(registrationId, oAuth2UserAttributes);
 
-        // 5. 회원가입 및 로그인
+        // 회원가입 및 로그인 (User를 저장하며 가져옴)
         User user = getOrSave(oAuth2Attributes);
 
-        // 6. AuthDetails 로 반환
+        // OAuth2UserDetails 반환
         log.info("CustomOAuth2UserService - loadUser() : OAuth2UserDetails로 반환합니다.");
-        return new OAuth2UserDetails(oAuth2UserAttributes, userNameAttributeName, oAuth2Attributes.getOauth2UserEmail());
+        return new OAuth2UserDetails(oAuth2UserAttributes, userNameAttributeName, oAuth2Attributes.getEmail());
     }
 
-    private User getOrSave(OAuth2Attributes oAuth2Attributes) { // provider도 확인해야 함
-        User user = userRepository.findByEmail(oAuth2Attributes.getOauth2UserEmail())
-                .orElseGet(oAuth2Attributes::toEntity);
-        return userRepository.save(user);
+    private User getOrSave(OAuth2Attributes oAuth2Attributes) {
+        String email = oAuth2Attributes.getEmail();
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        // 해당 이메일로 가입한 유저가 존재하는지 확인
+        if (user != null) {
+            // 이미 존재하는 유저의 로그인 유형과 현재 로그인 유형이 다르면 에러 발생
+            if (!user.getLoginType().name().equals(oAuth2Attributes.getLoginType())) {
+                throw new CustomOAuth2AuthenticationException(ErrorCode.EMAIL_ALREADY_REGISTERED);
+            }
+            return user; // TODO: 수정시각을 업데이트해야 하는지?
+        } else {
+            // 존재하지 않을 경우 새로운 유저 엔티티 생성. 랜덤 닉네임을 중복되지 않게 생성
+            String nickname;
+            do {
+                nickname = "북덕" + UUID.randomUUID().toString().substring(0, 6); // 랜덤으로 생성된 6자리 UUID 사용
+            } while (userRepository.existsByNickname(nickname)); // 중복 검사
+
+            return userRepository.save(oAuth2Attributes.toEntity(nickname));
+        }
     }
 }

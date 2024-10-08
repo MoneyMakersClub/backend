@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -22,6 +23,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -39,7 +41,7 @@ public class SecurityConfig {
 
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
-    // private final CustomLogoutHandler logoutHandler;
+    private final CustomLogoutHandler customLogoutHandler;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -84,33 +86,34 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .headers(header -> header
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
+                // 요청 권한 설정 TODO: 수정할 것
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .requestMatchers("/oauth2/**").authenticated()
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                         .anyRequest().authenticated()
                 )
+                // X-Frame-Options: SAME ORIGIN으로 설정
+                .headers(header -> header
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 // oauth2 설정
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(c -> c.userService(oAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
                         .failureHandler(oAuth2FailureHandler)
                 )
-                /*.logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .deleteCookies("refreshToken")
-                        .addLogoutHandler(logoutHandler)
-                        .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
-                )
-                .addFilterBefore(new JwtFilter(jwtUtil), LogoutFilter.class)*/
                 // 인증 예외 핸들링
                 .exceptionHandling(e -> e
-                        .authenticationEntryPoint(customAuthenticationEntryPoint)
-                        .accessDeniedHandler(customAccessDeniedHandler)
+                        .authenticationEntryPoint(customAuthenticationEntryPoint) // 인증되지 않은 사용자가 접근
+                        .accessDeniedHandler(customAccessDeniedHandler) // 인증은 되었지만 접근 권한이 없음
+                )
+                // 커스텀 로그아웃 사용 (refreshToken 삭제 위함)
+                .logout(logout -> logout
+                        .logoutUrl("/logout") // POST 요청
+                        .deleteCookies("refreshToken") // refreshToken이라는 이름의 쿠키 삭제
+                        .addLogoutHandler(customLogoutHandler) // 로그아웃 시 수행할 추가 동작
+                        .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)) // 상태코드 200 반환 위함
                 )
         ;
         return http.build();

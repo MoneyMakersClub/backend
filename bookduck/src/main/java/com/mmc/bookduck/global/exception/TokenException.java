@@ -1,6 +1,5 @@
-package com.mmc.bookduck.global.jwt;
+package com.mmc.bookduck.global.exception;
 
-import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

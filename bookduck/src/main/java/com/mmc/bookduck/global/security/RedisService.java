@@ -8,15 +8,17 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class RedisService {
     private final RedisTemplate<String,Object> redisTemplate;
 
+    // Redis에 값을 설정하고, 지정된 시간 후에 만료되도록 설정
     public void setValuesWithTimeout(String key, String value, Duration timeout){
         redisTemplate.opsForValue().set(key,value,timeout);
     }
 
+    // 키가 존재하지 않을 경우만 값을 설정
     public boolean setValuesWithTimeoutIfAbsent(String key, String value, Duration timeout){
         return redisTemplate.opsForValue().setIfAbsent(key, value, timeout);
     }
@@ -29,5 +31,4 @@ public class RedisService {
     public void deleteValues(String key){
         redisTemplate.delete(key);
     }
-
 }

@@ -12,41 +12,43 @@ import java.util.Map;
 @Getter
 public class OAuth2Attributes {
     private String loginType;
-    private String oauth2UserEmail;
-    private String birth;
-    private String gender;
-    private String country;
+    private String email;
 
     @Builder
-    private OAuth2Attributes(String loginType, String oauth2UserEmail, String birth, String gender, String country) {
+    private OAuth2Attributes(String loginType, String email) {
         this.loginType = loginType;
-        this.oauth2UserEmail = oauth2UserEmail;
-        this.birth = birth;
-        this.gender = gender;
-        this.country = country;
+        this.email = email;
     }
 
-    public static OAuth2Attributes ofKakao(String registrationId, Map<String, Object> attributes) {
-        if (!registrationId.equals("kakao"))
-            throw new CustomException(ErrorCode.ILLEGAL_REGISTRATION_ID);
-        Map<String, Object> accountAttributes = (Map<String, Object>) attributes.get("kakao_account");
+    public static OAuth2Attributes of(String registrationId, Map<String, Object> attributes) {
+        return switch (registrationId) { // registration id별로 userInfo 생성
+            case "google" -> ofGoogle(registrationId, attributes);
+            case "kakao" -> ofKakao(registrationId, attributes);
+            default -> throw new CustomException(ErrorCode.ILLEGAL_REGISTRATION_ID);
+        };
+    }
 
+    private  static OAuth2Attributes ofGoogle(String registrationId, Map<String, Object> attributes) {
         return OAuth2Attributes.builder()
                 .loginType(registrationId)
-                .oauth2UserEmail(String.valueOf(accountAttributes.get("email")))
-                .birth(String.valueOf(accountAttributes.get("birth")))
-                .gender(String.valueOf(accountAttributes.get("gender")))
-                .country(String.valueOf(accountAttributes.get("country")))
+                .email(String.valueOf(attributes.get("email")))
                 .build();
     }
 
-    public User toEntity() {
+    private static OAuth2Attributes ofKakao(String registrationId, Map<String, Object> attributes) {
+        Map<String, Object> accountAttributes = (Map<String, Object>) attributes.get("kakao_account");
+        return OAuth2Attributes.builder()
+                .loginType(registrationId)
+                .email(String.valueOf(accountAttributes.get("email")))
+                .build();
+    }
+
+    // User 엔티티로 변환할 때 사용
+    public User toEntity(String nickname) {
         return User.builder()
-                .loginType(LoginType.valueOf(loginType))
-                .email(oauth2UserEmail)
-                .birth(birth)
-                .gender(gender)
-                .country(country)
+                .email(email)
+                .loginType(LoginType.valueOf(loginType.toUpperCase()))
+                .nickname(nickname)
                 .build();
     }
 }
