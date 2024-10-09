@@ -5,6 +5,7 @@ import com.mmc.bookduck.domain.book.dto.response.BookAdditionalListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.service.BookInfoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,27 +17,27 @@ public class BookInfoController {
 
     // 도서목록 GET(API)
     @GetMapping("/search")
-    public BookListResponseDto searchBookList(@RequestParam(name = "keyword") String keyword,
-                                              @RequestParam Long page,
-                                              @RequestParam Long size){
+    public ResponseEntity<BookListResponseDto> searchBookList(@RequestParam(name = "keyword") final String keyword,
+                                                             @RequestParam final Long page,
+                                                             @RequestParam final Long size){
 
-        return bookInfoService.searchBookList(keyword, page, size);
+        return ResponseEntity.ok(bookInfoService.searchBookList(keyword, page, size));
     }
 
     /*
     // 도서목록 GET (직접등록)
     @GetMapping("/search/custom")
-    public BookListResponseDto searchCustomBookList(@RequestParam(name = "keyword") String keyword,
-                                                    @RequestParam Long page,
-                                                    @RequestParam Long size){
+    public BookListResponseDto searchCustomBookList(@RequestParam(name = "keyword") final String keyword,
+                                                    @RequestParam final Long page,
+                                                    @RequestParam final Long size){
         return bookInfoService.searchCustomBookList(keyword, page, size);
     }
     */
 
     // API 도서 상세 정보 GET - 기본 정보
     @GetMapping("/external/{providerId}")
-    public ApiBookBasicResponseDto getApiBookBasic(@PathVariable(name = "providerId") String providerId){
-        return bookInfoService.getApiBookBasic(providerId);
+    public ResponseEntity<ApiBookBasicResponseDto> getApiBookBasic(@PathVariable(name = "providerId") final String providerId){
+        return ResponseEntity.ok(bookInfoService.getApiBookBasic(providerId));
     }
 
     /*
