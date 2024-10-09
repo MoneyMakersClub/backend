@@ -78,6 +78,8 @@ public enum ErrorCode {
     // 외부 API 사용 도중 에러
     REDIS_CONNECTION_ERROR(500, "서버에서 Redis 연결 중 문제가 발생했습니다."),
     EXTERNAL_API_ERROR(500, "외부 API 사용 중 문제가 발생했습니다."),
+    //JSON
+    JSON_PARSING_ERROR(500, "API JSON에서 정보를 파싱하는 중 문제가 발생했습니다."),
     // Oauth2, JWT
     ILLEGAL_REGISTRATION_ID(500, "잘못된 registrationId입니다."),
     DATABASE_ERROR(500, "데이터베이스 오류가 발생했습니다."),

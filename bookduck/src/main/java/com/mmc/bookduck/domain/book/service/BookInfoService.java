@@ -13,15 +13,12 @@ import com.mmc.bookduck.domain.book.repository.GenreRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
+import com.mmc.bookduck.global.google.GoogleBooksApiService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,24 +27,12 @@ import java.util.Optional;
 public class BookInfoService {
     private final BookInfoRepository bookInfoRepository;
     private final GenreRepository genreRepository;
-
-
-    RestTemplate restTemplate = new RestTemplate();
-
-    @Value("${google.books.api.key}")
-    private String apiKey;
+    private final GoogleBooksApiService googleBooksApiService;
 
 
     // api 도서 목록 조회
     public BookListResponseDto searchBookList(String keyword, Long page, Long size) {
-
-        // 페이지 1부터 시작한다고 가정
-        String url = "https://www.googleapis.com/books/v1/volumes?q="+keyword+"&startIndex="+(page-1)+"&maxResults="+size+"&key="+apiKey;
-
-        // API GET 요청
-        ResponseEntity<String> apiResponse = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
-
-        String responseBody = apiResponse.getBody();
+        String responseBody = googleBooksApiService.searchBookList(keyword, page, size);
         return parseBookInfo(responseBody);
     }
 
@@ -68,8 +53,6 @@ public class BookInfoService {
                 JsonNode info = itemNode.get("volumeInfo");
                 // title
                 String title = getTextNode(info, "title");
-                // subtitle
-                String subtitle = getTextNode(info, "subtitle");
                 // authors
                 JsonNode authorsNode = info.get("authors");
                 List<String> authors = new ArrayList<>();
@@ -81,12 +64,6 @@ public class BookInfoService {
                     // authors가 없으면, null로 설정
                     authors = null;
                 }
-                // publisher
-                String publisher = getTextNode(info, "publisher");
-                // publishedYear
-                String publishedDate = getTextNode(info, "publishedDate");
-                Long publishedYear = extractYear(publishedDate);
-
                 // image
                 String imgPath;
                 JsonNode imageLink = info.get("imageLinks");
@@ -97,12 +74,12 @@ public class BookInfoService {
                 } else {
                     imgPath = null;
                 }
-                bookList.add(new BookInfoUnitDto(title,subtitle, authors, publisher, publishedYear, imgPath, providerId));
+                bookList.add(new BookInfoUnitDto(title, authors, imgPath, providerId));
             }
             return new BookListResponseDto(bookList);
 
         }catch(Exception e){
-            throw new CustomException(ErrorCode.EXTERNAL_API_ERROR);
+            throw new CustomException(ErrorCode.JSON_PARSING_ERROR);
         }
     }
 
@@ -124,13 +101,7 @@ public class BookInfoService {
 
     //api 도서 기본 정보 조회
     public ApiBookBasicResponseDto getApiBookBasic(String providerId) {
-
-        // 페이지 1부터 시작한다고 가정
-        String url = "https://www.googleapis.com/books/v1/volumes/"+providerId+"?key="+apiKey;
-        // API GET 요청
-        ResponseEntity<String> apiResponse = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
-
-        String responseBody = apiResponse.getBody();
+        String responseBody = googleBooksApiService.searchOneBook(providerId);
         return parseBookDetail(responseBody);
     }
 
@@ -140,9 +111,15 @@ public class BookInfoService {
         try{
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(responseBody);
-
             JsonNode info = rootNode.get("volumeInfo");
 
+            // subtitle
+            String subtitle = getTextNode(info, "subtitle");
+            // publisher
+            String publisher = getTextNode(info, "publisher");
+            // publishedYear
+            String publishedDate = getTextNode(info, "publishedDate");
+            Long publishedYear = extractYear(publishedDate);
             // description
             String description = getTextNode(info, "description");
             // page
@@ -163,7 +140,7 @@ public class BookInfoService {
             return new ApiBookBasicResponseDto(description, page, cate, language);
 
         }catch(Exception e){
-            throw new CustomException(ErrorCode.EXTERNAL_API_ERROR);
+            throw new CustomException(ErrorCode.JSON_PARSING_ERROR);
         }
     }
 
@@ -175,24 +152,17 @@ public class BookInfoService {
         Genre genre = genreRepository.findById(1l)
                 .orElseThrow(()->new CustomException(ErrorCode.GENRE_NOT_FOUND));
 
-        String url = "https://www.googleapis.com/books/v1/volumes/"+dto.getProviderId()+"?key="+apiKey;
-        // API GET 요청
-        ResponseEntity<String> apiResponse = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
-
-        String responseBody = apiResponse.getBody();
-        ApiBookBasicResponseDto apiDto = parseBookDetail(responseBody);
-
         BookInfo bookInfo = BookInfo.builder()
                 .providerId(dto.getProviderId())
                 .title(dto.getTitle())
                 .author(saveAuthor)
                 .publisher(dto.getPublisher())
                 .publishDate(dto.getPublishDate())
-                .description(apiDto.getDescription())
-                .category(apiDto.getCategory().getFirst())
-                .pageCount(apiDto.getPageCount())
+                .description(dto.getDescription())
+                .category(dto.getCategory().getFirst())
+                .pageCount(dto.getPageCount())
                 .imgPath(dto.getImgPath())
-                .language(apiDto.getLanguage())
+                .language(dto.getLanguage())
                 .genre(genre)
                 .build();
 
