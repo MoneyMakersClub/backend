@@ -24,7 +24,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         // OAuth2 제공업체의 유저 정보 가져오기
         Map<String, Object> oAuth2UserAttributes = super.loadUser(userRequest).getAttributes();
