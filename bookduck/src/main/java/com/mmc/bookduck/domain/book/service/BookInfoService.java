@@ -142,7 +142,6 @@ public class BookInfoService {
         }
     }
 
-
     /*
     // 책 별 rating
     public Double getBookRating(BookInfo bookInfo){
@@ -216,6 +215,11 @@ public class BookInfoService {
                 .build();
 
         return bookInfoRepository.save(bookInfo);
+    }
+
+    @Transactional(readOnly = true)
+    public BookInfo findBookInfoByProviderId(String providerId) {
+        return bookInfoRepository.findByProviderId(providerId);
     }
 
     // bookInfo 삭제
