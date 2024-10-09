@@ -65,7 +65,7 @@ public class UserBookService {
     public String deleteUserBook(Long userBookId) {
 
         UserBook userBook = userBookRepository.findById(userBookId)
-                .orElseThrow(()-> new CustomException(ErrorCode.USER_BOOK_NOT_FOUND));
+                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
 
         //임시 User
         Long userId = findUser().getUserId();
@@ -90,7 +90,7 @@ public class UserBookService {
     @Transactional
     public UserBookResponseDto updateUserBookStatus(Long userBookId, String status) {
         UserBook userBook = userBookRepository.findById(userBookId)
-                .orElseThrow(()-> new CustomException(ErrorCode.USER_BOOK_NOT_FOUND));
+                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
 
         //임시 User
         Long userId = findUser().getUserId();
