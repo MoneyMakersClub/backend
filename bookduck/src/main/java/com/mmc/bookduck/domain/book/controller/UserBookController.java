@@ -6,6 +6,8 @@ import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,22 +19,25 @@ public class UserBookController {
 
     // 서재에 책 추가
     @PostMapping
-    public UserBookResponseDto addUserBook(@RequestBody UserBookRequestDto dto,
-                                           @RequestParam(name="status")String status){
-        return userBookService.addUserBook(dto, status);
+    public ResponseEntity<UserBookResponseDto> addUserBook(@RequestBody UserBookRequestDto dto,
+                                                           @RequestParam(name="status") final String status){
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userBookService.addUserBook(dto, status));
     }
 
     // 서재에서 책 삭제
     @DeleteMapping("/{userBookId}")
-    public String deleteUserBook(@PathVariable Long userBookId){
-        return userBookService.deleteUserBook(userBookId);
+    public ResponseEntity<String> deleteUserBook(@PathVariable final Long userBookId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.deleteUserBook(userBookId));
     }
 
     // 서재 책 상태 변경
     @PatchMapping("/{userBookId}")
-    public UserBookResponseDto updateUserBookStatus(@PathVariable Long userBookId,
-                                                    @RequestParam(name = "status")String status){
-        return userBookService.updateUserBookStatus(userBookId, status);
+    public ResponseEntity<UserBookResponseDto> updateUserBookStatus(@PathVariable final Long userBookId,
+                                                                    @RequestParam(name = "status") final String status){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.updateUserBookStatus(userBookId, status));
     }
 }
 
