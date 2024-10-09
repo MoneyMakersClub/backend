@@ -1,8 +1,7 @@
 package com.mmc.bookduck.global.security;
 
-import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
-import com.mmc.bookduck.global.exception.TokenException;
+import com.mmc.bookduck.global.exception.CustomTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -69,9 +68,9 @@ public class JwtUtil {
         try {
             Jwts.parserBuilder().setSigningKey(accessKey).build().parseClaimsJws(accessToken);
         } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e){
-            throw new CustomException(ErrorCode.INVALID_TOKEN);
+            throw new CustomTokenException(ErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
-            throw new CustomException(ErrorCode.EXPIRED_ACCESS_TOKEN);
+            throw new CustomTokenException(ErrorCode.EXPIRED_ACCESS_TOKEN);
         }
     }
 
@@ -80,9 +79,9 @@ public class JwtUtil {
         try{
             Jwts.parserBuilder().setSigningKey(refreshKey).build().parseClaimsJws(refreshToken);
         } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e){
-            throw new CustomException(ErrorCode.INVALID_TOKEN);
+            throw new CustomTokenException(ErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
-            throw new CustomException(ErrorCode.EXPIRED_REFRESH_TOKEN);
+            throw new CustomTokenException(ErrorCode.EXPIRED_REFRESH_TOKEN);
         }
     }
 
@@ -102,7 +101,7 @@ public class JwtUtil {
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         } catch (JwtException e) {
-            throw new TokenException(ErrorCode.INVALID_TOKEN);
+            throw new CustomTokenException(ErrorCode.INVALID_TOKEN);
         }
     }
 
@@ -114,7 +113,7 @@ public class JwtUtil {
         } catch (ExpiredJwtException e){
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            throw new CustomException(ErrorCode.INVALID_TOKEN);
+            throw new CustomTokenException(ErrorCode.INVALID_TOKEN);
         }
     }
 
