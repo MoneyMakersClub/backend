@@ -208,7 +208,7 @@ public class BookInfoService {
     @Transactional
     public void deleteBookInfo(Long bookInfoId) {
         BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
-                .orElseThrow(()-> new CustomException(ErrorCode.BOOK_INFO_NOT_FOUND));
+                .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
         bookInfoRepository.delete(bookInfo);
     }
 
