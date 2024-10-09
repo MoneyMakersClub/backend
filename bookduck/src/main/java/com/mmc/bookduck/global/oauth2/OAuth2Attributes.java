@@ -13,11 +13,13 @@ import java.util.Map;
 public class OAuth2Attributes {
     private LoginType loginType;
     private String email;
+    private boolean isFirstLogin;  // 첫 로그인 여부 필드 추가
 
     @Builder
-    private OAuth2Attributes(String loginType, String email) {
+    private OAuth2Attributes(String loginType, String email, boolean isFirstLogin) {
         this.loginType = LoginType.valueOf(loginType.toUpperCase());
         this.email = email;
+        this.isFirstLogin = isFirstLogin;  // 첫 로그인 여부 초기화
     }
 
     public static OAuth2Attributes of(String registrationId, Map<String, Object> attributes) {
@@ -28,10 +30,11 @@ public class OAuth2Attributes {
         };
     }
 
-    private  static OAuth2Attributes ofGoogle(String registrationId, Map<String, Object> attributes) {
+    private static OAuth2Attributes ofGoogle(String registrationId, Map<String, Object> attributes) {
         return OAuth2Attributes.builder()
                 .loginType(registrationId)
                 .email(String.valueOf(attributes.get("email")))
+                .isFirstLogin(false)  // 초기값은 false로 설정
                 .build();
     }
 
@@ -40,6 +43,7 @@ public class OAuth2Attributes {
         return OAuth2Attributes.builder()
                 .loginType(registrationId)
                 .email(String.valueOf(accountAttributes.get("email")))
+                .isFirstLogin(false)  // 초기값은 false로 설정
                 .build();
     }
 
@@ -50,5 +54,10 @@ public class OAuth2Attributes {
                 .loginType(loginType)
                 .nickname(nickname)
                 .build();
+    }
+
+    // 첫 로그인 여부를 설정하는 메서드
+    public void setFirstLogin(boolean isFirstLogin) {
+        this.isFirstLogin = isFirstLogin;
     }
 }
