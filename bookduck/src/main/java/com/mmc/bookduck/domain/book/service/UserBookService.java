@@ -19,6 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserBookService {
 
     private final BookInfoService bookInfoService;
@@ -37,29 +38,31 @@ public class UserBookService {
 
 
     // 서재에 책 추가
-    @Transactional
     public UserBookResponseDto addUserBook(UserBookRequestDto dto, String status) {
 
         BookInfo bookInfo = bookInfoService.findBookInfoByProviderId(dto.getProviderId());
         if(bookInfo == null) {
-            // 없으면 먼저 bookInfo 저장
+            // bookInfo 없으면 먼저 bookInfo 저장
             bookInfo = bookInfoService.saveApiBookInfo(dto);
+
+            UserBook newUserBook = dto.toEntity(findUser(),bookInfo, ReadStatus.valueOf(status));
+            UserBook savedUserBook = userBookRepository.save(newUserBook);
+            return UserBookResponseDto.from(savedUserBook);
         }
-
-        UserBook userBook = UserBook.builder()
-                .user(findUser())
-                .readStatus(ReadStatus.valueOf(status))
-                .bookInfo(bookInfo)
-                .build();
-
-        UserBook savedUserBook = userBookRepository.save(userBook);
-
-        return new UserBookResponseDto(savedUserBook.getUserBookId(), savedUserBook.getBookInfo().getTitle(), savedUserBook.getBookInfo().getAuthor(),
-                savedUserBook.getBookInfo().getImgPath(), savedUserBook.getReadStatus(), savedUserBook.getBookInfo().getBookInfoId());
+        else{
+            UserBook userBook = userBookRepository.findByUserAndBookInfo(findUser(),bookInfo);
+            if(userBook == null){ // bookInfo는 있는데 userBook 아닌 경우
+                UserBook newUserBook = dto.toEntity(findUser(),bookInfo, ReadStatus.valueOf(status));
+                UserBook savedUserBook = userBookRepository.save(newUserBook);
+                return UserBookResponseDto.from(savedUserBook);
+            }
+            else{ // 이미 userBook에 있는 경우
+                throw new CustomException(ErrorCode.USERBOOK_ALREADY_EXISTS);
+            }
+        }
     }
 
     // 서재에서 책 삭제
-    @Transactional
     public String deleteUserBook(Long userBookId) {
 
         UserBook userBook = userBookRepository.findById(userBookId)
@@ -85,7 +88,6 @@ public class UserBookService {
     }
 
     // 서재 책 상태 변경
-    @Transactional
     public UserBookResponseDto updateUserBookStatus(Long userBookId, String status) {
         UserBook userBook = userBookRepository.findById(userBookId)
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
@@ -94,11 +96,10 @@ public class UserBookService {
         Long userId = findUser().getUserId();
 
         // 권한체크
-        if(userBook.getUser().getUserId() == userId){
+        if(userBook.getUser().getUserId().equals(userId)){
             userBook.changeReadStatus(ReadStatus.valueOf(status));
 
-            return new UserBookResponseDto(userBook.getUserBookId(), userBook.getBookInfo().getTitle(), userBook.getBookInfo().getAuthor(),
-                    userBook.getBookInfo().getImgPath(),userBook.getReadStatus(), userBook.getBookInfo().getBookInfoId());
+            return UserBookResponseDto.from(userBook);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }

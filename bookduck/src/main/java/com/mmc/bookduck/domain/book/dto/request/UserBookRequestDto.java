@@ -1,8 +1,13 @@
 package com.mmc.bookduck.domain.book.dto.request;
 
+import com.mmc.bookduck.domain.book.entity.BookInfo;
+import com.mmc.bookduck.domain.book.entity.ReadStatus;
+import com.mmc.bookduck.domain.book.entity.UserBook;
+import com.mmc.bookduck.domain.user.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Locked.Read;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -33,5 +38,13 @@ public class UserBookRequestDto {
 
     @NotBlank
     private String providerId;
+
+    public UserBook toEntity(User user, BookInfo bookInfo, ReadStatus readStatus) {
+        return UserBook.builder()
+                .readStatus(readStatus)
+                .user(user)
+                .bookInfo(bookInfo)
+                .build();
+    }
 }
 

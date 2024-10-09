@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.book.dto.response;
 
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
+import com.mmc.bookduck.domain.book.entity.UserBook;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,5 +28,16 @@ public class UserBookResponseDto {
         this.imgPath = imgPath;
         this.readStatus = readStatus;
         this.bookInfoId = bookInfoId;
+    }
+
+    public static UserBookResponseDto from(UserBook userBook) {
+        return UserBookResponseDto.builder()
+                .userBookId(userBook.getUserBookId())
+                .title(userBook.getBookInfo().getTitle())
+                .author(userBook.getBookInfo().getAuthor())
+                .imgPath(userBook.getBookInfo().getImgPath())
+                .readStatus(userBook.getReadStatus())
+                .bookInfoId(userBook.getBookInfo().getBookInfoId())
+                .build();
     }
 }

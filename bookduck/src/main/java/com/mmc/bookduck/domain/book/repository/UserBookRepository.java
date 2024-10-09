@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.book.repository;
 
+import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -18,5 +19,7 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
     // userbook 테이블과 bookinfo 테이블 조인해서 userbook의 user에 해당하는 bookinfo 정보 검색
     @Query("SELECT ub FROM UserBook ub JOIN ub.bookInfo b WHERE ub.user = :userId AND (" +
             "b.title LIKE %:keyword% OR b.author LIKE %:keyword% OR b.description LIKE %:keyword%)")
-    List<UserBook> searchByUserIdAndKeyword(@Param("user") User user, @Param("keyword") String keyword);
+    List<UserBook> searchByUserIdAndKeyword(@Param("userId") User user, @Param("keyword") String keyword);
+
+    UserBook findByUserAndBookInfo(User user, BookInfo bookInfo);
 }
