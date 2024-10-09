@@ -10,10 +10,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-public record OAuth2UserDetails (
+public record OAuth2UserDetails(
         Map<String, Object> attributes,
         String attributeKey,
-        String email) implements OAuth2User, UserDetails {
+        String email,
+        boolean isFirstLogin // 첫 로그인 여부 추가
+) implements OAuth2User, UserDetails {
 
     @Override
     public String getName() {

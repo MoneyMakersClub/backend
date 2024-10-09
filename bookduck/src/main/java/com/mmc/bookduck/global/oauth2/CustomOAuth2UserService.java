@@ -43,7 +43,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User user = getOrSave(oAuth2Attributes);
 
         // OAuth2UserDetails 반환
-        return new OAuth2UserDetails(oAuth2UserAttributes, userNameAttributeName, user.getEmail());
+        return new OAuth2UserDetails(oAuth2UserAttributes, userNameAttributeName, user.getEmail(), oAuth2Attributes.isFirstLogin());
     }
 
     @Transactional
@@ -57,10 +57,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             if (!user.getLoginType().equals(oAuth2Attributes.getLoginType())) {
                 throw new CustomOAuth2AuthenticationException(ErrorCode.EMAIL_ALREADY_REGISTERED);
             }
-            return user; // TODO: 수정시각을 업데이트해야 하는지?
+            // 첫 로그인이 아님을 설정
+            oAuth2Attributes.setFirstLogin(false);
+            return user;
         } else {
             // 존재하지 않을 경우 새로운 유저 엔티티 생성. 랜덤 닉네임을 중복되지 않게 생성
             String nickname = generateUniqueNickname();
+            // 첫 로그인임을 설정
+            oAuth2Attributes.setFirstLogin(true);
             return userRepository.save(oAuth2Attributes.toEntity(nickname));
         }
     }
