@@ -18,6 +18,9 @@ public class User extends BaseTimeEntity {
     @NotNull
     private String email;
 
+    @NotNull
+    private LoginType loginType;
+
     @Column(unique = true)
     @NotNull
     private String nickname;
@@ -30,9 +33,6 @@ public class User extends BaseTimeEntity {
     @NotNull
     private UserStatus userStatus;
 
-    @NotNull
-    private LoginType loginType;
-
     private String birth;
 
     private String gender;
@@ -40,17 +40,13 @@ public class User extends BaseTimeEntity {
     private String country;
 
     @Builder
-    public User(Long userId, String email, String nickname, Role role,
-                LoginType loginType, String birth, String gender, String country) {
+    public User(Long userId, String email, LoginType loginType, String nickname) {
         this.userId = userId;
         this.email = email;
-        this.nickname = nickname;
-        this.role = role != null ? role : Role.ROLE_USER;
-        this.userStatus = UserStatus.ACTIVE;
         this.loginType = loginType;
-        this.birth = birth;
-        this.gender = gender;
-        this.country = country;
+        this.nickname = nickname;
+        this.role = Role.ROLE_USER;
+        this.userStatus = UserStatus.ACTIVE;
     }
 
     // 닉네임 변경
