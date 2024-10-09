@@ -4,9 +4,7 @@ package com.mmc.bookduck.global.config;
 import com.mmc.bookduck.global.oauth2.OAuth2FailureHandler;
 import com.mmc.bookduck.global.oauth2.OAuth2SuccessHandler;
 import com.mmc.bookduck.global.oauth2.CustomOAuth2UserService;
-import com.mmc.bookduck.global.security.CustomAccessDeniedHandler;
-import com.mmc.bookduck.global.security.CustomAuthenticationEntryPoint;
-import com.mmc.bookduck.global.security.CustomLogoutHandler;
+import com.mmc.bookduck.global.security.*;
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -24,6 +22,7 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -38,6 +37,7 @@ public class SecurityConfig {
     private final CustomOAuth2UserService oAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
+    private final JwtUtil jwtUtil;
 
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
@@ -90,9 +90,8 @@ public class SecurityConfig {
                 // 요청 권한 설정 TODO: 수정할 것
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(AUTH_WHITELIST).permitAll()
-                        .requestMatchers("/oauth2/**").authenticated()
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 // X-Frame-Options: SAME ORIGIN으로 설정
                 .headers(header -> header
@@ -115,6 +114,8 @@ public class SecurityConfig {
                         .addLogoutHandler(customLogoutHandler) // 로그아웃 시 수행할 추가 동작
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)) // 상태코드 200 반환 위함
                 )
+                .addFilterBefore(new JwtFilter(jwtUtil), LogoutFilter.class)
+
         ;
         return http.build();
     }

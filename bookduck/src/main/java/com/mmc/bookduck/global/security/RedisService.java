@@ -28,7 +28,8 @@ public class RedisService {
         return redisTemplate.opsForValue().get(key);
     }
 
-    public void deleteValues(String key){
+    // email로 리프레시 토큰을 삭제
+    public void deleteValues(String key) {
         redisTemplate.delete(key);
     }
 }

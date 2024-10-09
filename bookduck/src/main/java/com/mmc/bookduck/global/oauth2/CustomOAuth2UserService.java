@@ -2,7 +2,6 @@ package com.mmc.bookduck.global.oauth2;
 
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
-import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.CustomOAuth2AuthenticationException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         // OAuth2 제공업체의 유저 정보 가져오기
         Map<String, Object> oAuth2UserAttributes = super.loadUser(userRequest).getAttributes();
@@ -44,11 +43,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User user = getOrSave(oAuth2Attributes);
 
         // OAuth2UserDetails 반환
-        log.info("CustomOAuth2UserService - loadUser() : OAuth2UserDetails로 반환합니다.");
-        return new OAuth2UserDetails(oAuth2UserAttributes, userNameAttributeName, oAuth2Attributes.getEmail());
+        return new OAuth2UserDetails(oAuth2UserAttributes, userNameAttributeName, user.getEmail());
     }
 
-    private User getOrSave(OAuth2Attributes oAuth2Attributes) {
+    @Transactional
+    public User getOrSave(OAuth2Attributes oAuth2Attributes) {
         String email = oAuth2Attributes.getEmail();
         User user = userRepository.findByEmail(email).orElse(null);
 
@@ -61,12 +60,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             return user; // TODO: 수정시각을 업데이트해야 하는지?
         } else {
             // 존재하지 않을 경우 새로운 유저 엔티티 생성. 랜덤 닉네임을 중복되지 않게 생성
-            String nickname;
-            do {
-                nickname = "북덕" + UUID.randomUUID().toString().substring(0, 6); // 랜덤으로 생성된 6자리 UUID 사용
-            } while (userRepository.existsByNickname(nickname)); // 중복 검사
-
+            String nickname = generateUniqueNickname();
             return userRepository.save(oAuth2Attributes.toEntity(nickname));
         }
+    }
+
+    private String generateUniqueNickname() {
+        String nickname;
+        do {
+            nickname = "북덕" + UUID.randomUUID().toString().substring(0, 6); // 랜덤으로 생성된 6자리 UUID 사용
+        } while (userRepository.existsByNickname(nickname)); // 중복 검사
+        return nickname;
     }
 }

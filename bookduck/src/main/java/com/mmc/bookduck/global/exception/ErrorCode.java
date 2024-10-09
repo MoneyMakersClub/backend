@@ -20,7 +20,6 @@ public enum ErrorCode {
     MISSING_PARAMETER(400, "필수 파라미터가 누락되었습니다."),
     // enum 값이 잘못됨
     INVALID_ENUM_VALUE(400, "enum 값이 잘못되었습니다."),
-    EMAIL_ALREADY_REGISTERED(400, "해당 이메일을 사용하는 다른 소셜 로그인 방법으로 가입되어 있습니다."),
 
 
     // 401 Unauthorized
@@ -29,7 +28,7 @@ public enum ErrorCode {
     // 권한이 없는 요청을 보냄
     UNAUTHORIZED_REQUEST(401,"권한이 없습니다."),
     // 소셜 로그인이 정상적으로 이루어지지 않음
-    LOGIN_FAILED(401, "로그인에 실패했습니다."),
+    OAUTH2_LOGIN_FAILED(401, "소셜 로그인에 실패했습니다."),
     // 유효하지 않은 토큰
     INVALID_TOKEN(401, "유효하지 않은 토큰입니다."),
     // 만료된 토큰
@@ -40,7 +39,6 @@ public enum ErrorCode {
     // 쿠키에 리프레시 토큰이 들어있지 않은 경우
     NO_COOKIE(401, "쿠키에 값이 존재하지 않습니다."),
 
-
     // 404 Not Found
     // 각 리소스를 찾지 못함
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
@@ -49,7 +47,7 @@ public enum ErrorCode {
     // 409 Conflict
     // 중복 리소스 생성 시도
     FRIEND_ALREADY_EXISTS(409, "이미 친구를 맺었습니다."),
-
+    EMAIL_ALREADY_REGISTERED(400, "해당 이메일을 사용하는 다른 소셜 로그인 방법으로 가입되어 있습니다."),
 
     // 500 Internal Server Error
     // 외부 API 사용 도중 에러
