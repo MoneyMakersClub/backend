@@ -2,15 +2,20 @@ package com.mmc.bookduck.domain.book.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mmc.bookduck.domain.book.dto.common.BookInfoUnitDto;
+import com.mmc.bookduck.domain.book.dto.common.BookListInfoUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
-import com.mmc.bookduck.domain.book.dto.response.ApiBookBasicResponseDto;
+import com.mmc.bookduck.domain.book.dto.common.AdditionalBookInfoDto;
+import com.mmc.bookduck.domain.book.dto.response.BasicBookInfoResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.Genre;
+import com.mmc.bookduck.domain.book.entity.ReadStatus;
+import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.BookInfoRepository;
 import com.mmc.bookduck.domain.book.repository.GenreRepository;
+import com.mmc.bookduck.domain.book.repository.UserBookRepository;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.repository.UserRepository;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.google.GoogleBooksApiService;
@@ -20,12 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class BookInfoService {
     private final BookInfoRepository bookInfoRepository;
+    private final UserBookRepository userBookRepository;
     private final GenreRepository genreRepository;
     private final GoogleBooksApiService googleBooksApiService;
 
@@ -44,7 +49,7 @@ public class BookInfoService {
             JsonNode rootNode = objectMapper.readTree(apiResult);
             JsonNode itemsNode = rootNode.path("items");
 
-            List<BookInfoUnitDto> bookList = new ArrayList<>();
+            List<BookListInfoUnitDto> bookList = new ArrayList<>();
 
             for(JsonNode itemNode : itemsNode) {
                 // providerId
@@ -74,7 +79,7 @@ public class BookInfoService {
                 } else {
                     imgPath = null;
                 }
-                bookList.add(new BookInfoUnitDto(title, authors, imgPath, providerId));
+                bookList.add(new BookListInfoUnitDto(title, authors, imgPath, providerId));
             }
             return new BookListResponseDto(bookList);
 
@@ -99,14 +104,58 @@ public class BookInfoService {
         return null; // 필드가 없을 경우 null
     }
 
+
+    // 임시 User
+    private final UserRepository userRepository;
+
+    public User findUser(){
+        User user = userRepository.findById(1L)
+                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
+        return user;
+    }
+    //
+
+
     //api 도서 기본 정보 조회
-    public ApiBookBasicResponseDto getApiBookBasic(String providerId) {
+    public BasicBookInfoResponseDto getOneBookBasic(String providerId, String title, List<String> authors, String imgPath) {
         String responseBody = googleBooksApiService.searchOneBook(providerId);
-        return parseBookDetail(responseBody);
+        AdditionalBookInfoDto additional = parseBookDetail(responseBody);
+
+        Double ratingAverage;
+        ReadStatus readStatus;
+        String myOneLine;
+        Double myRating;
+
+        BookInfo bookInfo = bookInfoRepository.findByProviderId(providerId);
+        if(bookInfo == null){
+            return new BasicBookInfoResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
+        }
+        else{
+            // ratingAverage = getBookRating(bookInfo); -> 별점, 한줄평 응답 추후 수정
+            UserBook userBook = userBookRepository.findByUserAndBookInfo(findUser(), bookInfo);
+            if(userBook == null){
+                return new BasicBookInfoResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
+            }else{
+                // 별점 한줄평 개발 후 추후 수정
+                return new BasicBookInfoResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
+            }
+        }
     }
 
+
+    /*
+    // 책 별 rating
+    public Double getBookRating(BookInfo bookInfo){
+        List<UserBook> books = userBookRepository.findByBookInfo(bookInfo);
+        for(UserBook userBook : books){
+            if()
+        }
+    }
+    */
+
+
     // 기본 정보 파싱
-    private ApiBookBasicResponseDto parseBookDetail(String responseBody) {
+    private AdditionalBookInfoDto parseBookDetail(String responseBody) {
 
         try{
             ObjectMapper objectMapper = new ObjectMapper();
@@ -137,7 +186,7 @@ public class BookInfoService {
                 cate = null;
             }
             String language = getTextNode(info, "language");
-            return new ApiBookBasicResponseDto(description, page, cate, language);
+            return new AdditionalBookInfoDto(subtitle, publisher, publishedDate, description, page, cate, language);
 
         }catch(Exception e){
             throw new CustomException(ErrorCode.JSON_PARSING_ERROR);
@@ -167,11 +216,6 @@ public class BookInfoService {
                 .build();
 
         return bookInfoRepository.save(bookInfo);
-    }
-
-    @Transactional(readOnly = true)
-    public BookInfo findBookInfoByProviderId(String providerId) {
-        return bookInfoRepository.findByProviderId(providerId);
     }
 
     // bookInfo 삭제

@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BookAdditionalUnitDto {
+public class BookRatingUnitDto {
     private String nickname;
     private double rating;
     private String oneLine;
 
     @Builder
-    public BookAdditionalUnitDto(String nickname, double rating, String oneLine){
+    public BookRatingUnitDto(String nickname, double rating, String oneLine){
         this.nickname = nickname;
         this.rating = rating;
         this.oneLine = oneLine;

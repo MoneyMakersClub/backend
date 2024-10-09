@@ -1,6 +1,6 @@
 package com.mmc.bookduck.domain.book.dto.response;
 
-import com.mmc.bookduck.domain.book.dto.common.BookInfoUnitDto;
+import com.mmc.bookduck.domain.book.dto.common.BookListInfoUnitDto;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,10 +12,10 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BookListResponseDto {
     private int bookCount;
-    private List<BookInfoUnitDto> bookList;
+    private List<BookListInfoUnitDto> bookList;
 
     @Builder
-    public BookListResponseDto(List<BookInfoUnitDto> bookList){
+    public BookListResponseDto(List<BookListInfoUnitDto> bookList){
         this.bookList = bookList;
         this.bookCount = (bookList != null) ? bookList.size() : 0;
     }

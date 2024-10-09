@@ -10,30 +10,20 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BookInfoUnitDto {
+public class BookListInfoUnitDto {
     @NotNull
     private String title;
 
-    private String subtitle;
-
     private List<String> author;
-
-    private String publisher;
-
-    private Long publishedYear;
 
     private String imgPath;
 
     private String providerId;
 
     @Builder
-    public BookInfoUnitDto(String title, String subtitle, List<String> author, String publisher,
-                           Long publishedYear, String imgPath, String providerId) {
+    public BookListInfoUnitDto(String title, List<String> author, String imgPath, String providerId) {
         this.title = title;
-        this.subtitle = subtitle;
         this.author = author;
-        this.publisher = publisher;
-        this.publishedYear = publishedYear;
         this.imgPath = imgPath;
         this.providerId = providerId;
     }
