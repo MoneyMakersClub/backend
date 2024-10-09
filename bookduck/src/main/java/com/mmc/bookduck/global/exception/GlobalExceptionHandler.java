@@ -28,6 +28,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OAuth2AuthenticationException.class)
     public ResponseEntity<ErrorDto> handleOAuth2AuthenticationException(OAuth2AuthenticationException e, HttpServletRequest request) {
         ErrorCode errorCode = ErrorCode.OAUTH2_LOGIN_FAILED;
+
         ErrorDto errorDto = new ErrorDto(
                 LocalDateTime.now().toString(),
                 errorCode.getStatus(),
