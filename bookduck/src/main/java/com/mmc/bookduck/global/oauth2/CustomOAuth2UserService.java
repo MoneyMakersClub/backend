@@ -54,7 +54,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // 해당 이메일로 가입한 유저가 존재하는지 확인
         if (user != null) {
             // 이미 존재하는 유저의 로그인 유형과 현재 로그인 유형이 다르면 에러 발생
-            if (!user.getLoginType().name().equals(oAuth2Attributes.getLoginType())) {
+            if (!user.getLoginType().equals(oAuth2Attributes.getLoginType())) {
                 throw new CustomOAuth2AuthenticationException(ErrorCode.EMAIL_ALREADY_REGISTERED);
             }
             return user; // TODO: 수정시각을 업데이트해야 하는지?

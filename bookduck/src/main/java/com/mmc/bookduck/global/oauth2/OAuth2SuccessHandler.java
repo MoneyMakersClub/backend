@@ -29,6 +29,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             String accessToken = jwtUtil.generateAccessToken(authentication);
              // 새로운 리프레시 토큰 발급
             String refreshToken = jwtUtil.generateRefreshToken(authentication);
+            log.info("토큰들 발급 완료");
 
             // 리프레시 토큰을 HttpOnly 쿠키에 저장
             cookieUtil.addCookie(response, "refreshToken", refreshToken, jwtUtil.getRefreshTokenMaxAge());

@@ -11,12 +11,12 @@ import java.util.Map;
 
 @Getter
 public class OAuth2Attributes {
-    private String loginType;
+    private LoginType loginType;
     private String email;
 
     @Builder
     private OAuth2Attributes(String loginType, String email) {
-        this.loginType = loginType;
+        this.loginType = LoginType.valueOf(loginType.toUpperCase());
         this.email = email;
     }
 
@@ -47,7 +47,7 @@ public class OAuth2Attributes {
     public User toEntity(String nickname) {
         return User.builder()
                 .email(email)
-                .loginType(LoginType.valueOf(loginType.toUpperCase()))
+                .loginType(loginType)
                 .nickname(nickname)
                 .build();
     }

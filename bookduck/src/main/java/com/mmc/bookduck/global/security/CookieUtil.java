@@ -6,8 +6,10 @@ import com.mmc.bookduck.global.exception.ErrorCode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class CookieUtil {
 
@@ -25,7 +27,6 @@ public class CookieUtil {
     }
 
     public void addCookie(HttpServletResponse response, String name, String value, int maxAge){
-
         StringBuilder cookieHeader = new StringBuilder();
         cookieHeader.append(name).append("=").append(value).append(";");
         cookieHeader.append("Max-Age=").append(maxAge).append(";");
@@ -36,7 +37,6 @@ public class CookieUtil {
         cookieHeader.append("SameSite=None;");
 
         response.addHeader("Set-Cookie", cookieHeader.toString());
-
     }
 
     public void deleteCookie(HttpServletResponse response, String name){
