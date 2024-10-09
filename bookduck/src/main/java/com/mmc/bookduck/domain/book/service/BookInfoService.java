@@ -28,6 +28,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookInfoService {
     private final BookInfoRepository bookInfoRepository;
     private final UserBookRepository userBookRepository;
@@ -193,27 +194,13 @@ public class BookInfoService {
     }
 
     // api bookInfo 저장
-    @Transactional
     public BookInfo saveApiBookInfo (UserBookRequestDto dto) {
 
         String saveAuthor = dto.getAuthors().getFirst();
         Genre genre = genreRepository.findById(1l)
                 .orElseThrow(()->new CustomException(ErrorCode.GENRE_NOT_FOUND));
 
-        BookInfo bookInfo = BookInfo.builder()
-                .providerId(dto.getProviderId())
-                .title(dto.getTitle())
-                .author(saveAuthor)
-                .publisher(dto.getPublisher())
-                .publishDate(dto.getPublishDate())
-                .description(dto.getDescription())
-                .category(dto.getCategory().getFirst())
-                .pageCount(dto.getPageCount())
-                .imgPath(dto.getImgPath())
-                .language(dto.getLanguage())
-                .genre(genre)
-                .build();
-
+        BookInfo bookInfo = dto.toEntity(saveAuthor,genre);
         return bookInfoRepository.save(bookInfo);
     }
 
@@ -223,7 +210,6 @@ public class BookInfoService {
     }
 
     // bookInfo 삭제
-    @Transactional
     public void deleteBookInfo(Long bookInfoId) {
         BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
                 .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
