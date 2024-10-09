@@ -34,6 +34,9 @@ public enum ErrorCode {
     // 404 Not Found
     // 각 리소스를 찾지 못함
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
+    USER_BOOK_NOT_FOUND(404, "서재 책을 찾을 수 없습니다."),
+    BOOK_INFO_NOT_FOUND(404, "책 정보를 찾을 수 없습니다."),
+    GENRE_NOT_FOUND(404, "장르를 찾을 수 없습니다."),
 
 
     // 409 Conflict

@@ -13,12 +13,14 @@ public class ApiBookBasicResponseDto {
     private String description;
     private Long pageCount;
     private List<String> category;
+    private String language;
 
     @Builder
-    public ApiBookBasicResponseDto(String description, Long pageCount, List<String> category){
+    public ApiBookBasicResponseDto(String description, Long pageCount, List<String> category, String language){
         this.description = description;
         this.pageCount = pageCount;
         this.category = category;
+        this.language = language;
     }
 
 }
