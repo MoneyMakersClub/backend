@@ -10,11 +10,11 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class UserSettings {
+public class UserSetting {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
-    private Long userSettingsId;
+    private Long userSettingId;
 
     @ColumnDefault("true")
     private boolean isPushAlarmEnabled;
@@ -33,7 +33,7 @@ public class UserSettings {
     private User user;
 
     @Builder
-    public UserSettings(User user) {
+    public UserSetting(User user) {
         this.user = user;
         this.isPushAlarmEnabled = true;
         this.isFriendRequestEnabled = true;
