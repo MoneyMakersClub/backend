@@ -10,6 +10,7 @@ import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,35 +39,38 @@ public class UserBookService {
 
 
     // 서재에 책 추가
-    public UserBookResponseDto addUserBook(UserBookRequestDto dto, String status) {
+    public UserBookResponseDto addUserBook(UserBookRequestDto dto) {
+        try {
+            ReadStatus.valueOf(dto.getReadStatus());
+        } catch (IllegalArgumentException e) {
+            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
+        }
 
-        BookInfo bookInfo = bookInfoService.findBookInfoByProviderId(dto.getProviderId());
-        if(bookInfo == null) {
-            // bookInfo 없으면 먼저 bookInfo 저장
-            bookInfo = bookInfoService.saveApiBookInfo(dto);
+        Optional<BookInfo> bookInfo = bookInfoService.findBookInfoByProviderId(dto.getProviderId());
 
-            UserBook newUserBook = dto.toEntity(findUser(),bookInfo, ReadStatus.valueOf(status));
+        if(bookInfo.isPresent()){
+            Optional<UserBook> userBook = userBookRepository.findByUserAndBookInfo(findUser(), bookInfo.get());
+
+            if(userBook.isPresent()){
+                throw new CustomException(ErrorCode.USERBOOK_ALREADY_EXISTS);
+            }
+            UserBook newUserBook = dto.toEntity(findUser(), bookInfo.get(), ReadStatus.valueOf(dto.getReadStatus()));
             UserBook savedUserBook = userBookRepository.save(newUserBook);
             return UserBookResponseDto.from(savedUserBook);
         }
         else{
-            UserBook userBook = userBookRepository.findByUserAndBookInfo(findUser(),bookInfo);
-            if(userBook == null){ // bookInfo는 있는데 userBook 아닌 경우
-                UserBook newUserBook = dto.toEntity(findUser(),bookInfo, ReadStatus.valueOf(status));
-                UserBook savedUserBook = userBookRepository.save(newUserBook);
-                return UserBookResponseDto.from(savedUserBook);
-            }
-            else{ // 이미 userBook에 있는 경우
-                throw new CustomException(ErrorCode.USERBOOK_ALREADY_EXISTS);
-            }
+            // bookInfo 없으면 먼저 bookInfo 저장
+            BookInfo newBookInfo = bookInfoService.saveApiBookInfo(dto);
+
+            UserBook newUserBook = dto.toEntity(findUser(),newBookInfo, ReadStatus.valueOf(dto.getReadStatus()));
+            UserBook savedUserBook = userBookRepository.save(newUserBook);
+            return UserBookResponseDto.from(savedUserBook);
         }
     }
 
     // 서재에서 책 삭제
     public String deleteUserBook(Long userBookId) {
-
-        UserBook userBook = userBookRepository.findById(userBookId)
-                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
+        UserBook userBook = findUserById(userBookId);
 
         //임시 User
         Long userId = findUser().getUserId();
@@ -89,8 +93,13 @@ public class UserBookService {
 
     // 서재 책 상태 변경
     public UserBookResponseDto updateUserBookStatus(Long userBookId, String status) {
-        UserBook userBook = userBookRepository.findById(userBookId)
-                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
+        try {
+            ReadStatus.valueOf(status);
+        } catch (IllegalArgumentException e) {
+            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
+        }
+
+        UserBook userBook = findUserById(userBookId);
 
         //임시 User
         Long userId = findUser().getUserId();
@@ -103,6 +112,12 @@ public class UserBookService {
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
+    }
+
+    public UserBook findUserById(Long userBookId){
+        UserBook userBook = userBookRepository.findById(userBookId)
+                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
+        return userBook;
     }
 }
 

@@ -22,6 +22,9 @@ public class UserBookRequestDto {
     @NotBlank
     private List<String> authors;
 
+    @NotBlank
+    private String readStatus;
+
     private String publisher; // null 가능
 
     private String publishDate; // null 가능, 연도만 제공될 수 있음

@@ -21,5 +21,5 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
             "b.title LIKE %:keyword% OR b.author LIKE %:keyword% OR b.description LIKE %:keyword%)")
     List<UserBook> searchByUserIdAndKeyword(@Param("userId") User user, @Param("keyword") String keyword);
 
-    UserBook findByUserAndBookInfo(User user, BookInfo bookInfo);
+    Optional<UserBook> findByUserAndBookInfo(User user, BookInfo bookInfo);
 }

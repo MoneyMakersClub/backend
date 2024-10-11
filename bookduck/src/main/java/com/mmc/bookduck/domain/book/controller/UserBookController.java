@@ -17,12 +17,10 @@ public class UserBookController {
 
     private final UserBookService userBookService;
 
-    // 서재에 책 추가
     @PostMapping
-    public ResponseEntity<UserBookResponseDto> addUserBook(@RequestBody UserBookRequestDto dto,
-                                                           @RequestParam(name="status") final String status){
+    public ResponseEntity<UserBookResponseDto> addUserBook(@RequestBody UserBookRequestDto dto){
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userBookService.addUserBook(dto, status));
+                .body(userBookService.addUserBook(dto));
     }
 
     // 서재에서 책 삭제
