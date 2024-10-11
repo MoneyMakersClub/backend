@@ -1,4 +1,5 @@
 package com.mmc.bookduck.domain.book.dto.request;
+
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.Genre;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
@@ -7,6 +8,8 @@ import com.mmc.bookduck.domain.user.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Locked.Read;
+
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -21,12 +24,22 @@ public class UserBookRequestDto {
     @NotBlank
     private List<String> authors;
 
+
+    @NotBlank
+    private String readStatus;
+
     private String publisher; // null 가능
+
     private String publishDate; // null 가능, 연도만 제공될 수 있음
+
     private String description;
+
     private List<String> category;
+
     private Long pageCount;
+
     private String imgPath;
+
     private String language;
 
     @NotBlank
@@ -39,6 +52,7 @@ public class UserBookRequestDto {
                 .bookInfo(bookInfo)
                 .build();
     }
+
 
     public BookInfo toEntity(String author, Genre genre){
         return BookInfo.builder()
