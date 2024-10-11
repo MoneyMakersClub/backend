@@ -1,16 +1,15 @@
 package com.mmc.bookduck.domain.book.controller;
 
-import com.mmc.bookduck.domain.book.dto.response.BooksInfoBasicResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.service.BookInfoService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/booksinfo")
+@RequestMapping("/bookinfo")
 public class BookInfoController {
 
     private final BookInfoService bookInfoService;
@@ -36,7 +35,7 @@ public class BookInfoController {
 
     // API 도서 상세 정보 GET - 기본 정보
     @GetMapping("/external/{providerId}")
-    public ResponseEntity<BooksInfoBasicResponseDto> getOneBookBasic(@PathVariable(name = "providerId") final String providerId){
+    public ResponseEntity<BookInfoBasicResponseDto> getOneBookBasic(@PathVariable(name = "providerId") final String providerId){
         return ResponseEntity.ok(bookInfoService.getOneBookBasic(providerId));
     }
 

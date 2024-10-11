@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AdditionalBookInfoDto {
+public class BookInfoDetailDto {
     private String publisher;
     private String publishedDate;
     private String description;
@@ -18,8 +18,8 @@ public class AdditionalBookInfoDto {
     private String language;
 
     @Builder
-    public AdditionalBookInfoDto(String publisher, String publishedDate,
-                                 String description, Long pageCount, List<String> category, String language){
+    public BookInfoDetailDto(String publisher, String publishedDate,
+                             String description, Long pageCount, List<String> category, String language){
         this.publishedDate = publishedDate;
         this.publisher = publisher;
         this.description = description;

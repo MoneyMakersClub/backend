@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
-import com.mmc.bookduck.domain.book.dto.common.AdditionalBookInfoDto;
-import com.mmc.bookduck.domain.book.dto.response.BooksInfoBasicResponseDto;
+import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
+import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.Genre;
@@ -109,9 +109,9 @@ public class BookInfoService {
 
 
     //api 도서 기본 정보 조회
-    public BooksInfoBasicResponseDto getOneBookBasic(String providerId) {
+    public BookInfoBasicResponseDto getOneBookBasic(String providerId) {
         String responseBody = googleBooksApiService.searchOneBook(providerId);
-        AdditionalBookInfoDto additional = parseBookDetail(responseBody);
+        BookInfoDetailDto additional = parseBookDetail(responseBody);
 
         Double ratingAverage;
         ReadStatus readStatus;
@@ -124,13 +124,13 @@ public class BookInfoService {
             Optional<UserBook> userBook = userBookRepository.findByUserAndBookInfo(findUser(), bookInfo.get());
             if(userBook.isPresent()){
                 // 별점 한줄평 개발 후 추후 수정
-                return new BooksInfoBasicResponseDto(null, null, null, null, additional);
+                return new BookInfoBasicResponseDto(null, null, null, null, additional);
             }else{
-                return new BooksInfoBasicResponseDto(null, null, null, null, additional);
+                return new BookInfoBasicResponseDto(null, null, null, null, additional);
             }
         }
         else{
-            return new BooksInfoBasicResponseDto(null, null, null, null, additional);
+            return new BookInfoBasicResponseDto(null, null, null, null, additional);
         }
     }
 
@@ -146,7 +146,7 @@ public class BookInfoService {
 
 
     // 기본 정보 파싱
-    private AdditionalBookInfoDto parseBookDetail(String responseBody) {
+    private BookInfoDetailDto parseBookDetail(String responseBody) {
         try{
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(responseBody);
@@ -173,7 +173,7 @@ public class BookInfoService {
                 cate = null;
             }
             String language = getTextNode(info, "language");
-            return new AdditionalBookInfoDto(publisher, publishedDate, description, page, cate, language);
+            return new BookInfoDetailDto(publisher, publishedDate, description, page, cate, language);
 
         }catch(Exception e){
             throw new CustomException(ErrorCode.JSON_PARSING_ERROR);
