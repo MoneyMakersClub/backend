@@ -1,4 +1,4 @@
-package com.mmc.bookduck.domain.book.dto.common;
+package com.mmc.bookduck.domain.book.dto.response;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BookListInfoUnitDto {
+public class BookUnitResponseDto {
     @NotNull
     private String title;
 
@@ -21,7 +21,7 @@ public class BookListInfoUnitDto {
     private String providerId;
 
     @Builder
-    public BookListInfoUnitDto(String title, List<String> author, String imgPath, String providerId) {
+    public BookUnitResponseDto(String title, List<String> author, String imgPath, String providerId) {
         this.title = title;
         this.author = author;
         this.imgPath = imgPath;

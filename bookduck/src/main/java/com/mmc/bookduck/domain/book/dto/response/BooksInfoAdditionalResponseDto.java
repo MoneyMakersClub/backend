@@ -10,12 +10,12 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BookRatingListResponseDto {
+public class BooksInfoAdditionalResponseDto {
 
     List<BookRatingUnitDto> list;
 
     @Builder
-    public BookRatingListResponseDto(List<BookRatingUnitDto> list){
+    public BooksInfoAdditionalResponseDto(List<BookRatingUnitDto> list){
         this.list = list;
     }
 }

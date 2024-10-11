@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class GoogleBooksApiService {
 

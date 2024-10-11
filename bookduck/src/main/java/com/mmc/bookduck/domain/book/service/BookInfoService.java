@@ -2,10 +2,10 @@ package com.mmc.bookduck.domain.book.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mmc.bookduck.domain.book.dto.common.BookListInfoUnitDto;
+import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.common.AdditionalBookInfoDto;
-import com.mmc.bookduck.domain.book.dto.response.BasicBookInfoResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.BooksInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.Genre;
@@ -50,7 +50,7 @@ public class BookInfoService {
             JsonNode rootNode = objectMapper.readTree(apiResult);
             JsonNode itemsNode = rootNode.path("items");
 
-            List<BookListInfoUnitDto> bookList = new ArrayList<>();
+            List<BookUnitResponseDto> bookList = new ArrayList<>();
 
             for(JsonNode itemNode : itemsNode) {
                 // providerId
@@ -80,7 +80,7 @@ public class BookInfoService {
                 } else {
                     imgPath = null;
                 }
-                bookList.add(new BookListInfoUnitDto(title, authors, imgPath, providerId));
+                bookList.add(new BookUnitResponseDto(title, authors, imgPath, providerId));
             }
             return new BookListResponseDto(bookList);
 
@@ -118,7 +118,7 @@ public class BookInfoService {
 
 
     //api 도서 기본 정보 조회
-    public BasicBookInfoResponseDto getOneBookBasic(String providerId, String title, List<String> authors, String imgPath) {
+    public BooksInfoBasicResponseDto getOneBookBasic(String providerId, String title, List<String> authors, String imgPath) {
         String responseBody = googleBooksApiService.searchOneBook(providerId);
         AdditionalBookInfoDto additional = parseBookDetail(responseBody);
 
@@ -129,16 +129,16 @@ public class BookInfoService {
 
         BookInfo bookInfo = bookInfoRepository.findByProviderId(providerId);
         if(bookInfo == null){
-            return new BasicBookInfoResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
+            return new BooksInfoBasicResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
         }
         else{
             // ratingAverage = getBookRating(bookInfo); -> 별점, 한줄평 응답 추후 수정
             UserBook userBook = userBookRepository.findByUserAndBookInfo(findUser(), bookInfo);
             if(userBook == null){
-                return new BasicBookInfoResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
+                return new BooksInfoBasicResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
             }else{
                 // 별점 한줄평 개발 후 추후 수정
-                return new BasicBookInfoResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
+                return new BooksInfoBasicResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
             }
         }
     }
