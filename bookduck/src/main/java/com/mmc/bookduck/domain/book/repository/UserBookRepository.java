@@ -4,6 +4,10 @@ import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.entity.User;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserBookRepository extends JpaRepository<UserBook, Long> {
+
     Optional<UserBook> findUserBookByUserBookId(Long userBookId);
 
     List<UserBook> findByUserAndReadStatus(User user, ReadStatus readStatus);
@@ -22,4 +27,8 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
     List<UserBook> searchByUserIdAndKeyword(@Param("userId") User user, @Param("keyword") String keyword);
 
     Optional<UserBook> findByUserAndBookInfo(User user, BookInfo bookInfo);
+
+    List<UserBook> findByBookInfo(BookInfo bookInfo);
+
+
 }
