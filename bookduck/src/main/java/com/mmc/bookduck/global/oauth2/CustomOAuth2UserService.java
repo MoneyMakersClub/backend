@@ -76,13 +76,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             // 새로운 User 생성
             User newUser = oAuth2Attributes.toEntity(nickname);
 
+            // 새로운 User를 먼저 저장
+            newUser = userRepository.save(newUser);
+
             // 새로운 User의 UserSettings, UserHome, UserGrowth 생성
             UserSettings userSettings = UserSettings.builder().user(newUser).build();
             UserHome userHome = UserHome.builder().user(newUser).build();
             UserGrowth userGrowth = UserGrowth.builder().user(newUser).build();
 
             // 각 Repository에 저장
-            userRepository.save(oAuth2Attributes.toEntity(nickname));
             userSettingsRepository.save(userSettings);
             userHomeRepository.save(userHome);
             userGrowthRepository.save(userGrowth);
