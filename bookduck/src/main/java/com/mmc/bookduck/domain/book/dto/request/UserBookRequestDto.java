@@ -22,17 +22,11 @@ public class UserBookRequestDto {
     private List<String> authors;
 
     private String publisher; // null 가능
-
     private String publishDate; // null 가능, 연도만 제공될 수 있음
-
     private String description;
-
     private List<String> category;
-
     private Long pageCount;
-
     private String imgPath;
-
     private String language;
 
     @NotBlank

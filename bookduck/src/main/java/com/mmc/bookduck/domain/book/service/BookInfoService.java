@@ -89,22 +89,12 @@ public class BookInfoService {
         }
     }
 
-    private Long extractYear(String publishedDate) {
-        if (publishedDate == null || publishedDate.isEmpty()) {
-            return null;
-        }
-        else {
-            return Long.parseLong(publishedDate.substring(0, 4));  //네자리 연도로 추출
-        }
-    }
-
     private String getTextNode(JsonNode node, String fieldName) {
         if (node != null && node.has(fieldName)) {
             return node.get(fieldName).asText();
         }
         return null; // 필드가 없을 경우 null
     }
-
 
     // 임시 User
     private final UserRepository userRepository;
@@ -156,19 +146,15 @@ public class BookInfoService {
 
     // 기본 정보 파싱
     private AdditionalBookInfoDto parseBookDetail(String responseBody) {
-
         try{
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(responseBody);
             JsonNode info = rootNode.get("volumeInfo");
 
-            // subtitle
-            String subtitle = getTextNode(info, "subtitle");
             // publisher
             String publisher = getTextNode(info, "publisher");
-            // publishedYear
+            // publishedDate
             String publishedDate = getTextNode(info, "publishedDate");
-            Long publishedYear = extractYear(publishedDate);
             // description
             String description = getTextNode(info, "description");
             // page
@@ -186,7 +172,7 @@ public class BookInfoService {
                 cate = null;
             }
             String language = getTextNode(info, "language");
-            return new AdditionalBookInfoDto(subtitle, publisher, publishedDate, description, page, cate, language);
+            return new AdditionalBookInfoDto(publisher, publishedDate, description, page, cate, language);
 
         }catch(Exception e){
             throw new CustomException(ErrorCode.JSON_PARSING_ERROR);

@@ -10,7 +10,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AdditionalBookInfoDto {
-    private String subtitle;
     private String publisher;
     private String publishedDate;
     private String description;
@@ -19,15 +18,13 @@ public class AdditionalBookInfoDto {
     private String language;
 
     @Builder
-    public AdditionalBookInfoDto(String subtitle, String publisher, String publishedDate,
+    public AdditionalBookInfoDto(String publisher, String publishedDate,
                                  String description, Long pageCount, List<String> category, String language){
-        this.subtitle = subtitle;
-        this.publisher = publisher;
         this.publishedDate = publishedDate;
+        this.publisher = publisher;
         this.description = description;
         this.pageCount = pageCount;
         this.category = category;
         this.language = language;
     }
-
 }
