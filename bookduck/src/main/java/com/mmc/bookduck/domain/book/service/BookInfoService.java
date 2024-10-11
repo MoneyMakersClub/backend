@@ -19,6 +19,7 @@ import com.mmc.bookduck.domain.user.repository.UserRepository;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.google.GoogleBooksApiService;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -117,19 +118,19 @@ public class BookInfoService {
         String myOneLine;
         Double myRating;
 
-        BookInfo bookInfo = bookInfoRepository.findByProviderId(providerId);
-        if(bookInfo == null){
-            return new BooksInfoBasicResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
-        }
-        else{
+        Optional<BookInfo> bookInfo = bookInfoRepository.findByProviderId(providerId);
+        if(bookInfo.isPresent()){
             // ratingAverage = getBookRating(bookInfo); -> 별점, 한줄평 응답 추후 수정
-            UserBook userBook = userBookRepository.findByUserAndBookInfo(findUser(), bookInfo);
-            if(userBook == null){
-                return new BooksInfoBasicResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
-            }else{
+            Optional<UserBook> userBook = userBookRepository.findByUserAndBookInfo(findUser(), bookInfo.get());
+            if(userBook.isPresent()){
                 // 별점 한줄평 개발 후 추후 수정
                 return new BooksInfoBasicResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
+            }else{
+                return new BooksInfoBasicResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
             }
+        }
+        else{
+            return new BooksInfoBasicResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
         }
     }
 
@@ -191,7 +192,7 @@ public class BookInfoService {
     }
 
     @Transactional(readOnly = true)
-    public BookInfo findBookInfoByProviderId(String providerId) {
+    public Optional<BookInfo> findBookInfoByProviderId(String providerId) {
         return bookInfoRepository.findByProviderId(providerId);
     }
 
