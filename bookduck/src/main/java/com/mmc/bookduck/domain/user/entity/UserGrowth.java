@@ -36,7 +36,7 @@ public class UserGrowth {
     }
 
     // 레벨업
-    public void levelUp() {
+    public void incrementLevel() {
         this.level += 1;
     }
 }

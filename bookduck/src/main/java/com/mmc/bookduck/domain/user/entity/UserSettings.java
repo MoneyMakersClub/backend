@@ -22,6 +22,10 @@ public class UserSettings {
     @ColumnDefault("true")
     private boolean isFriendRequestEnabled;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private RecordFont recordFont;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", unique = true, updatable = false)
     @NotNull
@@ -33,10 +37,16 @@ public class UserSettings {
         this.user = user;
         this.isPushAlarmEnabled = true;
         this.isFriendRequestEnabled = true;
+        this.recordFont = RecordFont.NANUMGOTHIC;
     }
 
-    public void updateSettings(boolean isPushAlarmEnabled, boolean isFriendRequestEnabled) {
+    public void updateIsPushAlarmEnabled(boolean isPushAlarmEnabled) {
         this.isPushAlarmEnabled = isPushAlarmEnabled;
+    }
+    public void updateIsFriendRequestEnabled(boolean isFriendRequestEnabled) {
         this.isFriendRequestEnabled = isFriendRequestEnabled;
+    }
+    public void updateRecordFont(RecordFont recordFont) {
+        this.recordFont = recordFont;
     }
 }
