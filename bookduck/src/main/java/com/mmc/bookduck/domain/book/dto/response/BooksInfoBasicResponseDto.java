@@ -11,10 +11,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BooksInfoBasicResponseDto {
-    private String title;
-    private List<String> author;
-    private String imgPath;
-    private String providerId;
 
     private Double ratingAverage;
     private ReadStatus readStatus;
@@ -24,14 +20,8 @@ public class BooksInfoBasicResponseDto {
 
     private AdditionalBookInfoDto additionalBookInfoDto;
 
-
     @Builder
-    public BooksInfoBasicResponseDto(String title, List<String> author, String imgPath, String providerId, Double ratingAverage,
-                                     String myOneLine, Double myRating, ReadStatus readStatus, AdditionalBookInfoDto additionalBookInfoDto) {
-        this.title = title;
-        this.author = author;
-        this.imgPath = imgPath;
-        this.providerId = providerId;
+    public BooksInfoBasicResponseDto(Double ratingAverage, String myOneLine, Double myRating, ReadStatus readStatus, AdditionalBookInfoDto additionalBookInfoDto) {
         this.ratingAverage = ratingAverage;
         this.myRating = myRating;
         this.myOneLine = myOneLine;

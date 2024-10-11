@@ -36,11 +36,8 @@ public class BookInfoController {
 
     // API 도서 상세 정보 GET - 기본 정보
     @GetMapping("/external/{providerId}")
-    public ResponseEntity<BooksInfoBasicResponseDto> getOneBookBasic(@PathVariable(name = "providerId") final String providerId,
-                                                                     @RequestParam final String title,
-                                                                     @RequestParam final List<String> authors,
-                                                                     @RequestParam final String imgPath){
-        return ResponseEntity.ok(bookInfoService.getOneBookBasic(providerId, title, authors, imgPath));
+    public ResponseEntity<BooksInfoBasicResponseDto> getOneBookBasic(@PathVariable(name = "providerId") final String providerId){
+        return ResponseEntity.ok(bookInfoService.getOneBookBasic(providerId));
     }
 
     /*

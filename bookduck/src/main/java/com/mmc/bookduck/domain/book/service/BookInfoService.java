@@ -109,7 +109,7 @@ public class BookInfoService {
 
 
     //api 도서 기본 정보 조회
-    public BooksInfoBasicResponseDto getOneBookBasic(String providerId, String title, List<String> authors, String imgPath) {
+    public BooksInfoBasicResponseDto getOneBookBasic(String providerId) {
         String responseBody = googleBooksApiService.searchOneBook(providerId);
         AdditionalBookInfoDto additional = parseBookDetail(responseBody);
 
@@ -124,13 +124,13 @@ public class BookInfoService {
             Optional<UserBook> userBook = userBookRepository.findByUserAndBookInfo(findUser(), bookInfo.get());
             if(userBook.isPresent()){
                 // 별점 한줄평 개발 후 추후 수정
-                return new BooksInfoBasicResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
+                return new BooksInfoBasicResponseDto(null, null, null, null, additional);
             }else{
-                return new BooksInfoBasicResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
+                return new BooksInfoBasicResponseDto(null, null, null, null, additional);
             }
         }
         else{
-            return new BooksInfoBasicResponseDto(title, authors, imgPath, providerId, null, null, null, null, additional);
+            return new BooksInfoBasicResponseDto(null, null, null, null, additional);
         }
     }
 
