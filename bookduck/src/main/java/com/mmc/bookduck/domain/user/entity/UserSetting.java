@@ -10,17 +10,21 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class UserSettings {
+public class UserSetting {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
-    private Long userSettingsId;
+    private Long userSettingId;
 
     @ColumnDefault("true")
     private boolean isPushAlarmEnabled;
 
     @ColumnDefault("true")
     private boolean isFriendRequestEnabled;
+
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private RecordFont recordFont;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id", unique = true, updatable = false)
@@ -29,14 +33,20 @@ public class UserSettings {
     private User user;
 
     @Builder
-    public UserSettings(User user) {
+    public UserSetting(User user) {
         this.user = user;
         this.isPushAlarmEnabled = true;
         this.isFriendRequestEnabled = true;
+        this.recordFont = RecordFont.NANUMGOTHIC;
     }
 
-    public void updateSettings(boolean isPushAlarmEnabled, boolean isFriendRequestEnabled) {
+    public void updateIsPushAlarmEnabled(boolean isPushAlarmEnabled) {
         this.isPushAlarmEnabled = isPushAlarmEnabled;
+    }
+    public void updateIsFriendRequestEnabled(boolean isFriendRequestEnabled) {
         this.isFriendRequestEnabled = isFriendRequestEnabled;
+    }
+    public void updateRecordFont(RecordFont recordFont) {
+        this.recordFont = recordFont;
     }
 }
