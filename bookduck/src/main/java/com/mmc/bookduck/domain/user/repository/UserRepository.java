@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     boolean existsByNickname(String nickname);
 
-    // 유저 검색
+    // 유저를 닉네임으로 검색
     @Query("SELECT u FROM User u WHERE (u.nickname LIKE %:keyword% ESCAPE '\\') AND u.userStatus = 'ACTIVE'")
-    Page<User> findAllByNicknameContaining(@Param("keyword") String keyword, Pageable pageable);
+    Page<User> searchAllByNicknameContaining(@Param("keyword") String keyword, Pageable pageable);
 }
