@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.folder.dto.common;
 
 import com.mmc.bookduck.domain.folder.entity.Folder;
 import com.mmc.bookduck.domain.folder.entity.FolderBook;
+import com.mmc.bookduck.domain.folder.dto.common.FolderBookCoverDto;
 
 import java.util.ArrayList;
 import java.util.List;
