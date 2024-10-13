@@ -44,7 +44,7 @@ public class FolderService {
     // 폴더 생성
     public FolderResponseDto createFolder(FolderRequestDto dto) {
         User user = findUser();
-        Folder folder = new Folder(dto.getFolderName(), user);
+        Folder folder = new Folder(dto.folderName(), user);
 
         Folder savedFolder = folderRepository.save(folder);
         return FolderResponseDto.from(savedFolder);
@@ -55,7 +55,7 @@ public class FolderService {
         User user = findUser();
         Folder folder = findFolderById(folderId);
 
-        folder.updateFolderName(dto.getFolderName());
+        folder.updateFolderName(dto.folderName());
         return FolderResponseDto.from(folder);
     }
 
@@ -167,6 +167,7 @@ public class FolderService {
                 .orElseThrow(()-> new CustomException(ErrorCode.FOLDER_NOT_FOUND));
         return folder;
     }
+
 
     /*
     public CandidateFolderBookListResponseDto getCandidateBooks(Long folderId) {

@@ -4,7 +4,6 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.folder.entity.Folder;
 import com.mmc.bookduck.domain.folder.entity.FolderBook;
 import com.mmc.bookduck.domain.folder.repository.FolderBookRepository;
-import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
