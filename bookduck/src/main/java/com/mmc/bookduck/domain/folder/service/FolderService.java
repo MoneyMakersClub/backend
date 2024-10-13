@@ -13,6 +13,7 @@ import com.mmc.bookduck.domain.folder.entity.FolderBook;
 import com.mmc.bookduck.domain.folder.repository.FolderRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
+import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -29,21 +30,12 @@ public class FolderService {
     private final FolderRepository folderRepository;
     private final UserBookRepository userBookRepository;
     private final FolderBookService folderBookService;
-
-    // 임시 User
-    private final UserRepository userRepository;
-
-    public User findUser(){
-        User user = userRepository.findById(1L)
-                .orElseThrow(()->new CustomException(ErrorCode.USER_NOT_FOUND));
-        return user;
-    }
-    //
+    private final UserService userService;
 
 
     // 폴더 생성
     public FolderResponseDto createFolder(FolderRequestDto dto) {
-        User user = findUser();
+        User user = userService.getCurrentUser();
         Folder folder = new Folder(dto.folderName(), user);
 
         Folder savedFolder = folderRepository.save(folder);
@@ -52,7 +44,7 @@ public class FolderService {
 
     // 폴더명 수정
     public FolderResponseDto updateFolder(Long folderId, FolderRequestDto dto) {
-        User user = findUser();
+        User user = userService.getCurrentUser();
         Folder folder = findFolderById(folderId);
 
         folder.updateFolderName(dto.folderName());
@@ -61,7 +53,7 @@ public class FolderService {
 
     // 폴더 삭제
     public String deleteFolder(Long folderId) {
-        User user = findUser();
+        User user = userService.getCurrentUser();
         Folder folder = findFolderById(folderId);
 
         // 권한확인
@@ -78,7 +70,7 @@ public class FolderService {
 
     // 폴더에 책 추가
     public FolderBookListResponseDto addFolderBook(Long folderId, Long userBookId) {
-        User user = findUser();
+        User user = userService.getCurrentUser();
         Folder folder = findFolderById(folderId);
         //수정필요
         UserBook userBook = userBookRepository.findById(userBookId)
@@ -106,7 +98,7 @@ public class FolderService {
 
     // 폴더에서 책 삭제
     public FolderBookListResponseDto deleteFolderBook(Long folderId, Long folderBookId) {
-        User user = findUser();
+        User user = userService.getCurrentUser();
         Folder folder = findFolderById(folderId);
         FolderBook folderBook = folderBookService.findFolderBookById(folderBookId);
 
@@ -128,7 +120,7 @@ public class FolderService {
 
     // 폴더 별 도서 목록 조회
     public FolderBookListResponseDto getFolderBookList(Long folderId) {
-        User user = findUser();
+        User user = userService.getCurrentUser();
         Folder folder = findFolderById(folderId);
 
         List<FolderBookUnitDto> folderBookList = new ArrayList<>();
@@ -146,20 +138,17 @@ public class FolderService {
 
     // 전체 폴더 목록 조회
     public AllFolderListResponseDto getAllFolderList() {
-        User user = findUser();
+        User user = userService.getCurrentUser();
         List<Folder> folders = folderRepository.findAllByUser(user);
 
         List<FolderBookCoverListDto> folderList = new ArrayList<>();
 
-        if(folders == null){
-            return new AllFolderListResponseDto(folderList);
-        }
-        else{
+        if(folders != null){
             for(Folder folder : folders){
                 folderList.add(FolderBookCoverListDto.from(folder, folder.getFolderBooks()));
             }
-            return new AllFolderListResponseDto(folderList);
         }
+        return new AllFolderListResponseDto(folderList);
     }
 
     public Folder findFolderById(Long folderId){
