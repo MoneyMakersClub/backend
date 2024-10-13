@@ -39,6 +39,7 @@ public enum ErrorCode {
     ACCESS_TOKEN_NOT_EXPIRED(401,"액세스 토큰이 아직 만료되지 않았습니다."),
     // 쿠키에 리프레시 토큰이 들어있지 않은 경우
     NO_COOKIE(401, "쿠키에 값이 존재하지 않습니다."),
+    USER_STATUS_IS_NOT_ACTIVE(401, "계정이 활성 상태가 아닙니다."),
 
     // 404 Not Found
     // 각 리소스를 찾지 못함
@@ -55,6 +56,7 @@ public enum ErrorCode {
     FOLDER_NOT_FOUND(404, "폴더를 찾을 수 없습니다."),
     BADGE_NOT_FOUND(404, "뱃지를 찾을 수 없습니다."),
     SKIN_NOT_FOUND(404, "스킨을 찾을 수 없습니다."),
+    GENRE_NOT_FOUND(404, "장르를 찾을 수 없습니다."),
 
 
     // 409 Conflict
@@ -77,6 +79,8 @@ public enum ErrorCode {
     // 외부 API 사용 도중 에러
     REDIS_CONNECTION_ERROR(500, "서버에서 Redis 연결 중 문제가 발생했습니다."),
     EXTERNAL_API_ERROR(500, "외부 API 사용 중 문제가 발생했습니다."),
+    //JSON
+    JSON_PARSING_ERROR(500, "API JSON에서 정보를 파싱하는 중 문제가 발생했습니다."),
     // Oauth2, JWT
     ILLEGAL_REGISTRATION_ID(500, "잘못된 registrationId입니다."),
     DATABASE_ERROR(500, "데이터베이스 오류가 발생했습니다."),

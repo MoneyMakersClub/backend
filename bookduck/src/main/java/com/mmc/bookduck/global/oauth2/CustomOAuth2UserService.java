@@ -1,7 +1,13 @@
 package com.mmc.bookduck.global.oauth2;
 
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.entity.UserGrowth;
+import com.mmc.bookduck.domain.user.entity.UserHome;
+import com.mmc.bookduck.domain.user.entity.UserSetting;
+import com.mmc.bookduck.domain.user.repository.UserGrowthRepository;
+import com.mmc.bookduck.domain.user.repository.UserHomeRepository;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
+import com.mmc.bookduck.domain.user.repository.UserSettingRepository;
 import com.mmc.bookduck.global.exception.CustomOAuth2AuthenticationException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +28,9 @@ import java.util.UUID;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+    private final UserSettingRepository userSettingRepository;
+    private final UserHomeRepository userHomeRepository;
+    private final UserGrowthRepository userGrowthRepository;
 
     @Override
     @Transactional
@@ -49,23 +58,38 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Transactional
     public User getOrSave(OAuth2Attributes oAuth2Attributes) {
         String email = oAuth2Attributes.getEmail();
-        User user = userRepository.findByEmail(email).orElse(null);
+        User emailUser = userRepository.findByEmail(email).orElse(null);
 
         // 해당 이메일로 가입한 유저가 존재하는지 확인
-        if (user != null) {
+        if (emailUser != null) {
             // 이미 존재하는 유저의 로그인 유형과 현재 로그인 유형이 다르면 에러 발생
-            if (!user.getLoginType().equals(oAuth2Attributes.getLoginType())) {
+            if (!emailUser.getLoginType().equals(oAuth2Attributes.getLoginType())) {
                 throw new CustomOAuth2AuthenticationException(ErrorCode.EMAIL_ALREADY_REGISTERED);
             }
-            // 첫 로그인이 아님을 설정
             oAuth2Attributes.setFirstLogin(false);
-            return user;
+            return emailUser;
         } else {
             // 존재하지 않을 경우 새로운 유저 엔티티 생성. 랜덤 닉네임을 중복되지 않게 생성
             String nickname = generateUniqueNickname();
-            // 첫 로그인임을 설정
             oAuth2Attributes.setFirstLogin(true);
-            return userRepository.save(oAuth2Attributes.toEntity(nickname));
+
+            // 새로운 User 생성
+            User newUser = oAuth2Attributes.toEntity(nickname);
+
+            // 새로운 User를 먼저 저장
+            newUser = userRepository.save(newUser);
+
+            // 새로운 User의 UserSetting, UserHome, UserGrowth 생성
+            UserSetting userSetting = UserSetting.builder().user(newUser).build();
+            UserHome userHome = UserHome.builder().user(newUser).build();
+            UserGrowth userGrowth = UserGrowth.builder().user(newUser).build();
+
+            // 각 Repository에 저장
+            userSettingRepository.save(userSetting);
+            userHomeRepository.save(userHome);
+            userGrowthRepository.save(userGrowth);
+
+            return newUser;
         }
     }
 
