@@ -12,8 +12,8 @@ public record FriendRequestResponseDTO(
     public static FriendRequestResponseDTO from(FriendRequest friendRequest) {
         return new FriendRequestResponseDTO(
                 friendRequest.getRequestId(),
-                friendRequest.getSender().getId(),
-                friendRequest.getReceiver().getId(),
+                friendRequest.getSender().getUserId(),
+                friendRequest.getReceiver().getUserId(),
                 friendRequest.getFriendRequestStatus()
         );
     }

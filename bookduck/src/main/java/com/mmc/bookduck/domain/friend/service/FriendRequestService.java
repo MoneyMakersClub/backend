@@ -1,0 +1,73 @@
+package com.mmc.bookduck.domain.friend.service;
+
+import com.mmc.bookduck.domain.friend.dto.request.FriendRequestDTO;
+import com.mmc.bookduck.domain.friend.dto.response.FriendRequestResponseDTO;
+import com.mmc.bookduck.domain.friend.entity.FriendRequest;
+import com.mmc.bookduck.domain.friend.entity.FriendRequestStatus;
+import com.mmc.bookduck.domain.friend.repository.FriendRequestRepository;
+import com.mmc.bookduck.domain.user.service.UserService;
+import com.mmc.bookduck.global.exception.CustomException;
+import com.mmc.bookduck.global.exception.ErrorCode;
+import lombok.RequiredArgsConstructor;
+import com.mmc.bookduck.domain.user.entity.User;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class FriendRequestService {
+    private final FriendRequestRepository friendRequestRepository;
+    private final UserService userService;
+
+    // 친구 요청 전송
+    public void sendFriendRequest(FriendRequestDTO requestDto) {
+        User sender = userService.getActiveUserByUserId(requestDto.senderId());
+        User receiver = userService.getActiveUserByUserId(requestDto.senderId());
+        if (friendRequestRepository.findBySenderIdAndReceiverIdAndFriendRequestStatus(sender.getUserId(), receiver.getUserId(), FriendRequestStatus.PENDING).isPresent()){
+            throw new CustomException(ErrorCode.FRIEND_REQUEST_ALREADY_SENT);
+        }
+        FriendRequest friendRequest = requestDto.toEntity(sender, receiver);
+        friendRequestRepository.save(friendRequest);
+    }
+
+    // 친구 요청 취소
+    public void cancelFriendRequest(Long requestId) {
+        FriendRequest request = friendRequestRepository.findById(requestId)
+                .orElseThrow(() -> new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND));
+        friendRequestRepository.delete(request);
+    }
+
+    // 받은 친구 요청 목록 조회
+    @Transactional(readOnly = true)
+    public List<FriendRequestResponseDTO> getReceivedFriendRequests() throws CustomException{
+        User currentUser = userService.getCurrentUser();
+        List<FriendRequestResponseDTO> receivedList = friendRequestRepository.findByReceiverIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
+                .stream()
+                .map(FriendRequestResponseDTO::from)
+                .collect(Collectors.toList());
+        return receivedList;
+    }
+
+    // 보낸 친구 요청 목록 조회
+    @Transactional(readOnly = true)
+    public List<FriendRequestResponseDTO> getSentFriendRequests() {
+        User currentUser = userService.getCurrentUser();
+        List<FriendRequestResponseDTO> sentList = friendRequestRepository.findByReceiverIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
+                .stream()
+                .map(FriendRequestResponseDTO::from)
+                .collect(Collectors.toList());
+        return sentList;
+    }
+
+    // 친구 요청 거절
+    public void rejectFriendRequest(Long requestId) {
+        FriendRequest request = friendRequestRepository.findById(requestId)
+                .orElseThrow(() -> new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND));
+        request.setFriendRequestStatus(FriendRequestStatus.REJECTED);
+        friendRequestRepository.save(request);
+    }
+}

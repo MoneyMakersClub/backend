@@ -39,4 +39,8 @@ public class FriendRequest extends CreatedTimeEntity {
         this.receiver = receiver;
         this.friendRequestStatus = friendRequestStatus;
     }
+
+    public void setFriendRequestStatus(FriendRequestStatus friendRequestStatus) {
+        this.friendRequestStatus = friendRequestStatus;
+    }
 }
