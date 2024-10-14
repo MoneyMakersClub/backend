@@ -84,4 +84,13 @@ public class FolderController {
                 .body((folderService.getFolderBookList(folderId)));
     }
 
+    //폴더별&상태별 책 목록 조회
+    @GetMapping("/{folderId}/books/filter")
+    public ResponseEntity<FolderBookListResponseDto> getFolderBookListStatus(@PathVariable(name="folderId") final Long folderId,
+                                                                       @RequestParam(name="status") final String status){
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body((folderService.getFolderBookListStatus(folderId, status)));
+    }
+
 }

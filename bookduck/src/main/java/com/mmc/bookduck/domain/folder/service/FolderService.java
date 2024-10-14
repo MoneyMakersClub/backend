@@ -156,6 +156,25 @@ public class FolderService {
         return folder;
     }
 
+    // 폴더별 & 상태별 도서 목록 조회
+    public FolderBookListResponseDto getFolderBookListStatus(Long folderId, String status) {
+        User user = userService.getCurrentUser();
+        Folder folder = findFolderById(folderId);
+
+        List<FolderBookUnitDto> folderBookList = new ArrayList<>();
+
+        if(folder.getUser().equals(user)){
+            for(FolderBook folderBook : folder.getFolderBooks()){
+                if(folderBook.getUserBook().getReadStatus().name().equals(status)){
+                    folderBookList.add(FolderBookUnitDto.from(folderBook));
+                }
+            }
+            return new FolderBookListResponseDto(folder, folderBookList);
+        }else{
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+        }
+    }
+
 
     /*
     public CandidateFolderBookListResponseDto getCandidateBooks(Long folderId) {
