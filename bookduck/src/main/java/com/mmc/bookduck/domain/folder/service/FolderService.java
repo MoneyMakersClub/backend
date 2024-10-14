@@ -1,7 +1,7 @@
 package com.mmc.bookduck.domain.folder.service;
 
 import com.mmc.bookduck.domain.book.entity.UserBook;
-import com.mmc.bookduck.domain.book.repository.UserBookRepository;
+import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.folder.dto.common.FolderBookCoverListDto;
 import com.mmc.bookduck.domain.folder.dto.request.FolderRequestDto;
 import com.mmc.bookduck.domain.folder.dto.response.AllFolderListResponseDto;
@@ -28,7 +28,7 @@ import java.util.List;
 @Transactional
 public class FolderService {
     private final FolderRepository folderRepository;
-    private final UserBookRepository userBookRepository;
+    private final UserBookService userBookService;
     private final FolderBookService folderBookService;
     private final UserService userService;
 
@@ -71,10 +71,9 @@ public class FolderService {
     // 폴더에 책 추가
     public FolderBookListResponseDto addFolderBook(Long folderId, Long userBookId) {
         User user = userService.getCurrentUser();
+
         Folder folder = findFolderById(folderId);
-        //수정필요
-        UserBook userBook = userBookRepository.findById(userBookId)
-                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
+        UserBook userBook = userBookService.findUserBookById(userBookId);
 
         List<FolderBookUnitDto> folderBookList = new ArrayList<>();
 
