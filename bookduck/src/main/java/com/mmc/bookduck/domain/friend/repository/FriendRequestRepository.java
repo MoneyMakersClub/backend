@@ -3,14 +3,12 @@ package com.mmc.bookduck.domain.friend.repository;
 import com.mmc.bookduck.domain.friend.entity.FriendRequest;
 import com.mmc.bookduck.domain.friend.entity.FriendRequestStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface FriendRequestRepository extends JpaRepository<FriendRequest, Long> {
-    Optional<FriendRequest> findBySenderIdAndReceiverIdAndFriendRequestStatus(Long senderId, Long receiverId, FriendRequestStatus status);
+    Optional<FriendRequest> findBySenderIdAndReceiverIdAndFriendRequestStatus(Long senderId, Long receiverId, FriendRequestStatus status); // 특정한 한 케이스므로 Optional
     List<FriendRequest> findByReceiverIdAndFriendRequestStatus(Long receiverId, FriendRequestStatus status);
+    List<FriendRequest> findBySenderIdAndFriendRequestStatus(Long receiverId, FriendRequestStatus status);
 }

@@ -4,6 +4,7 @@ import com.mmc.bookduck.domain.friend.dto.request.FriendRequestDTO;
 import com.mmc.bookduck.domain.friend.dto.response.FriendRequestResponseDTO;
 import com.mmc.bookduck.domain.friend.entity.FriendRequest;
 import com.mmc.bookduck.domain.friend.entity.FriendRequestStatus;
+import com.mmc.bookduck.domain.friend.repository.FriendRepository;
 import com.mmc.bookduck.domain.friend.repository.FriendRequestRepository;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -21,12 +22,18 @@ import java.util.stream.Collectors;
 @Transactional
 public class FriendRequestService {
     private final FriendRequestRepository friendRequestRepository;
+    private final FriendRepository friendRepository;
     private final UserService userService;
 
     // 친구 요청 전송
     public void sendFriendRequest(FriendRequestDTO requestDto) {
         User sender = userService.getActiveUserByUserId(requestDto.senderId());
         User receiver = userService.getActiveUserByUserId(requestDto.senderId());
+        // 이미 친구인지 확인
+        if (friendRepository.findByUser1IdAndUser2Id(sender.getUserId(), receiver.getUserId()).isPresent()) {
+            throw new CustomException(ErrorCode.FRIEND_ALREADY_EXISTS);
+        }
+        // 중복된 친구 요청 확인
         if (friendRequestRepository.findBySenderIdAndReceiverIdAndFriendRequestStatus(sender.getUserId(), receiver.getUserId(), FriendRequestStatus.PENDING).isPresent()){
             throw new CustomException(ErrorCode.FRIEND_REQUEST_ALREADY_SENT);
         }
@@ -56,7 +63,7 @@ public class FriendRequestService {
     @Transactional(readOnly = true)
     public List<FriendRequestResponseDTO> getSentFriendRequests() {
         User currentUser = userService.getCurrentUser();
-        List<FriendRequestResponseDTO> sentList = friendRequestRepository.findByReceiverIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
+        List<FriendRequestResponseDTO> sentList = friendRequestRepository.findBySenderIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
                 .map(FriendRequestResponseDTO::from)
                 .collect(Collectors.toList());
