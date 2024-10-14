@@ -33,7 +33,7 @@ import java.util.List;
 public class BookInfoService {
     private final BookInfoRepository bookInfoRepository;
     private final UserBookRepository userBookRepository;
-    private final GenreRepository genreRepository;
+    private final GenreService genreService;
     private final GoogleBooksApiService googleBooksApiService;
 
 
@@ -172,8 +172,12 @@ public class BookInfoService {
                 //카테고리가 없으면, null로 설정
                 cate = null;
             }
+            //장르 매칭
+            Genre genre = genreService.matchGenre(cate);
+            String koreanGenre = genreService.genreNameToKorean(genre);
+
             String language = getTextNode(info, "language");
-            return new BookInfoDetailDto(publisher, publishedDate, description, page, cate, language);
+            return new BookInfoDetailDto(publisher, publishedDate, description, page, cate, genre.getGenreId(), koreanGenre, language);
 
         }catch(Exception e){
             throw new CustomException(ErrorCode.JSON_PARSING_ERROR);
@@ -184,8 +188,7 @@ public class BookInfoService {
     public BookInfo saveApiBookInfo (UserBookRequestDto dto) {
 
         String saveAuthor = dto.getAuthors().getFirst();
-        Genre genre = genreRepository.findById(1l)
-                .orElseThrow(()->new CustomException(ErrorCode.GENRE_NOT_FOUND));
+        Genre genre = genreService.findGenreById(dto.getGenreId());
 
         BookInfo bookInfo = dto.toEntity(saveAuthor,genre);
         return bookInfoRepository.save(bookInfo);
