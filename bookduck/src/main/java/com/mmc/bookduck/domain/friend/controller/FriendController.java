@@ -16,7 +16,7 @@ public class FriendController {
 
     private final FriendService friendService;
 
-    @PostMapping("/{requestId}/accept")
+    @PostMapping("/{friendRequestId}/accept")
     @Operation(summary = "친구 요청 수락", description = "친구 요청을 수락하고 친구를 생성합니다.")
     public ResponseEntity<Void> acceptFriendRequest(@PathVariable final Long requestId) {
         friendService.acceptFriendRequest(requestId);
