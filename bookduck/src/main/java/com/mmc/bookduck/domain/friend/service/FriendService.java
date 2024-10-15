@@ -67,4 +67,23 @@ public class FriendService {
     }
 
     // 친구 삭제
+    public void deleteFriend(Long friendId) {
+        Friend friend = friendRepository.findById(friendId)
+                .orElseThrow(() -> new CustomException(ErrorCode.FRIEND_NOT_FOUND));
+
+        // 사용자가 user1이거나 user2일 때만 친구 삭제 가능
+        User currentUser = userService.getCurrentUser();
+        if (!friend.getUser1().getUserId().equals(currentUser.getUserId()) &&
+                !friend.getUser2().getUserId().equals(currentUser.getUserId())) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+        }
+
+        // 친구 요청 상태를 BREAKUP로 변경
+        FriendRequest request = friendRequestRepository.findBySenderIdAndReceiverIdAndFriendRequestStatus(
+                        friend.getUser1().getUserId(), friend.getUser2().getUserId(), FriendRequestStatus.ACCEPTED)
+                .orElseThrow(() -> new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND));
+        request.setFriendRequestStatus(FriendRequestStatus.BREAKUP);
+
+        friendRepository.delete(friend);
+    }
 }
