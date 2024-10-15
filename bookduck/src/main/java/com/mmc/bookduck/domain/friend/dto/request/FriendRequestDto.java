@@ -5,7 +5,7 @@ import com.mmc.bookduck.domain.friend.entity.FriendRequestStatus;
 import jakarta.validation.constraints.NotNull;
 import com.mmc.bookduck.domain.user.entity.User;
 
-public record FriendRequestDTO(
+public record FriendRequestDto(
         @NotNull Long senderId,
         @NotNull Long receiverId
 ) {

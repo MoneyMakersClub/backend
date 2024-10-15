@@ -1,7 +1,8 @@
 package com.mmc.bookduck.domain.friend.service;
 
-import com.mmc.bookduck.domain.friend.dto.request.FriendRequestDTO;
-import com.mmc.bookduck.domain.friend.dto.response.FriendRequestResponseDTO;
+import com.mmc.bookduck.domain.friend.dto.common.FriendRequestUnitDto;
+import com.mmc.bookduck.domain.friend.dto.request.FriendRequestDto;
+import com.mmc.bookduck.domain.friend.dto.response.FriendRequestListResponseDto;
 import com.mmc.bookduck.domain.friend.entity.FriendRequest;
 import com.mmc.bookduck.domain.friend.entity.FriendRequestStatus;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
@@ -26,7 +27,7 @@ public class FriendRequestService {
     private final UserService userService;
 
     // 친구 요청 전송
-    public void sendFriendRequest(FriendRequestDTO requestDto) {
+    public void sendFriendRequest(FriendRequestDto requestDto) {
         User sender = userService.getActiveUserByUserId(requestDto.senderId());
         User receiver = userService.getActiveUserByUserId(requestDto.senderId());
         // 이미 친구인지 확인
@@ -50,24 +51,24 @@ public class FriendRequestService {
 
     // 받은 친구 요청 목록 조회
     @Transactional(readOnly = true)
-    public List<FriendRequestResponseDTO> getReceivedFriendRequests() throws CustomException{
+    public FriendRequestListResponseDto getReceivedFriendRequests() {
         User currentUser = userService.getCurrentUser();
-        List<FriendRequestResponseDTO> receivedList = friendRequestRepository.findByReceiverIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
+        List<FriendRequestUnitDto> receivedList = friendRequestRepository.findByReceiverIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
-                .map(FriendRequestResponseDTO::from)
+                .map(FriendRequestUnitDto::from)
                 .collect(Collectors.toList());
-        return receivedList;
+        return FriendRequestListResponseDto.from(receivedList);
     }
 
     // 보낸 친구 요청 목록 조회
     @Transactional(readOnly = true)
-    public List<FriendRequestResponseDTO> getSentFriendRequests() {
+    public FriendRequestListResponseDto getSentFriendRequests() {
         User currentUser = userService.getCurrentUser();
-        List<FriendRequestResponseDTO> sentList = friendRequestRepository.findBySenderIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
+        List<FriendRequestUnitDto> sentList = friendRequestRepository.findBySenderIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
-                .map(FriendRequestResponseDTO::from)
+                .map(FriendRequestUnitDto::from)
                 .collect(Collectors.toList());
-        return sentList;
+        return FriendRequestListResponseDto.from(sentList);
     }
 
     // 친구 요청 거절
