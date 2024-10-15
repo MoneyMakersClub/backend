@@ -29,7 +29,7 @@ public class FriendRequestService {
     // 친구 요청 전송
     public void sendFriendRequest(FriendRequestDto requestDto) {
         User sender = userService.getActiveUserByUserId(requestDto.senderId());
-        User receiver = userService.getActiveUserByUserId(requestDto.senderId());
+        User receiver = userService.getActiveUserByUserId(requestDto.receiverId());
         // 이미 친구인지 확인
         if (friendRepository.findByUser1IdAndUser2Id(sender.getUserId(), receiver.getUserId()).isPresent()) {
             throw new CustomException(ErrorCode.FRIEND_ALREADY_EXISTS);
