@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FriendRequestRepository extends JpaRepository<FriendRequest, Long> {
-    Optional<FriendRequest> findBySenderIdAndReceiverIdAndFriendRequestStatus(Long senderId, Long receiverId, FriendRequestStatus status); // 특정한 한 케이스므로 Optional
-    List<FriendRequest> findByReceiverIdAndFriendRequestStatus(Long receiverId, FriendRequestStatus status);
-    List<FriendRequest> findBySenderIdAndFriendRequestStatus(Long receiverId, FriendRequestStatus status);
+    Optional<FriendRequest> findBySenderUserIdAndReceiverUserIdAndFriendRequestStatus(Long senderId, Long receiverId, FriendRequestStatus status); // 특정한 한 케이스므로 Optional
+    List<FriendRequest> findByReceiverUserIdAndFriendRequestStatus(Long receiverId, FriendRequestStatus status);
+    List<FriendRequest> findBySenderUserIdAndFriendRequestStatus(Long receiverId, FriendRequestStatus status);
 }

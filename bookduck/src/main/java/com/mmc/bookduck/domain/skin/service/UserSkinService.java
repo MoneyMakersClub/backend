@@ -14,7 +14,7 @@ public class UserSkinService {
 
     // 장착된 스킨 조회, 기본 스킨 처리
     public UserSkinEquippedDto getEquippedSkinOrDefault(Long userId) {
-        return userSkinRepository.findByUserIdAndIsEquippedTrue(userId)
+        return userSkinRepository.findByUserUserIdAndIsEquippedTrue(userId)
                 .map(UserSkinEquippedDto::from)
                 .orElseGet(() -> new UserSkinEquippedDto(0L, 0L));  // 기본 스킨(=아무 장착도 하지 않은 상태)의 ID에 0 부여
     }

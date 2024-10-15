@@ -31,11 +31,11 @@ public class FriendRequestService {
         User sender = userService.getActiveUserByUserId(requestDto.senderId());
         User receiver = userService.getActiveUserByUserId(requestDto.receiverId());
         // 이미 친구인지 확인
-        if (friendRepository.findByUser1IdAndUser2Id(sender.getUserId(), receiver.getUserId()).isPresent()) {
+        if (friendRepository.findByUser1UserIdAndUser2UserId(sender.getUserId(), receiver.getUserId()).isPresent()) {
             throw new CustomException(ErrorCode.FRIEND_ALREADY_EXISTS);
         }
         // 중복된 친구 요청 확인
-        if (friendRequestRepository.findBySenderIdAndReceiverIdAndFriendRequestStatus(sender.getUserId(), receiver.getUserId(), FriendRequestStatus.PENDING).isPresent()){
+        if (friendRequestRepository.findBySenderUserIdAndReceiverUserIdAndFriendRequestStatus(sender.getUserId(), receiver.getUserId(), FriendRequestStatus.PENDING).isPresent()){
             throw new CustomException(ErrorCode.FRIEND_REQUEST_ALREADY_SENT);
         }
         FriendRequest friendRequest = requestDto.toEntity(sender, receiver);
@@ -53,7 +53,7 @@ public class FriendRequestService {
     @Transactional(readOnly = true)
     public FriendRequestListResponseDto getReceivedFriendRequests() {
         User currentUser = userService.getCurrentUser();
-        List<FriendRequestUnitDto> receivedList = friendRequestRepository.findByReceiverIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
+        List<FriendRequestUnitDto> receivedList = friendRequestRepository.findByReceiverUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
                 .map(FriendRequestUnitDto::from)
                 .collect(Collectors.toList());
@@ -64,7 +64,7 @@ public class FriendRequestService {
     @Transactional(readOnly = true)
     public FriendRequestListResponseDto getSentFriendRequests() {
         User currentUser = userService.getCurrentUser();
-        List<FriendRequestUnitDto> sentList = friendRequestRepository.findBySenderIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
+        List<FriendRequestUnitDto> sentList = friendRequestRepository.findBySenderUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
                 .map(FriendRequestUnitDto::from)
                 .collect(Collectors.toList());

@@ -56,7 +56,7 @@ public class FriendService {
     @Transactional(readOnly = true)
     public FriendListResponseDto getFriendList() {
         User currentUser = userService.getCurrentUser();
-        List<FriendUnitDto> friendList = friendRepository.findByUser1Id(currentUser.getUserId())
+        List<FriendUnitDto> friendList = friendRepository.findByUser1UserId(currentUser.getUserId())
                 .stream()
                 .map(friend -> {
                     UserSkinEquippedDto userSkinEquipped = userSkinService.getEquippedSkinOrDefault(friend.getUser2().getUserId());
@@ -79,7 +79,7 @@ public class FriendService {
         }
 
         // 친구 요청 상태를 BREAKUP로 변경
-        FriendRequest request = friendRequestRepository.findBySenderIdAndReceiverIdAndFriendRequestStatus(
+        FriendRequest request = friendRequestRepository.findBySenderUserIdAndReceiverUserIdAndFriendRequestStatus(
                         friend.getUser1().getUserId(), friend.getUser2().getUserId(), FriendRequestStatus.ACCEPTED)
                 .orElseThrow(() -> new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND));
         request.setFriendRequestStatus(FriendRequestStatus.BREAKUP);
