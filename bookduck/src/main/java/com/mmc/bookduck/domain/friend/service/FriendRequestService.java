@@ -80,6 +80,11 @@ public class FriendRequestService {
     public void rejectFriendRequest(Long requestId) {
         FriendRequest request = friendRequestRepository.findById(requestId)
                 .orElseThrow(() -> new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND));
+        User currentUser = userService.getCurrentUser();
+        // receiver = currentUser 인지 확인
+        if (!request.getReceiver().getUserId().equals(currentUser.getUserId())) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+        }
         request.setFriendRequestStatus(FriendRequestStatus.REJECTED);
         friendRequestRepository.save(request);
     }
