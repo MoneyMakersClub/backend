@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
@@ -51,6 +52,13 @@ public class JwtUtil {
         Claims claims = Jwts.claims();
         claims.setSubject(authentication.getName());
 
+        // Authentication 객체에서 role 추출
+        String role = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)  // 각 GrantedAuthority에서 권한 문자열을 추출
+                .findFirst()  // 첫 번째 권한만 사용
+                .orElse("ROLE_USER");  // 기본값으로 ROLE_USER 사용
+        claims.put("role", role);  // role 클레임 추가
+
         Date now = new Date();
         Date expireDate = new Date(now.getTime()+expiredTime.toMillis());
 
@@ -88,8 +96,8 @@ public class JwtUtil {
     public Authentication getAuthentication(String token){
         Claims claims = parseClaims(token);
         List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(claims.get("role").toString()));
-        User principal = new User(claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        User principal = new User(claims.getSubject(), "", authorities); // 서비스 로직의 User 엔티티와 다른 클래스
+        return new UsernamePasswordAuthenticationToken(principal, "", principal.getAuthorities());
     }
 
     private Claims parseClaims(String token) {

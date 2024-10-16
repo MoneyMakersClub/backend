@@ -52,7 +52,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User user = getOrSave(oAuth2Attributes);
 
         // OAuth2UserDetails 반환
-        return new OAuth2UserDetails(oAuth2UserAttributes, userNameAttributeName, user.getEmail(), oAuth2Attributes.isFirstLogin());
+        return new OAuth2UserDetails(oAuth2UserAttributes, userNameAttributeName, user.getEmail(), oAuth2Attributes.isFirstLogin(), user.getRole().name());
     }
 
     @Transactional
