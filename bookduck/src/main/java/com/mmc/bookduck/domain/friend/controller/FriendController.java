@@ -18,7 +18,7 @@ public class FriendController {
 
     @PostMapping("/{friendRequestId}/accept")
     @Operation(summary = "친구 요청 수락", description = "친구 요청을 수락하고 친구를 생성합니다.")
-    public ResponseEntity<Void> acceptFriendRequest(@PathVariable final Long requestId) {
+    public ResponseEntity<Void> acceptFriendRequest(@PathVariable("requestId") final Long requestId) {
         friendService.acceptFriendRequest(requestId);
         return ResponseEntity.ok().build();
     }
@@ -32,7 +32,7 @@ public class FriendController {
 
     @DeleteMapping("/{friendId}")
     @Operation(summary = "친구 삭제", description = "친구를 삭제합니다.")
-    public ResponseEntity<Void> deleteFriend(@PathVariable final Long friendId) {
+    public ResponseEntity<Void> deleteFriend(@PathVariable("friendId") final Long friendId) {
         friendService.deleteFriend(friendId);
         return ResponseEntity.ok().build();
     }

@@ -26,7 +26,7 @@ public class FriendRequestController {
 
     @DeleteMapping("/{friendRequestId}")
     @Operation(summary = "친구 요청 취소", description = "보낸 친구 요청을 취소합니다.")
-    public ResponseEntity<?> cancelFriendRequest(@PathVariable final Long friendRequestId) {
+    public ResponseEntity<?> cancelFriendRequest(@PathVariable("friendRequestId") final Long friendRequestId) {
         friendRequestService.cancelFriendRequest(friendRequestId);
         return ResponseEntity.ok().build();
     }
@@ -47,7 +47,7 @@ public class FriendRequestController {
 
     @PatchMapping("/{friendRequestId}/reject")
     @Operation(summary = "친구 요청 거절", description = "받은 친구 요청을 거절합니다.")
-    public ResponseEntity<?> rejectFriendRequest(@PathVariable final Long friendRequestId){
+    public ResponseEntity<?> rejectFriendRequest(@PathVariable("friendRequestId") final Long friendRequestId){
         friendRequestService.rejectFriendRequest(friendRequestId);
         return ResponseEntity.ok().build();
     }
