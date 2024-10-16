@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import com.mmc.bookduck.domain.user.entity.User;
 
 public record FriendRequestDto(
-        @NotNull Long senderId,
         @NotNull Long receiverId
 ) {
     public FriendRequest toEntity(User sender, User receiver) {
