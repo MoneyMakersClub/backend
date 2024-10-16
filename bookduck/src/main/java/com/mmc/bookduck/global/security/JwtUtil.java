@@ -75,7 +75,7 @@ public class JwtUtil {
     public void validateAccessToken(String accessToken){
         try {
             Jwts.parserBuilder().setSigningKey(accessKey).build().parseClaimsJws(accessToken);
-        } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e){
+        } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException | SignatureException e){
             throw new CustomTokenException(ErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
             throw new CustomTokenException(ErrorCode.EXPIRED_ACCESS_TOKEN);
