@@ -30,6 +30,10 @@ public class FriendRequestService {
     public void sendFriendRequest(FriendRequestDto requestDto) {
         User sender = userService.getCurrentUser();
         User receiver = userService.getActiveUserByUserId(requestDto.receiverId());
+        // sender = receiver인 경우는 요청을 보낼 수 없음
+        if (sender.getUserId().equals(receiver.getUserId())) {
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+        }
         // 이미 친구인지 확인
         if (friendRepository.findByUser1UserIdAndUser2UserId(sender.getUserId(), receiver.getUserId()).isPresent()) {
             throw new CustomException(ErrorCode.FRIEND_ALREADY_EXISTS);
