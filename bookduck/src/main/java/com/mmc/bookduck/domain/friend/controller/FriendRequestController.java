@@ -45,7 +45,7 @@ public class FriendRequestController {
         return ResponseEntity.ok(sentList);
     }
 
-    @PatchMapping("/{friendRequestId}/reject")
+    @PutMapping("/{friendRequestId}/reject")
     @Operation(summary = "친구 요청 거절", description = "받은 친구 요청을 거절합니다.")
     public ResponseEntity<?> rejectFriendRequest(@PathVariable("friendRequestId") final Long friendRequestId){
         friendRequestService.rejectFriendRequest(friendRequestId);
