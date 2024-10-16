@@ -1,6 +1,5 @@
 package com.mmc.bookduck.global.oauth2;
 
-import com.mmc.bookduck.domain.user.entity.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +13,8 @@ public record OAuth2UserDetails(
         Map<String, Object> attributes,
         String attributeKey,
         String email,
-        boolean isFirstLogin // 첫 로그인 여부 추가
+        Boolean isFirstLogin, // 첫 로그인 여부
+        String role // 권한
 ) implements OAuth2User, UserDetails {
 
     @Override
@@ -29,8 +29,7 @@ public record OAuth2UserDetails(
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(
-                new SimpleGrantedAuthority(Role.ROLE_USER.toString()));
+        return Collections.singletonList(new SimpleGrantedAuthority(role)); // 권한 반환
     }
 
     @Override
