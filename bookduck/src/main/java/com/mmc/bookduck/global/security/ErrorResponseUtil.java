@@ -13,7 +13,7 @@ public class ErrorResponseUtil {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    public static void writeErrorResponse(HttpServletResponse response, ErrorCode errorCode, String requestUri, boolean redirectToRefresh) {
+    public static void writeErrorResponse(HttpServletResponse response, ErrorCode errorCode, String requestUri) {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -27,11 +27,6 @@ public class ErrorResponseUtil {
                 requestUri
         );
 
-        // 만약 리프레시 토큰 경로로 리다이렉트하고 싶다면 Location 헤더에 "/refresh" 추가
-        if (redirectToRefresh) {
-            response.setHeader("Location", "/refresh");
-        }
-
         try {
             String jsonResponse = objectMapper.writeValueAsString(errorDto);
             response.getWriter().write(jsonResponse);
@@ -39,5 +34,11 @@ public class ErrorResponseUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    // Location 있는 에러 응답
+    public static void writeErrorResponseWithLocationHeader(HttpServletResponse response, ErrorCode errorCode, String requestUri, String locationUri) {
+        response.setHeader("Location", locationUri);
+        writeErrorResponse(response, errorCode, requestUri);
     }
 }

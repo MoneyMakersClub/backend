@@ -39,14 +39,14 @@ public class JwtFilter extends OncePerRequestFilter {
                         try {
                             // 리프레시 토큰의 유효성을 검증
                             jwtUtil.validateRefreshToken(refreshToken);
-                            ErrorResponseUtil.writeErrorResponse(response, e.getErrorCode(), request.getRequestURI(), true);
+                            ErrorResponseUtil.writeErrorResponseWithLocationHeader(response, e.getErrorCode(), request.getRequestURI(), "/auth/refresh");
                             return;
                         } catch (CustomTokenException ex) {
-                            ErrorResponseUtil.writeErrorResponse(response, ex.getErrorCode(), request.getRequestURI(), false);
+                            ErrorResponseUtil.writeErrorResponse(response, ex.getErrorCode(), request.getRequestURI());
                             return;
                         }
                     } else {
-                        ErrorResponseUtil.writeErrorResponse(response, e.getErrorCode(), request.getRequestURI(), false);
+                        ErrorResponseUtil.writeErrorResponse(response, e.getErrorCode(), request.getRequestURI());
                         return;
                     }
                 }

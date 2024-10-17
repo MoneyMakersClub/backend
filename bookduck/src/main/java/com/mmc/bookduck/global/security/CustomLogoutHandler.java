@@ -44,7 +44,7 @@ public class CustomLogoutHandler implements LogoutHandler {
             SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
             logoutHandler.logout(request, response, authentication);
         } else {
-            ErrorResponseUtil.writeErrorResponse(response, ErrorCode.NOT_AUTHENTICATED, request.getRequestURI(), false);
+            ErrorResponseUtil.writeErrorResponse(response, ErrorCode.NOT_AUTHENTICATED, request.getRequestURI());
         }
     }
 }

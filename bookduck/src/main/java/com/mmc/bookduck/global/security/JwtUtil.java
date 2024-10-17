@@ -2,7 +2,6 @@ package com.mmc.bookduck.global.security;
 
 import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.exception.CustomTokenException;
-import com.nimbusds.oauth2.sdk.TokenResponse;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -76,7 +75,7 @@ public class JwtUtil {
     public void validateAccessToken(String accessToken){
         try {
             Jwts.parserBuilder().setSigningKey(accessKey).build().parseClaimsJws(accessToken);
-        } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e){
+        } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException | SignatureException e){
             throw new CustomTokenException(ErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
             throw new CustomTokenException(ErrorCode.EXPIRED_ACCESS_TOKEN);
@@ -87,7 +86,7 @@ public class JwtUtil {
     public void validateRefreshToken(String refreshToken){
         try{
             Jwts.parserBuilder().setSigningKey(refreshKey).build().parseClaimsJws(refreshToken);
-        } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e){
+        } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException | SignatureException e){
             throw new CustomTokenException(ErrorCode.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
             throw new CustomTokenException(ErrorCode.EXPIRED_REFRESH_TOKEN);

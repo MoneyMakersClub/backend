@@ -23,6 +23,9 @@ public class AuthService {
     // 액세스 토큰 및 리프레시 토큰 재발급
     public TokenResponseDto refreshTokens(String accessToken, String refreshToken) {
         // 액세스 토큰 만료 여부 확인
+        if (accessToken != null && accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        }
         if (!jwtUtil.isAccessTokenExpired(accessToken)) {
             throw new CustomTokenException(ErrorCode.ACCESS_TOKEN_NOT_EXPIRED);
         }
