@@ -41,12 +41,8 @@ public class FriendService {
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
 
-        User sender = request.getSender();
-        User receiver = request.getReceiver();
-        Friend friend = Friend.builder()
-                .user1(receiver)
-                .user2(sender)
-                .build();
+        FriendCreateRequestDto friendCreateRequestDto = new FriendCreateRequestDto(requestId, request.getSender(), currentUser);
+        Friend friend = friendCreateRequestDto.toEntity();
         friendRepository.save(friend);
         request.setFriendRequestStatus(FriendRequestStatus.ACCEPTED);
         friendRequestRepository.save(request);
