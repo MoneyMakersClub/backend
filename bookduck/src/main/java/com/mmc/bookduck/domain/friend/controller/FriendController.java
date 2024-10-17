@@ -1,9 +1,12 @@
 package com.mmc.bookduck.domain.friend.controller;
 
+import com.mmc.bookduck.domain.friend.dto.request.FriendCreateRequestDto;
 import com.mmc.bookduck.domain.friend.dto.response.FriendListResponseDto;
+import com.mmc.bookduck.domain.friend.entity.Friend;
 import com.mmc.bookduck.domain.friend.service.FriendService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +19,10 @@ public class FriendController {
 
     private final FriendService friendService;
 
-    @PostMapping("/{friendRequestId}/accept")
+    @PostMapping
     @Operation(summary = "친구 요청 수락", description = "친구 요청을 수락하고 친구를 생성합니다.")
-    public ResponseEntity<Void> acceptFriendRequest(@PathVariable("requestId") final Long requestId) {
-        friendService.acceptFriendRequest(requestId);
+    public ResponseEntity<?> createFriend(@Valid @RequestBody FriendCreateRequestDto requestDto) {
+        friendService.createFriend(requestDto.requestId());
         return ResponseEntity.ok().build();
     }
 
@@ -32,7 +35,7 @@ public class FriendController {
 
     @DeleteMapping("/{friendId}")
     @Operation(summary = "친구 삭제", description = "친구를 삭제합니다.")
-    public ResponseEntity<Void> deleteFriend(@PathVariable("friendId") final Long friendId) {
+    public ResponseEntity<?> deleteFriend(@PathVariable("friendId") final Long friendId) {
         friendService.deleteFriend(friendId);
         return ResponseEntity.ok().build();
     }

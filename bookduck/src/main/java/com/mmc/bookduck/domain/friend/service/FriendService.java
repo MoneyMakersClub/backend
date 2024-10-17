@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.friend.service;
 
 import com.mmc.bookduck.domain.friend.dto.common.FriendUnitDto;
+import com.mmc.bookduck.domain.friend.dto.request.FriendCreateRequestDto;
 import com.mmc.bookduck.domain.friend.dto.response.FriendListResponseDto;
 import com.mmc.bookduck.domain.friend.entity.Friend;
 import com.mmc.bookduck.domain.friend.entity.FriendRequest;
@@ -30,7 +31,7 @@ public class FriendService {
     private final UserSkinService userSkinService;
 
     // 친구 요청 수락 (=친구 생성)
-    public void acceptFriendRequest(Long requestId){
+    public void createFriend(Long requestId){
         FriendRequest request = friendRequestRepository.findById(requestId)
                 .orElseThrow(() -> new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND));
 
@@ -43,11 +44,10 @@ public class FriendService {
         User sender = request.getSender();
         User receiver = request.getReceiver();
         Friend friend = Friend.builder()
-                        .user1(receiver)
-                        .user2(sender)
-                        .build();
+                .user1(receiver)
+                .user2(sender)
+                .build();
         friendRepository.save(friend);
-
         request.setFriendRequestStatus(FriendRequestStatus.ACCEPTED);
         friendRequestRepository.save(request);
     }
