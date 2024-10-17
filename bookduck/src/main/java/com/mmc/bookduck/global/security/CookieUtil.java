@@ -1,7 +1,5 @@
 package com.mmc.bookduck.global.security;
 
-
-import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.CustomTokenException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import jakarta.servlet.http.Cookie;
@@ -46,5 +44,6 @@ public class CookieUtil {
         cookie.setPath("/");
         cookie.setMaxAge(0);
 
-        response.addCookie(cookie);}
+        response.addCookie(cookie);
+    }
 }

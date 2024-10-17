@@ -38,6 +38,7 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final JwtUtil jwtUtil;
+    private final CookieUtil cookieUtil;
 
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
@@ -114,7 +115,7 @@ public class SecurityConfig {
                         .addLogoutHandler(customLogoutHandler) // 로그아웃 시 수행할 추가 동작
                         .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)) // 상태코드 200 반환 위함
                 )
-                .addFilterBefore(new JwtFilter(jwtUtil), LogoutFilter.class)
+                .addFilterBefore(new JwtFilter(jwtUtil, cookieUtil), LogoutFilter.class)
 
         ;
         return http.build();

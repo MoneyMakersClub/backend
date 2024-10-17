@@ -2,6 +2,7 @@ package com.mmc.bookduck.global.security;
 
 import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.exception.CustomTokenException;
+import com.nimbusds.oauth2.sdk.TokenResponse;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -100,7 +101,7 @@ public class JwtUtil {
         return new UsernamePasswordAuthenticationToken(principal, "", principal.getAuthorities());
     }
 
-    private Claims parseClaims(String token) {
+    public Claims parseClaims(String token) {
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(accessKey)
@@ -113,7 +114,6 @@ public class JwtUtil {
         }
     }
 
-    // 액세스 토큰 재발급에서 사용
     public boolean isAccessTokenExpired(String accessToken) {
         try {
             Claims claims = Jwts.parserBuilder().setSigningKey(accessKey).build().parseClaimsJws(accessToken).getBody();
@@ -125,19 +125,8 @@ public class JwtUtil {
         }
     }
 
-    // 액세스 토큰 재발급
-    public String refreshAccessToken(String refreshToken) {
-        validateRefreshToken(refreshToken);
-        Claims claims = parseClaims(refreshToken);
-        String email = claims.getSubject();
-
-        String storedRefreshToken = redisService.getValues(email).toString();
-
-        if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
-            throw new CustomTokenException(ErrorCode.INVALID_REFRESH_TOKEN);
-        }
-        Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, Collections.singletonList(new SimpleGrantedAuthority(claims.get("role").toString())));
-        return generateAccessToken(authentication); // 새로운 액세스 토큰 반환
+    public int getAccessTokenMaxAge() {
+        return (int)  ACCESS_TOKEN_EXPIRE_TIME.toSeconds();
     }
 
     public int getRefreshTokenMaxAge() {

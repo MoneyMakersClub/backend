@@ -16,6 +16,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
+    private final CookieUtil cookieUtil;
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
 
@@ -31,13 +32,23 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication); // 인증된 사용자 정보를 SecurityContext에 저장
             } catch (CustomTokenException e) {
                 SecurityContextHolder.clearContext();
-                // 리프레시 토큰은 유효한 경우
-                if (e.getErrorCode().equals(ErrorCode.EXPIRED_ACCESS_TOKEN)){
-                    ErrorResponseUtil.writeErrorResponse(response, e.getErrorCode(), request.getRequestURI(), true);
-                    return;
-                } else {
-                    ErrorResponseUtil.writeErrorResponse(response, e.getErrorCode(), request.getRequestURI(), false);
-                    return;
+                if (e.getErrorCode().equals(ErrorCode.EXPIRED_ACCESS_TOKEN)) {
+                    // 리프레시 토큰 검증을 위해 쿠키에서 리프레시 토큰 가져오기
+                    String refreshToken = cookieUtil.getCookieValue(request, "refreshToken");
+                    if (refreshToken != null) {
+                        try {
+                            // 리프레시 토큰의 유효성을 검증
+                            jwtUtil.validateRefreshToken(refreshToken);
+                            ErrorResponseUtil.writeErrorResponse(response, e.getErrorCode(), request.getRequestURI(), true);
+                            return;
+                        } catch (CustomTokenException ex) {
+                            ErrorResponseUtil.writeErrorResponse(response, ex.getErrorCode(), request.getRequestURI(), false);
+                            return;
+                        }
+                    } else {
+                        ErrorResponseUtil.writeErrorResponse(response, e.getErrorCode(), request.getRequestURI(), false);
+                        return;
+                    }
                 }
             }
         }
