@@ -5,15 +5,13 @@ import com.mmc.bookduck.domain.friend.entity.FriendRequestStatus;
 
 public record FriendRequestUnitDto(
         Long requestId,
-        Long senderId,
-        Long receiverId,
+        String receiverNickname,
         FriendRequestStatus friendRequestStatus
 ) {
     public static FriendRequestUnitDto from(FriendRequest friendRequest) {
         return new FriendRequestUnitDto(
                 friendRequest.getRequestId(),
-                friendRequest.getSender().getUserId(),
-                friendRequest.getReceiver().getUserId(),
+                friendRequest.getReceiver().getNickname(),
                 friendRequest.getFriendRequestStatus()
         );
     }
