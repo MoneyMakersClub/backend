@@ -22,7 +22,7 @@ public class FriendController {
     @PostMapping
     @Operation(summary = "친구 요청 수락", description = "친구 요청을 수락하고 친구를 생성합니다.")
     public ResponseEntity<?> createFriend(@Valid @RequestBody FriendCreateRequestDto requestDto) {
-        friendService.createFriend(requestDto.requestId());
+        friendService.createFriend(requestDto.friendRequestId());
         return ResponseEntity.ok().build();
     }
 

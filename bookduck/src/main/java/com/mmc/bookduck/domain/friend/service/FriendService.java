@@ -31,8 +31,8 @@ public class FriendService {
     private final UserSkinService userSkinService;
 
     // 친구 요청 수락 (=친구 생성)
-    public void createFriend(Long requestId){
-        FriendRequest request = friendRequestRepository.findById(requestId)
+    public void createFriend(Long friendRequestId){
+        FriendRequest request = friendRequestRepository.findById(friendRequestId)
                 .orElseThrow(() -> new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND));
 
         // currentUser = receiver여야만 수락 가능
@@ -46,8 +46,9 @@ public class FriendService {
             throw new CustomException(ErrorCode.FRIEND_ALREADY_EXISTS);
         }
 
-        FriendCreateRequestDto friendCreateRequestDto = new FriendCreateRequestDto(requestId, request.getSender(), currentUser);
-        Friend friend = friendCreateRequestDto.toEntity();
+        User sender = request.getSender();
+        FriendCreateRequestDto friendCreateRequestDto = new FriendCreateRequestDto(friendRequestId);
+        Friend friend = friendCreateRequestDto.toEntity(sender, currentUser);
         friendRepository.save(friend);
         request.setFriendRequestStatus(FriendRequestStatus.ACCEPTED);
         friendRequestRepository.save(request);
