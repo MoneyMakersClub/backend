@@ -1,6 +1,6 @@
-package com.mmc.bookduck.domain.user.service;
+package com.mmc.bookduck.domain.auth.service;
 
-import com.mmc.bookduck.domain.user.dto.common.TokenResponseDto;
+import com.mmc.bookduck.domain.auth.dto.response.TokenResponseDto;
 import com.mmc.bookduck.global.exception.CustomTokenException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.security.JwtUtil;
@@ -29,13 +29,13 @@ public class AuthService {
 
         // 리프레시 토큰 유효성 검사
         jwtUtil.validateRefreshToken(refreshToken);
-        Claims claims = jwtUtil.parseClaims(refreshToken);
+        Claims claims = jwtUtil.getRefreshTokenClaims(refreshToken);
         String email = claims.getSubject();
 
         // Redis에 저장된 리프레시 토큰과 일치하는지 확인
-        String storedRefreshToken = redisService.getValues(email).toString();
+        Object storedRefreshToken = redisService.getValues(email);
 
-        if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
+        if (storedRefreshToken == null || !storedRefreshToken.toString().equals(refreshToken)) {
             throw new CustomTokenException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
