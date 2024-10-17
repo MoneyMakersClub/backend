@@ -80,7 +80,7 @@ public class FriendService {
         }
 
         // 친구 요청 상태를 BREAKUP로 변경
-        FriendRequest request = friendRequestRepository.findBySenderUserIdAndReceiverUserIdAndFriendRequestStatus(
+        FriendRequest request = friendRequestRepository.findFriendRequestBetweenUsers(
                         friend.getUser1().getUserId(), friend.getUser2().getUserId(), FriendRequestStatus.ACCEPTED)
                 .orElseThrow(() -> new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND));
         request.setFriendRequestStatus(FriendRequestStatus.BREAKUP);

@@ -39,8 +39,7 @@ public class FriendRequestService {
             throw new CustomException(ErrorCode.FRIEND_ALREADY_EXISTS);
         }
         // 중복된 친구 요청 확인
-        if (friendRequestRepository.findBySenderUserIdAndReceiverUserIdAndFriendRequestStatus(sender.getUserId(), receiver.getUserId(), FriendRequestStatus.PENDING).isPresent() ||
-                friendRequestRepository.findBySenderUserIdAndReceiverUserIdAndFriendRequestStatus(receiver.getUserId(), sender.getUserId(), FriendRequestStatus.PENDING).isPresent()) {
+        if (friendRequestRepository.findFriendRequestBetweenUsers(sender.getUserId(), receiver.getUserId(), FriendRequestStatus.PENDING).isPresent()) {
             throw new CustomException(ErrorCode.FRIEND_REQUEST_ALREADY_EXISTS);
         }
         FriendRequest friendRequest = requestDto.toEntity(sender, receiver);
