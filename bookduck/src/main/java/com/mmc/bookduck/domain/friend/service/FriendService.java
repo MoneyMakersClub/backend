@@ -41,6 +41,11 @@ public class FriendService {
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
 
+        // 이미 친구인지 확인
+        if (friendRepository.findFriendBetweenUsers(request.getSender().getUserId(), request.getReceiver().getUserId()).isPresent()) {
+            throw new CustomException(ErrorCode.FRIEND_ALREADY_EXISTS);
+        }
+
         FriendCreateRequestDto friendCreateRequestDto = new FriendCreateRequestDto(requestId, request.getSender(), currentUser);
         Friend friend = friendCreateRequestDto.toEntity();
         friendRepository.save(friend);

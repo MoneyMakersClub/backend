@@ -35,7 +35,7 @@ public class FriendRequestService {
             throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
         }
         // 이미 친구인지 확인
-        if (friendRepository.findByUser1UserIdAndUser2UserId(sender.getUserId(), receiver.getUserId()).isPresent()) {
+        if (friendRepository.findFriendBetweenUsers(sender.getUserId(), receiver.getUserId()).isPresent()) {
             throw new CustomException(ErrorCode.FRIEND_ALREADY_EXISTS);
         }
         // 중복된 친구 요청 확인
