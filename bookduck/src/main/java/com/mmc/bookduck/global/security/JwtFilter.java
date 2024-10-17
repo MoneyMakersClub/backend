@@ -1,6 +1,5 @@
 package com.mmc.bookduck.global.security;
 
-import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.CustomTokenException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import jakarta.servlet.FilterChain;
@@ -17,7 +16,6 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
-    private final CookieUtil cookieUtil;
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
 
@@ -33,17 +31,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication); // 인증된 사용자 정보를 SecurityContext에 저장
             } catch (CustomTokenException e) {
                 SecurityContextHolder.clearContext();
-                // 리프레시 토큰은 유효한 경우 재발급
+                // 리프레시 토큰은 유효한 경우
                 if (e.getErrorCode().equals(ErrorCode.EXPIRED_ACCESS_TOKEN)){
-                    String refreshToken = cookieUtil.getCookieValue(request, "refreshToken");
-                    try {
-                        String newAccessToken = jwtUtil.refreshAccessToken(refreshToken);
-                        response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + newAccessToken);
-                    } catch (CustomTokenException ex) {
-                        ErrorResponseUtil.writeErrorResponse(response, ex.getErrorCode(), request.getRequestURI());
-                    }
+                    ErrorResponseUtil.writeErrorResponse(response, e.getErrorCode(), request.getRequestURI(), true);
+                    return;
                 } else {
-                    ErrorResponseUtil.writeErrorResponse(response, e.getErrorCode(), request.getRequestURI());
+                    ErrorResponseUtil.writeErrorResponse(response, e.getErrorCode(), request.getRequestURI(), false);
                     return;
                 }
             }
