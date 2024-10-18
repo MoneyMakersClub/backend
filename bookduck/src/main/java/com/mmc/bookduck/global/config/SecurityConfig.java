@@ -49,7 +49,6 @@ public class SecurityConfig {
         return web -> web.ignoring()
                 .requestMatchers("/error", "/favicon.ico",
                         "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs", "/v3/api-docs/**",
-                        "/oauth2/authorization/**",
                         "/auth/refresh"
                 )
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
