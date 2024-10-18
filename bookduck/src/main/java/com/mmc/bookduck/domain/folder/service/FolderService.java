@@ -118,6 +118,7 @@ public class FolderService {
     }
 
     // 폴더 별 도서 목록 조회
+    @Transactional(readOnly = true)
     public FolderBookListResponseDto getFolderBookList(Long folderId) {
         User user = userService.getCurrentUser();
         Folder folder = findFolderById(folderId);
@@ -136,6 +137,7 @@ public class FolderService {
     }
 
     // 전체 폴더 목록 조회
+    @Transactional(readOnly = true)
     public AllFolderListResponseDto getAllFolderList() {
         User user = userService.getCurrentUser();
         List<Folder> folders = folderRepository.findAllByUser(user);
@@ -150,6 +152,7 @@ public class FolderService {
         return new AllFolderListResponseDto(folderList);
     }
 
+    @Transactional(readOnly = true)
     public Folder findFolderById(Long folderId){
         Folder folder = folderRepository.findById(folderId)
                 .orElseThrow(()-> new CustomException(ErrorCode.FOLDER_NOT_FOUND));
@@ -157,6 +160,7 @@ public class FolderService {
     }
 
     // 폴더별 & 상태별 도서 목록 조회
+    @Transactional(readOnly = true)
     public FolderBookListResponseDto getFolderBookListStatus(Long folderId, String status) {
         User user = userService.getCurrentUser();
         Folder folder = findFolderById(folderId);
