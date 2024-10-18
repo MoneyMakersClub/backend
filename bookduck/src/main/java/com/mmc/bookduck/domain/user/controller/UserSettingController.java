@@ -5,6 +5,7 @@ import com.mmc.bookduck.domain.user.dto.request.UserSettingUpdateRequestDto;
 import com.mmc.bookduck.domain.user.service.UserSettingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,14 +31,14 @@ public class UserSettingController {
 
     @Operation(summary = "닉네임 변경", description = "닉네임을 변경합니다.")
     @PatchMapping("/nickname")
-    public ResponseEntity<?> updateNickname(@RequestBody UserNicknameRequestDto requestDto) {
+    public ResponseEntity<?> updateNickname(@RequestBody @Valid UserNicknameRequestDto requestDto) {
         userSettingService.updateNickname(requestDto);
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "설정 옵션 변경", description = "사용 설정 및 기록 폰트 옵션을 변경합니다.")
     @PatchMapping("/options")
-    public ResponseEntity<?> updateOptions(@RequestBody UserSettingUpdateRequestDto requestDto) {
+    public ResponseEntity<?> updateOptions(@RequestBody @Valid UserSettingUpdateRequestDto requestDto) {
         userSettingService.updateOptions(requestDto);
         return ResponseEntity.ok().build();
     }
