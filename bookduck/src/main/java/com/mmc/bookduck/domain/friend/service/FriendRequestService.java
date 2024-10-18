@@ -39,7 +39,9 @@ public class FriendRequestService {
             throw new CustomException(ErrorCode.FRIEND_ALREADY_EXISTS);
         }
         // 중복된 친구 요청 확인
-        if (friendRequestRepository.findFriendRequestBetweenUsers(sender.getUserId(), receiver.getUserId(), FriendRequestStatus.PENDING).isPresent()) {
+        List<FriendRequest> existingRequests = friendRequestRepository.findAllFriendRequestsBetweenUsers(
+                sender.getUserId(), receiver.getUserId(), FriendRequestStatus.PENDING);
+        if (!existingRequests.isEmpty()) {
             throw new CustomException(ErrorCode.FRIEND_REQUEST_ALREADY_EXISTS);
         }
         FriendRequest friendRequest = requestDto.toEntity(sender, receiver);
@@ -64,7 +66,7 @@ public class FriendRequestService {
     @Transactional(readOnly = true)
     public FriendRequestListResponseDto getReceivedFriendRequests() {
         User currentUser = userService.getCurrentUser();
-        List<FriendRequestUnitDto> receivedList = friendRequestRepository.findByReceiverUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
+        List<FriendRequestUnitDto> receivedList = friendRequestRepository.findAllByReceiverUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
                 .map(FriendRequestUnitDto::from)
                 .collect(Collectors.toList());
@@ -75,7 +77,7 @@ public class FriendRequestService {
     @Transactional(readOnly = true)
     public FriendRequestListResponseDto getSentFriendRequests() {
         User currentUser = userService.getCurrentUser();
-        List<FriendRequestUnitDto> sentList = friendRequestRepository.findBySenderUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
+        List<FriendRequestUnitDto> sentList = friendRequestRepository.findAllBySenderUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
                 .map(FriendRequestUnitDto::from)
                 .collect(Collectors.toList());

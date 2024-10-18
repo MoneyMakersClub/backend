@@ -58,7 +58,7 @@ public class FriendService {
     @Transactional(readOnly = true)
     public FriendListResponseDto getFriendList() {
         User currentUser = userService.getCurrentUser();
-        List<FriendUnitDto> friendList = friendRepository.findByUser1UserId(currentUser.getUserId())
+        List<FriendUnitDto> friendList = friendRepository.findAllByUser1UserId(currentUser.getUserId())
                 .stream()
                 .map(friend -> {
                     UserSkinEquippedDto userSkinEquipped = userSkinService.getEquippedSkinOrDefault(friend.getUser2().getUserId());
@@ -81,10 +81,14 @@ public class FriendService {
         }
 
         // 친구 요청 상태를 BREAKUP로 변경
-        FriendRequest request = friendRequestRepository.findFriendRequestBetweenUsers(
-                        friend.getUser1().getUserId(), friend.getUser2().getUserId(), FriendRequestStatus.ACCEPTED)
-                .orElseThrow(() -> new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND));
+        List<FriendRequest> requests = friendRequestRepository.findAllFriendRequestsBetweenUsers(
+                friend.getUser1().getUserId(), friend.getUser2().getUserId(), FriendRequestStatus.ACCEPTED);
+        if (requests.isEmpty()) {
+            throw new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND);
+        }
+        FriendRequest request = requests.get(0);  // 여러 개가 있을 경우, 가장 최근 요청을 처리
         request.setFriendRequestStatus(FriendRequestStatus.BREAKUP);
+        friendRequestRepository.save(request);
 
         friendRepository.delete(friend);
     }
