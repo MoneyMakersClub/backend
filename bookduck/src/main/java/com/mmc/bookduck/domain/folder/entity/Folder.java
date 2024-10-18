@@ -38,6 +38,11 @@ public class Folder {
         this.folderBooks = new ArrayList<>();
     }
 
+    // folder 이름 수정
+    public void updateFolderName(String folderName) {
+        this.folderName = folderName;
+    }
+
     // folderBook 추가
     public void addFolderBook(FolderBook folderBook) {
         this.folderBooks.add(folderBook);

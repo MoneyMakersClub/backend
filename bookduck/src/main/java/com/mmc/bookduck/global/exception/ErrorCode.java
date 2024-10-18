@@ -55,15 +55,17 @@ public enum ErrorCode {
     EXCERPT_HEART_NOT_FOUND(404, "발췌의 좋아요를 찾을 수 없습니다."),
     ALARM_NOT_FOUND(404, "알림을 찾을 수 없습니다."),
     FOLDER_NOT_FOUND(404, "폴더를 찾을 수 없습니다."),
+    FOLDERBOOK_NOT_FOUND(404, "폴더내의 책을 찾을 수 없습니다."),
     BADGE_NOT_FOUND(404, "뱃지를 찾을 수 없습니다."),
     SKIN_NOT_FOUND(404, "스킨을 찾을 수 없습니다."),
     GENRE_NOT_FOUND(404, "장르를 찾을 수 없습니다."),
 
 
+
     // 409 Conflict
     // 중복 리소스 생성 시도
     USER_ALREADY_EXISTS(409, "이미 존재하는 사용자입니다."),
-    FRIEND_REQUEST_ALREADY_SENT(409, "이미 친구 요청을 보냈습니다."),
+    FRIEND_REQUEST_ALREADY_EXISTS(409, "이미 친구 요청이 존재합니다."),
     FRIEND_ALREADY_EXISTS(409, "이미 친구를 맺었습니다."),
     EMAIL_ALREADY_REGISTERED(400, "해당 이메일을 사용하는 다른 소셜 로그인 방법으로 가입되어 있습니다."),
     BOOK_ALREADY_EXISTS(409, "이미 등록된 책입니다."),
@@ -72,6 +74,7 @@ public enum ErrorCode {
     EXCERPT_ALREADY_EXISTS(409, "이미 존재하는 발췌입니다."),
     ALARM_ALREADY_EXISTS(409, "이미 존재하는 알림입니다."),
     FOLDER_ALREADY_EXISTS(409, "이미 존재하는 폴더입니다."),
+    FOLDERBOOK_ALREADY_EXISTS(409, "이미 폴더 내에 존재하는 책입니다."),
     BADGE_ALREADY_EXISTS(409, "이미 존재하는 뱃지입니다."),
     SKIN_ALREADY_EXISTS(409, "이미 존재하는 스킨입니다."),
     SKIN_ALREADY_EQUIPPED(409, "이미 장착한 스킨입니다."),
