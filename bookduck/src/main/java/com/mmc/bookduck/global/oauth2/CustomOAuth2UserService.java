@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -94,10 +93,31 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private String generateUniqueNickname() {
+        final int maxNicknameLength = 8;
+        String[] prefixes = {
+                "행복한", "즐거운", "상냥한", "발랄한", "귀여운",
+                "용감한", "따뜻한", "활기찬", "신나는", "멋쟁이",
+                "웃는", "맑은", "포근", "튼튼", "순수",
+                "조용", "멋진", "상쾌", "활발", "빛나는",
+                "기쁜", "부끄", "새침", "춤추는", "반짝"
+        };
+        String suffixChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String prefix = prefixes[(int) (Math.random() * prefixes.length)];
         String nickname;
+        int suffixLength = maxNicknameLength - prefix.length() - 2;
+
         do {
-            nickname = "북덕" + UUID.randomUUID().toString().substring(0, 6); // 랜덤으로 생성된 6자리 UUID 사용
+            StringBuilder suffix = new StringBuilder();
+            // suffixChars에서 랜덤 글자를 선택
+            for (int i = 0; i < suffixLength; i++) {
+                char randomChar = suffixChars.charAt((int) (Math.random() * suffixChars.length()));
+                suffix.append(randomChar);
+            }
+            // 닉네임 선택 및 8글자로 자르기
+            nickname = prefix + "북덕" + suffix;
+            nickname = nickname.substring(0, 8);
         } while (userRepository.existsByNickname(nickname)); // 중복 검사
+
         return nickname;
     }
 }
