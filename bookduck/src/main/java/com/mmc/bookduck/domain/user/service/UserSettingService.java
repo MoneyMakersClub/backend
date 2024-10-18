@@ -35,13 +35,13 @@ public class UserSettingService {
 
     @Transactional(readOnly = true)
     public UserNicknameAvailabilityResponseDto checkNicknameAvailability(UserNicknameRequestDto requestDto) {
-        return new UserNicknameAvailabilityResponseDto(userService.existsByNickname(requestDto.nickname()));
+        return new UserNicknameAvailabilityResponseDto(!userService.existsByNickname(requestDto.nickname()));
     }
 
     public void updateNickname(UserNicknameRequestDto requestDto) {
         String nickname = requestDto.nickname();
         User user = userService.getCurrentUser();
-        boolean isAvailable = userService.existsByNickname(nickname);
+        boolean isAvailable = !userService.existsByNickname(nickname);
         if (isAvailable) {
             user.updateNickname(nickname); // 트랜잭션 커밋 시 자동 저장
         } else {
