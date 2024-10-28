@@ -59,7 +59,7 @@ public class UserBookController {
 
     // 서재 책 상세 조회 - 기본 정보
     @GetMapping("/{userbookId}")
-    public ResponseEntity<BookInfoBasicResponseDto> getUserBookInfoBasic(@PathVariable(name = "userbookId")Long userbookId){
+    public ResponseEntity<BookInfoBasicResponseDto> getUserBookInfoBasic(@PathVariable(name = "userbookId") final Long userbookId){
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userBookService.getUserBookInfoBasic(userbookId));
@@ -67,7 +67,7 @@ public class UserBookController {
 
     // 서재 책 상세 조회 - 추가 정보
     @GetMapping("/{userbookId}/additional")
-    public ResponseEntity<BookInfoAdditionalResponseDto> getUserBookInfoAdditional(@PathVariable(name = "userbookId")Long userbookId){
+    public ResponseEntity<BookInfoAdditionalResponseDto> getUserBookInfoAdditional(@PathVariable(name = "userbookId") final Long userbookId){
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userBookService.getUserBookInfoAdditional(userbookId));
