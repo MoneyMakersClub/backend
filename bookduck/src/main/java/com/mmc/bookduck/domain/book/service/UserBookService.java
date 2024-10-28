@@ -9,6 +9,8 @@ import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
+import com.mmc.bookduck.domain.onelinerating.entity.OneLineRating;
+import com.mmc.bookduck.domain.onelinerating.repository.OneLineRatingRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -30,6 +32,7 @@ public class UserBookService {
     private final UserBookRepository userBookRepository;
     private final GenreService genreService;
     private final UserService userService;
+    private final OneLineRatingRepository oneLineRatingRepository;
 
 
     // 서재에 책 추가
@@ -116,7 +119,6 @@ public class UserBookService {
     }
 
     // 서재 책 전체 조회
-    @Transactional(readOnly = true)
     public UserBookListResponseDto getAllUserBook(String sort){
 
         User user = userService.getCurrentUser();
@@ -130,7 +132,6 @@ public class UserBookService {
     }
 
     // 서재 책 상태별 조회
-    @Transactional(readOnly = true)
     public UserBookListResponseDto getStatusUserBook(List<String> statusList, String sort){
 
         if(statusList.isEmpty()){
@@ -174,8 +175,16 @@ public class UserBookService {
         String koreanGenreName = genreService.genreNameToKorean(userBook.getBookInfo().getGenre());
         BookInfoDetailDto detailDto = BookInfoDetailDto.from(userBook, koreanGenreName);
 
+        OneLineRating oneLineRating = oneLineRatingRepository.findByUserBook(userBook)
+                .orElse(null);
+
         // 추후 수정
-        return new BookInfoBasicResponseDto(null, null, null, userBook.getReadStatus(), detailDto);
+        return new BookInfoBasicResponseDto(
+                null,
+                oneLineRating!=null ? oneLineRating.getOneLineContent() : null,
+                oneLineRating!=null ? oneLineRating.getRating() : null,
+                userBook.getReadStatus(),
+                detailDto);
     }
 
 
