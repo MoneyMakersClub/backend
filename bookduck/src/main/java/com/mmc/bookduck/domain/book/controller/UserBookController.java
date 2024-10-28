@@ -5,6 +5,7 @@ import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
 import com.mmc.bookduck.domain.book.service.UserBookService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,18 +41,19 @@ public class UserBookController {
 
     // 서재 전체 조회
     @GetMapping("/list")
-    public ResponseEntity<UserBookListResponseDto> getAllUserBook(){
+    public ResponseEntity<UserBookListResponseDto> getAllUserBook(@RequestParam(name = "sort") final String sort){
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(userBookService.getAllUserBook());
+                .body(userBookService.getAllUserBook(sort));
     }
 
     // 서재 책 상태별 조회
     @GetMapping("/filter")
-    public ResponseEntity<UserBookListResponseDto> getStatusUserBook(@RequestParam(name = "status")String status){
+    public ResponseEntity<UserBookListResponseDto> getStatusUserBook(@RequestParam(name = "status") final List<String> statusList,
+                                                                     @RequestParam(name = "sort") final String sort){
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(userBookService.getStatusUserBook(status));
+                .body(userBookService.getStatusUserBook(statusList, sort));
     }
 
     // 서재 책 상세 조회 - 기본 정보

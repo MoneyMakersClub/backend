@@ -117,39 +117,50 @@ public class UserBookService {
 
     // 서재 책 전체 조회
     @Transactional(readOnly = true)
-    public UserBookListResponseDto getAllUserBook(){
+    public UserBookListResponseDto getAllUserBook(String sort){
 
         User user = userService.getCurrentUser();
-        List<UserBook> userBookList= userBookRepository.findAllByUser(user);
-        List<UserBookResponseDto> dtos = new ArrayList<>();
+        List<UserBook> userBookList = sortUserBook(user, sort);
 
-        if(userBookList != null){
-            for(UserBook book : userBookList){
+        List<UserBookResponseDto> dtos = new ArrayList<>();
+        for(UserBook book : userBookList){
                 dtos.add(UserBookResponseDto.from(book));
-            }
         }
         return new UserBookListResponseDto(dtos);
-
     }
 
     // 서재 책 상태별 조회
     @Transactional(readOnly = true)
-    public UserBookListResponseDto getStatusUserBook(String status){
+    public UserBookListResponseDto getStatusUserBook(List<String> statusList, String sort){
 
+        if(statusList.isEmpty()){
+            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
+        }
+
+        List<ReadStatus> readStatusList = new ArrayList<>();
         try {
-            ReadStatus.valueOf(status);
+            for(String status : statusList){
+                readStatusList.add(ReadStatus.valueOf(status));
+            }
         } catch (IllegalArgumentException e) {
             throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
         }
 
         User user = userService.getCurrentUser();
-        List<UserBook> userBookList= userBookRepository.findByUserAndReadStatus(user, ReadStatus.valueOf(status));
-        List<UserBookResponseDto> dtos = new ArrayList<>();
+        List<UserBook> sorteduserBookList = sortUserBook(user, sort);
 
-        if(userBookList != null){
-            for(UserBook book : userBookList){
-                dtos.add(UserBookResponseDto.from(book));
+        List<UserBook> userBookList = new ArrayList<>();
+        for(UserBook userBook : sorteduserBookList){
+            for(ReadStatus status : readStatusList){
+                if(userBook.getReadStatus().equals(status)){
+                    userBookList.add(userBook);
+                }
             }
+        }
+
+        List<UserBookResponseDto> dtos = new ArrayList<>();
+        for(UserBook book : userBookList){
+            dtos.add(UserBookResponseDto.from(book));
         }
         return new UserBookListResponseDto(dtos);
     }
@@ -165,5 +176,20 @@ public class UserBookService {
 
         // 추후 수정
         return new BookInfoBasicResponseDto(null, null, null, userBook.getReadStatus(), detailDto);
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<UserBook> sortUserBook(User user, String sort){
+
+        if(sort.equals("latest")){
+            return userBookRepository.findAllByUserOrderByCreatedTimeDesc(user);
+        }else if(sort.equals("rating")){
+            return userBookRepository.findByUserOrderByRating(user);
+        }else if(sort.equals("title")){
+            return userBookRepository.findAllByUserOrderByTitle(user);
+        }else{
+            throw new CustomException(ErrorCode.ERROR);
+        }
     }
 }
