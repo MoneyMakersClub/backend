@@ -180,9 +180,10 @@ public class UserBookService {
         OneLineRating oneLineRating = oneLineRatingRepository.findByUserBook(userBook)
                 .orElse(null);
 
-        // 추후 수정
+        double ratingAverage = getRatingAverage(findAllUserBookByBookInfo(userBook.getBookInfo()));
+
         return new BookInfoBasicResponseDto(
-                null,
+                ratingAverage,
                 oneLineRating!=null ? oneLineRating.getOneLineContent() : null,
                 oneLineRating!=null ? oneLineRating.getRating() : null,
                 userBook.getReadStatus(),
@@ -193,7 +194,7 @@ public class UserBookService {
     @Transactional(readOnly = true)
     public BookInfoAdditionalResponseDto getUserBookInfoAdditional(Long userBookId) {
         UserBook userBook = findUserBookById(userBookId);
-        List<UserBook> sameBookInfo_userBookList = userBookRepository.findAllByBookInfo(userBook.getBookInfo());
+        List<UserBook> sameBookInfo_userBookList = findAllUserBookByBookInfo(userBook.getBookInfo());
 
         List<BookRatingUnitDto> oneLineList = new ArrayList<>();
         if (!sameBookInfo_userBookList.isEmpty()) {
@@ -220,5 +221,26 @@ public class UserBookService {
         }else{
             throw new CustomException(ErrorCode.ERROR);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserBook> findAllUserBookByBookInfo(BookInfo bookInfo){
+        return userBookRepository.findAllByBookInfo(bookInfo);
+    }
+
+    @Transactional(readOnly = true)
+    public double getRatingAverage(List<UserBook> userBookList) {
+
+        double totalRating = 0.0;
+        int count = 0;
+
+        for(UserBook book : userBookList){
+            Optional<OneLineRating> oneLineRating = oneLineRatingRepository.findByUserBook(book);
+            if (oneLineRating.isPresent()) {
+                totalRating += oneLineRating.get().getRating();
+                count++;
+            }
+        }
+        return count > 0 ? totalRating / count : 0.0;
     }
 }
