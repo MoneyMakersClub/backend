@@ -6,47 +6,23 @@ import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.entity.User;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Locked.Read;
-
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserBookRequestDto {
-
-    @NotBlank
-    private String title;
-
-    @NotBlank
-    private List<String> authors;
-
-
-    @NotBlank
-    private String readStatus;
-
-    private String publisher; // null 가능
-
-    private String publishDate; // null 가능, 연도만 제공될 수 있음
-
-    private String description;
-
-    private List<String> category;
-
-    @NotBlank
-    private Long genreId;
-
-    private Long pageCount;
-
-    private String imgPath;
-
-    private String language;
-
-    @NotBlank
-    private String providerId;
+public record UserBookRequestDto(
+        @NotBlank String title,
+        @NotBlank List<String> authors,
+        @NotBlank String readStatus,
+        String publisher,
+        String publishDate,
+        String description,
+        List<String> category,
+        @NotBlank Long genreId,
+        Long pageCount,
+        String imgPath,
+        String language,
+        @NotBlank String providerId
+) {
 
     public UserBook toEntity(User user, BookInfo bookInfo, ReadStatus readStatus) {
         return UserBook.builder()
@@ -57,21 +33,19 @@ public class UserBookRequestDto {
     }
 
 
-    public BookInfo toEntity(String author, Genre genre){
+    public BookInfo toEntity(String author, Genre genre) {
         return BookInfo.builder()
-                .providerId(this.getProviderId())
-                .title(this.getTitle())
+                .providerId(this.providerId)
+                .title(this.title)
                 .author(author)
-                .publisher(this.getPublisher())
-                .publishDate(this.getPublishDate())
-                .description(this.getDescription())
-                .category(this.getCategory().getFirst())
+                .publisher(this.publisher)
+                .publishDate(this.publishDate)
+                .description(this.description)
+                .category(this.category != null && !this.category.isEmpty() ? this.category.get(0) : null)
                 .genre(genre)
-                .pageCount(this.getPageCount())
-                .imgPath(this.getImgPath())
-                .language(this.getLanguage())
-                .genre(genre)
+                .pageCount(this.pageCount)
+                .imgPath(this.imgPath)
+                .language(this.language)
                 .build();
     }
 }
-

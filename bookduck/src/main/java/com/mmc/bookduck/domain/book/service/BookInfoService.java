@@ -187,8 +187,8 @@ public class BookInfoService {
     // api bookInfo 저장
     public BookInfo saveApiBookInfo (UserBookRequestDto dto) {
 
-        String saveAuthor = dto.getAuthors().getFirst();
-        Genre genre = genreService.findGenreById(dto.getGenreId());
+        String saveAuthor = dto.authors().getFirst();
+        Genre genre = genreService.findGenreById(dto.genreId());
 
         BookInfo bookInfo = dto.toEntity(saveAuthor,genre);
         return bookInfoRepository.save(bookInfo);
