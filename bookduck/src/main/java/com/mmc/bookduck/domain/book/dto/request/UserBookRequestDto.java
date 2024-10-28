@@ -36,6 +36,9 @@ public class UserBookRequestDto {
 
     private List<String> category;
 
+    @NotBlank
+    private Long genreId;
+
     private Long pageCount;
 
     private String imgPath;
@@ -63,6 +66,7 @@ public class UserBookRequestDto {
                 .publishDate(this.getPublishDate())
                 .description(this.getDescription())
                 .category(this.getCategory().getFirst())
+                .genre(genre)
                 .pageCount(this.getPageCount())
                 .imgPath(this.getImgPath())
                 .language(this.getLanguage())
