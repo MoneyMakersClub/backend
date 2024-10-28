@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.book.controller;
 
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
+import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
@@ -62,5 +63,13 @@ public class UserBookController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userBookService.getUserBookInfoBasic(userbookId));
+    }
+
+    // 서재 책 상세 조회 - 추가 정보
+    @GetMapping("/{userbookId}/additional")
+    public ResponseEntity<BookInfoAdditionalResponseDto> getUserBookInfoAdditional(@PathVariable(name = "userbookId")Long userbookId){
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.getUserBookInfoAdditional(userbookId));
     }
 }

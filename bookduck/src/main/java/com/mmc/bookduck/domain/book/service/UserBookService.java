@@ -1,7 +1,9 @@
 package com.mmc.bookduck.domain.book.service;
 
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
+import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
+import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
@@ -185,6 +187,24 @@ public class UserBookService {
                 oneLineRating!=null ? oneLineRating.getRating() : null,
                 userBook.getReadStatus(),
                 detailDto);
+    }
+
+    // 서재 책 상세보기 - 추가정보
+    @Transactional(readOnly = true)
+    public BookInfoAdditionalResponseDto getUserBookInfoAdditional(Long userBookId) {
+        UserBook userBook = findUserBookById(userBookId);
+        List<UserBook> sameBookInfo_userBookList = userBookRepository.findAllByBookInfo(userBook.getBookInfo());
+
+        List<BookRatingUnitDto> oneLineList = new ArrayList<>();
+        if (!sameBookInfo_userBookList.isEmpty()) {
+            for (UserBook book : sameBookInfo_userBookList) {
+                if (!book.equals(userBook)) {
+                    oneLineRatingRepository.findByUserBook(book).ifPresent(oneLineRating -> oneLineList.add(
+                            BookRatingUnitDto.from(oneLineRating)));
+                }
+            }
+        }
+        return new BookInfoAdditionalResponseDto(oneLineList);
     }
 
 
