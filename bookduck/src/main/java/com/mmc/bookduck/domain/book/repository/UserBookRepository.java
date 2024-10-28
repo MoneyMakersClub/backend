@@ -30,5 +30,5 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
 
     List<UserBook> findByBookInfo(BookInfo bookInfo);
 
-
+    List<UserBook> findAllByUser(User user);
 }
