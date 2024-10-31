@@ -73,4 +73,9 @@ public class UserService {
     public Page<User> getSearchedUserPage(String keyword, Pageable pageable) {
         return userRepository.searchAllByNicknameContaining(keyword, pageable);
     }
+
+    @Transactional(readOnly = true)
+    public boolean existsByNickname(String nickname) {
+        return userRepository.existsByNickname(nickname);
+    }
 }

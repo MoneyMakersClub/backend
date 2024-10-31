@@ -45,6 +45,7 @@ public enum ErrorCode {
     // 404 Not Found
     // 각 리소스를 찾지 못함
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
+    USERSETTING_NOT_FOUND(404, "사용자 설정을 찾을 수 없습니다."),
     FRIEND_REQUEST_NOT_FOUND(404, "친구 요청을 찾을 수 없습니다."),
     FRIEND_NOT_FOUND(404, "친구를 찾을 수 없습니다."),
     BOOKINFO_NOT_FOUND(404, "책 정보를 찾을 수 없습니다."),
@@ -65,6 +66,7 @@ public enum ErrorCode {
     // 409 Conflict
     // 중복 리소스 생성 시도
     USER_ALREADY_EXISTS(409, "이미 존재하는 사용자입니다."),
+    NICKNAME_ALREADY_EXISTS(409, "이미 존재하는 닉네임입니다."),
     FRIEND_REQUEST_ALREADY_EXISTS(409, "이미 친구 요청이 존재합니다."),
     FRIEND_ALREADY_EXISTS(409, "이미 친구를 맺었습니다."),
     EMAIL_ALREADY_REGISTERED(400, "해당 이메일을 사용하는 다른 소셜 로그인 방법으로 가입되어 있습니다."),
