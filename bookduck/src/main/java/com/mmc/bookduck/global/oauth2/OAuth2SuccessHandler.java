@@ -19,7 +19,7 @@ import java.io.IOException;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtUtil jwtUtil;
     private final CookieUtil cookieUtil;
-    private static final String REDIRECT_URL = "http://localhost:3000"; // TODO: 추후 프론트엔드 배포 주소로 교체
+    private static final String REDIRECT_URL = "http://localhost:3000/home"; // TODO: 추후 프론트엔드 배포 주소로 교체
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
