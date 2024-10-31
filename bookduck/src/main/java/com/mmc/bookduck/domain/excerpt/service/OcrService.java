@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OcrService {
@@ -23,10 +22,7 @@ public class OcrService {
         if (image.isEmpty()) {
             throw new CustomException(ErrorCode.EMPTY_IMAGE_FILE);
         }
-        // 이미지 업로드 후 URL 생성
-        log.info("Uploading image to Google Cloud Storage");
         String filePath = googleCloudUploadService.upload(image);
-        log.info("Image uploaded successfully, filePath: {}", filePath);
         return extractTextFromImage(filePath);
     }
 
