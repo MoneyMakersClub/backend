@@ -31,7 +31,7 @@ public class ExcerptController {
     }
 
     @PostMapping
-    @Operation(summary = "발췌 텍스트 저장", description = "OCR로 인식된 텍스트를 확인 및 수정 후 발췌로 저장합니다.")
+    @Operation(summary = "발췌 텍스트 저장", description = "OCR로 인식된 텍스트 또는 사용자가 입력한 텍스트를 저장합니다.")
     public ResponseEntity<?> saveExcerpt(@Valid @RequestBody ExcerptSaveRequestDto requestDto) {
         ExcerptResponseDto responseDto = excerptService.saveExcerpt(requestDto);
         return ResponseEntity.ok(responseDto);

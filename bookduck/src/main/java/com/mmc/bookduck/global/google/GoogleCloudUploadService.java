@@ -22,10 +22,10 @@ public class GoogleCloudUploadService {
 
     public String upload(MultipartFile file) {
         try {
-            // 파일 이름에 UUID를 추가 (중복방지)
-            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            // 파일 이름에 UUID를 추가 (중복방지), 한글 및 특수문자 제거
+            String sanitizedFileName = UUID.randomUUID() + "_" + file.getOriginalFilename().replaceAll("[^a-zA-Z0-9.]", "");
             BlobInfo blobInfo = storage.create(
-                    BlobInfo.newBuilder(bucketName, fileName).build(),
+                    BlobInfo.newBuilder(bucketName, sanitizedFileName).build(),
                     file.getBytes()
             );
             return blobInfo.getMediaLink();  // 업로드된 파일의 URL 반환
