@@ -36,7 +36,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             // 리프레시 토큰을 HttpOnly 쿠키에 저장
             cookieUtil.addCookie(response, "refreshToken", refreshToken, jwtUtil.getRefreshTokenMaxAge());
 
-            // OAuth2UserDetails를 통해 신규 회원 여부 확인
+            // OAuth2UserDetails를 통해 신규 유저 여부 확인
             OAuth2UserDetails userDetails = (OAuth2UserDetails) authentication.getPrincipal();
             boolean isNewUser = userDetails.isNewUser();
 
