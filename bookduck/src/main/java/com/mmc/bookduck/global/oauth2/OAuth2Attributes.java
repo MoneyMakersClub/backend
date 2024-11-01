@@ -13,13 +13,13 @@ import java.util.Map;
 public class OAuth2Attributes {
     private LoginType loginType;
     private String email;
-    private boolean isFirstLogin;  // 첫 로그인 여부 필드 추가
+    private boolean isNewUser;
 
     @Builder
-    private OAuth2Attributes(String loginType, String email, boolean isFirstLogin) {
+    private OAuth2Attributes(String loginType, String email, boolean isNewUser) {
         this.loginType = LoginType.valueOf(loginType.toUpperCase());
         this.email = email;
-        this.isFirstLogin = isFirstLogin;  // 첫 로그인 여부 초기화
+        this.isNewUser = isNewUser;  // 신규 유저 여부
     }
 
     public static OAuth2Attributes of(String registrationId, Map<String, Object> attributes) {
@@ -34,7 +34,7 @@ public class OAuth2Attributes {
         return OAuth2Attributes.builder()
                 .loginType(registrationId)
                 .email(String.valueOf(attributes.get("email")))
-                .isFirstLogin(false)  // 초기값은 false로 설정
+                .isNewUser(false)  // 초기값은 false로 설정
                 .build();
     }
 
@@ -43,7 +43,7 @@ public class OAuth2Attributes {
         return OAuth2Attributes.builder()
                 .loginType(registrationId)
                 .email(String.valueOf(accountAttributes.get("email")))
-                .isFirstLogin(false)  // 초기값은 false로 설정
+                .isNewUser(false)  // 초기값은 false로 설정
                 .build();
     }
 
@@ -56,8 +56,8 @@ public class OAuth2Attributes {
                 .build();
     }
 
-    // 첫 로그인 여부를 설정하는 메서드
-    public void setFirstLogin(boolean isFirstLogin) {
-        this.isFirstLogin = isFirstLogin;
+    // 신규 유저 여부를 설정하는 메서드
+    public void setFirstLogin(boolean isNewUser) {
+        this.isNewUser = isNewUser;
     }
 }
