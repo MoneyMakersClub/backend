@@ -49,7 +49,7 @@ jobs:
       - name: Docker build & push
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./.github/workflows
           file: ./.github/workflows/Dockerfile
           push: true
           platforms: linux/amd64
