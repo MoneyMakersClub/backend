@@ -13,7 +13,7 @@ public record OAuth2UserDetails(
         Map<String, Object> attributes,
         String attributeKey,
         String email,
-        Boolean isFirstLogin, // 첫 로그인 여부
+        Boolean isNewUser, // 신규 회원 여부
         String role // 권한
 ) implements OAuth2User, UserDetails {
 
