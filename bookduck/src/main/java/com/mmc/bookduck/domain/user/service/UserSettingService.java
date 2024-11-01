@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.user.service;
 
 import com.mmc.bookduck.domain.user.dto.request.UserNicknameRequestDto;
 import com.mmc.bookduck.domain.user.dto.request.UserSettingUpdateRequestDto;
+import com.mmc.bookduck.domain.user.dto.response.UserNicknameResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserSettingInfoResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserNicknameAvailabilityResponseDto;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -21,7 +22,7 @@ public class UserSettingService {
     private final UserSettingRepository userSettingRepository;
 
     @Transactional(readOnly = true)
-    public UserSettingInfoResponseDto getUserSetting() {
+    public UserSettingInfoResponseDto getUserSettingInfo() {
         User user = userService.getCurrentUser();
         UserSetting userSetting = getUserSettingByUser(user);
         return UserSettingInfoResponseDto.from(user, userSetting);
@@ -34,11 +35,17 @@ public class UserSettingService {
     }
 
     @Transactional(readOnly = true)
+    public UserNicknameResponseDto getUserNickname() {
+        User user = userService.getCurrentUser();
+        return new UserNicknameResponseDto(user.getNickname());
+    }
+
+    @Transactional(readOnly = true)
     public UserNicknameAvailabilityResponseDto checkNicknameAvailability(UserNicknameRequestDto requestDto) {
         return new UserNicknameAvailabilityResponseDto(!userService.existsByNickname(requestDto.nickname()));
     }
 
-    public void updateNickname(UserNicknameRequestDto requestDto) {
+    public void updateUserNickname(UserNicknameRequestDto requestDto) {
         String nickname = requestDto.nickname();
         User user = userService.getCurrentUser();
         boolean isAvailable = !userService.existsByNickname(nickname);
