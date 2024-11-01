@@ -49,7 +49,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-cache'
 
 	// OCR 관련
-	implementation 'com.google.cloud:google-cloud-bigquery'
+	implementation 'com.google.cloud:google-cloud-bigquery:2.22.0'
 	implementation 'com.google.cloud:google-cloud-vision:3.3.0'
 	// gcp storage 의존성
 	implementation 'org.springframework.cloud:spring-cloud-gcp-starter:1.2.8.RELEASE'
