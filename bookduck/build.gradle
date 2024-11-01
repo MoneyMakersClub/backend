@@ -52,8 +52,8 @@ dependencies {
 	implementation 'com.google.cloud:google-cloud-bigquery:2.22.0'
 	implementation 'com.google.cloud:google-cloud-vision:3.3.0'
 	// gcp storage 의존성
-	implementation 'org.springframework.cloud:spring-cloud-gcp-starter:1.2.8.RELEASE'
-	implementation 'org.springframework.cloud:spring-cloud-gcp-storage:1.2.8.RELEASE'
+	implementation 'com.google.cloud:google-cloud-storage:2.10.0'
+	implementation 'org.springframework.cloud:spring-cloud-gcp-starter-storage:3.1.0'
 
 	//JSON 처리
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
