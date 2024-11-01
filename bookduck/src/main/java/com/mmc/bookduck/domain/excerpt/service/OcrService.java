@@ -46,7 +46,9 @@ public class OcrService {
                 if (res.hasError()) {
                     throw new CustomException(ErrorCode.EXTERNAL_API_ERROR);
                 }
-                res.getTextAnnotationsList().forEach(annotation -> extractedText.append(annotation.getDescription()).append("\n"));
+                if (!res.getTextAnnotationsList().isEmpty()) {
+                    return res.getTextAnnotationsList().get(0).getDescription().trim();
+                }
             }
             return extractedText.toString().trim();
         }
