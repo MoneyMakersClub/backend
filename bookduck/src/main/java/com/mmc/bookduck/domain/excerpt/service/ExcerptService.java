@@ -2,7 +2,7 @@ package com.mmc.bookduck.domain.excerpt.service;
 
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
-import com.mmc.bookduck.domain.excerpt.dto.request.ExcerptSaveRequestDto;
+import com.mmc.bookduck.domain.excerpt.dto.request.ExcerptCreateRequestDto;
 import com.mmc.bookduck.domain.excerpt.dto.response.ExcerptResponseDto;
 import com.mmc.bookduck.domain.excerpt.entity.Excerpt;
 import com.mmc.bookduck.domain.excerpt.repository.ExcerptRepository;
@@ -20,7 +20,7 @@ public class ExcerptService {
     private final UserService userService;
     private final UserBookService userBookService;
 
-    public ExcerptResponseDto saveExcerpt(ExcerptSaveRequestDto requestDto){
+    public ExcerptResponseDto createExcerpt(ExcerptCreateRequestDto requestDto){
         User user = userService.getCurrentUser();
         UserBook userBook = userBookService.findUserBookById(requestDto.userBookId());
         Excerpt excerpt = requestDto.toEntity(user, userBook);

@@ -1,6 +1,6 @@
 package com.mmc.bookduck.domain.excerpt.controller;
 
-import com.mmc.bookduck.domain.excerpt.dto.request.ExcerptSaveRequestDto;
+import com.mmc.bookduck.domain.excerpt.dto.request.ExcerptCreateRequestDto;
 import com.mmc.bookduck.domain.excerpt.dto.response.ExcerptResponseDto;
 import com.mmc.bookduck.domain.excerpt.service.ExcerptService;
 import com.mmc.bookduck.domain.excerpt.service.OcrService;
@@ -25,15 +25,15 @@ public class ExcerptController {
 
     @PostMapping("/ocr")
     @Operation(summary = "OCR을 통한 텍스트 추출", description = "이미지를 업로드하여 텍스트를 OCR로 추출합니다.")
-    public ResponseEntity<String> uploadAndExtractText(@RequestParam("image") MultipartFile image) throws IOException {
+    public ResponseEntity<String> uploadAndExtractText(@RequestParam("image") final MultipartFile image) throws IOException {
         String extractedText = ocrService.processOcr(image);
         return ResponseEntity.ok(extractedText);
     }
 
     @PostMapping
     @Operation(summary = "발췌 생성", description = "OCR로 인식된 텍스트 또는 사용자가 입력한 텍스트를 활용해 발췌를 생성합니다.")
-    public ResponseEntity<?> saveExcerpt(@Valid @RequestBody ExcerptSaveRequestDto requestDto) {
-        ExcerptResponseDto responseDto = excerptService.saveExcerpt(requestDto);
+    public ResponseEntity<?> createExcerpt(@Valid @RequestBody ExcerptCreateRequestDto requestDto) {
+        ExcerptResponseDto responseDto = excerptService.createExcerpt(requestDto);
         return ResponseEntity.ok(responseDto);
     }
 }

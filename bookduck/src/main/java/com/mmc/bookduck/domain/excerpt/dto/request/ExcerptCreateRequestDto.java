@@ -5,7 +5,7 @@ import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.excerpt.entity.Excerpt;
 import com.mmc.bookduck.domain.user.entity.User;
 
-public record ExcerptSaveRequestDto(
+public record ExcerptCreateRequestDto(
         String excerptContent,
         Visibility visibility,
         Long pageNumber,
