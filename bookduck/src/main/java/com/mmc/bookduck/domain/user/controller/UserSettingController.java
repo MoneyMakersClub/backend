@@ -19,20 +19,26 @@ public class UserSettingController {
 
     @Operation(summary = "설정 정보 보기", description = "유저의 계정 정보, 사용 설정, 기록 폰트 정보를 조회합니다.")
     @GetMapping
-    public ResponseEntity<?> getUserSettings() {
-        return ResponseEntity.ok().body(userSettingService.getUserSetting());
+    public ResponseEntity<?> getUserSettingInfo() {
+        return ResponseEntity.ok().body(userSettingService.getUserSettingInfo());
+    }
+
+    @Operation(summary = "닉네임 보기", description = "유저의 닉네임을 조회합니다.")
+    @GetMapping("/nickname")
+    public ResponseEntity<?> getUserNickname() {
+        return ResponseEntity.ok().body(userSettingService.getUserNickname());
     }
 
     @Operation(summary = "닉네임 사용 가능 여부 확인", description = "닉네임 사용 가능 여부를 확인합니다.")
     @GetMapping("/nickname/check")
-    public ResponseEntity<?> checkNicknameAvailability(@RequestBody @Valid UserNicknameRequestDto requestDto) {
+    public ResponseEntity<?> checkUserNicknameAvailability(@RequestBody @Valid UserNicknameRequestDto requestDto) {
         return ResponseEntity.ok().body(userSettingService.checkNicknameAvailability(requestDto));
     }
 
     @Operation(summary = "닉네임 변경", description = "닉네임을 변경합니다.")
     @PatchMapping("/nickname")
-    public ResponseEntity<?> updateNickname(@RequestBody @Valid UserNicknameRequestDto requestDto) {
-        userSettingService.updateNickname(requestDto);
+    public ResponseEntity<?> updateUserNickname(@RequestBody @Valid UserNicknameRequestDto requestDto) {
+        userSettingService.updateUserNickname(requestDto);
         return ResponseEntity.ok().build();
     }
 
