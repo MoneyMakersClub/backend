@@ -21,12 +21,12 @@ public class Review extends BaseTimeEntity {
     private Long reviewId;
 
     @NotNull
-    private String title;
+    private String reviewTitle;
 
     @NotNull
     private String reviewContent;
 
-    @NotNull
+    @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
     private String color;
@@ -44,9 +44,9 @@ public class Review extends BaseTimeEntity {
     private UserBook userBook;
 
     @Builder
-    public Review(String title, String reviewContent, String color,
+    public Review(String reviewTitle, String reviewContent, String color,
                   Visibility visibility, User user, UserBook userBook) {
-        this.title = title;
+        this.reviewTitle = reviewTitle;
         this.reviewContent = reviewContent;
         this.color = color;
         this.visibility = visibility;
@@ -54,8 +54,8 @@ public class Review extends BaseTimeEntity {
         this.userBook = userBook;
     }
 
-    public void updateTitle(String title) {
-        this.title = title;
+    public void updateReviewTitle(String reviewTitle) {
+        this.reviewTitle = reviewTitle;
     }
 
     public void updateContent(String reviewContent) {

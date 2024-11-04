@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -20,11 +22,12 @@ public class ExcerptService {
     private final UserService userService;
     private final UserBookService userBookService;
 
-    public Excerpt createExcerpt(ExcerptCreateRequestDto requestDto){
+    public Excerpt createExcerpt(ExcerptCreateRequestDto requestDto, LocalDateTime createdTime){
         User user = userService.getCurrentUser();
         UserBook userBook = userBookService.findUserBookById(requestDto.userBookId());
         boolean isMain = requestDto.isMain() != null ? requestDto.isMain() : false;
         Excerpt excerpt = requestDto.toEntity(user, userBook, isMain);
+        excerpt.setCreatedTime(createdTime);
         return excerptRepository.save(excerpt);
     }
 }

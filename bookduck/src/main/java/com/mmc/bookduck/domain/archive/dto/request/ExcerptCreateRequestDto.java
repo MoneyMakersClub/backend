@@ -4,13 +4,14 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.user.entity.User;
+import jakarta.validation.constraints.NotNull;
 
 public record ExcerptCreateRequestDto(
-        String excerptContent,
-        Visibility visibility,
+        @NotNull String excerptContent,
+        @NotNull Visibility visibility,
         Boolean isMain,
-        Long pageNumber,
-        Long userBookId
+        @NotNull Long pageNumber,
+        @NotNull Long userBookId
 ) {
     public Excerpt toEntity(User user, UserBook userBook, boolean isMain) {
         return Excerpt.builder()

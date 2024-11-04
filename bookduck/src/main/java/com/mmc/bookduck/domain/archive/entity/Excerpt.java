@@ -26,10 +26,9 @@ public class Excerpt extends BaseTimeEntity {
     @NotNull
     private String excerptContent;
 
-    @NotNull
+    @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
-    @ColumnDefault("false")
     private boolean isMain;
 
     @NotNull

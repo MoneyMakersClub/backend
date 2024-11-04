@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -21,11 +23,12 @@ public class ReviewService {
     private final UserService userService;
     private final UserBookService userBookService;
 
-    public Review createReview(ReviewCreateRequestDto requestDto){
+    public Review createReview(ReviewCreateRequestDto requestDto, LocalDateTime createdTime){
         User user = userService.getCurrentUser();
         UserBook userBook = userBookService.findUserBookById(requestDto.userBookId());
         String color = requestDto.color() != null ? requestDto.color() : "#FFFFFF";
         Review review = requestDto.toEntity(user, userBook, color);
+        review.setCreatedTime(createdTime);
         return reviewRepository.save(review);
     }
 }
