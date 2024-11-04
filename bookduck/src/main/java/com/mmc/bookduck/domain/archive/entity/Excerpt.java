@@ -1,4 +1,4 @@
-package com.mmc.bookduck.domain.review.entity;
+package com.mmc.bookduck.domain.archive.entity;
 
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.common.Visibility;
@@ -6,33 +6,29 @@ import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Review extends BaseTimeEntity {
+public class Excerpt extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
-    private Long reviewId;
+    private Long excerptId;
 
     @NotNull
-    private String title;
-
-    @NotNull
-    private String content;
-
-    private Long pageNumber;
-
-    @ColumnDefault("false")
-    private boolean isMain;
+    private String excerptContent;
 
     @NotNull
     private Visibility visibility;
+
+    private Long pageNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", updatable = false)
@@ -47,13 +43,11 @@ public class Review extends BaseTimeEntity {
     private UserBook userBook;
 
     @Builder
-    public Review(String title, String content, Long pageNumber, boolean isMain,
-                  Visibility visibility, User user, UserBook userBook) {
-        this.title = title;
-        this.content = content;
-        this.pageNumber = pageNumber;
-        this.isMain = isMain;
+    public Excerpt(String excerptContent, Visibility visibility,
+                   Long pageNumber, User user, UserBook userBook) {
+        this.excerptContent = excerptContent;
         this.visibility = visibility;
+        this.pageNumber = pageNumber;
         this.user = user;
         this.userBook = userBook;
     }

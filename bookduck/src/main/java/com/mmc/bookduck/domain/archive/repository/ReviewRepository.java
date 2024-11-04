@@ -1,6 +1,6 @@
-package com.mmc.bookduck.domain.review.repository;
+package com.mmc.bookduck.domain.archive.repository;
 
-import com.mmc.bookduck.domain.review.entity.Review;
+import com.mmc.bookduck.domain.archive.entity.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {

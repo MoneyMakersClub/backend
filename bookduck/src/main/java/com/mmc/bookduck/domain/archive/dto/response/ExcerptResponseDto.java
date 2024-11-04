@@ -1,7 +1,7 @@
-package com.mmc.bookduck.domain.excerpt.dto.response;
+package com.mmc.bookduck.domain.archive.dto.response;
 
 import com.mmc.bookduck.domain.common.Visibility;
-import com.mmc.bookduck.domain.excerpt.entity.Excerpt;
+import com.mmc.bookduck.domain.archive.entity.Excerpt;
 
 public record ExcerptResponseDto(
         Long excerptId,

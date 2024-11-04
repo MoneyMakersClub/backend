@@ -1,11 +1,11 @@
-package com.mmc.bookduck.domain.excerpt.service;
+package com.mmc.bookduck.domain.archive.service;
 
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
-import com.mmc.bookduck.domain.excerpt.dto.request.ExcerptCreateRequestDto;
-import com.mmc.bookduck.domain.excerpt.dto.response.ExcerptResponseDto;
-import com.mmc.bookduck.domain.excerpt.entity.Excerpt;
-import com.mmc.bookduck.domain.excerpt.repository.ExcerptRepository;
+import com.mmc.bookduck.domain.archive.dto.request.ExcerptCreateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.response.ExcerptResponseDto;
+import com.mmc.bookduck.domain.archive.entity.Excerpt;
+import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;

@@ -1,9 +1,9 @@
-package com.mmc.bookduck.domain.excerpt.controller;
+package com.mmc.bookduck.domain.archive.controller;
 
-import com.mmc.bookduck.domain.excerpt.dto.request.ExcerptCreateRequestDto;
-import com.mmc.bookduck.domain.excerpt.dto.response.ExcerptResponseDto;
-import com.mmc.bookduck.domain.excerpt.service.ExcerptService;
-import com.mmc.bookduck.domain.excerpt.service.OcrService;
+import com.mmc.bookduck.domain.archive.dto.request.ExcerptCreateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.response.ExcerptResponseDto;
+import com.mmc.bookduck.domain.archive.service.ExcerptService;
+import com.mmc.bookduck.domain.archive.service.OcrService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

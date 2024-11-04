@@ -1,4 +1,4 @@
-package com.mmc.bookduck.domain.excerpt.entity;
+package com.mmc.bookduck.domain.archive.entity;
 
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.common.Visibility;
@@ -6,29 +6,33 @@ import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Excerpt extends BaseTimeEntity {
+public class Review extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
-    private Long excerptId;
+    private Long reviewId;
 
     @NotNull
-    private String excerptContent;
+    private String title;
+
+    @NotNull
+    private String content;
+
+    private Long pageNumber;
+
+    @ColumnDefault("false")
+    private boolean isMain;
 
     @NotNull
     private Visibility visibility;
-
-    private Long pageNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", updatable = false)
@@ -43,11 +47,13 @@ public class Excerpt extends BaseTimeEntity {
     private UserBook userBook;
 
     @Builder
-    public Excerpt(String excerptContent, Visibility visibility,
-                   Long pageNumber, User user, UserBook userBook) {
-        this.excerptContent = excerptContent;
-        this.visibility = visibility;
+    public Review(String title, String content, Long pageNumber, boolean isMain,
+                  Visibility visibility, User user, UserBook userBook) {
+        this.title = title;
+        this.content = content;
         this.pageNumber = pageNumber;
+        this.isMain = isMain;
+        this.visibility = visibility;
         this.user = user;
         this.userBook = userBook;
     }
