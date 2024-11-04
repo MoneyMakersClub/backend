@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -28,6 +29,10 @@ public class Excerpt extends BaseTimeEntity {
     @NotNull
     private Visibility visibility;
 
+    @ColumnDefault("false")
+    private boolean isMain;
+
+    @NotNull
     private Long pageNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,10 +48,10 @@ public class Excerpt extends BaseTimeEntity {
     private UserBook userBook;
 
     @Builder
-    public Excerpt(String excerptContent, Visibility visibility,
-                   Long pageNumber, User user, UserBook userBook) {
+    public Excerpt(String excerptContent, Visibility visibility, boolean isMain, Long pageNumber, User user, UserBook userBook) {
         this.excerptContent = excerptContent;
         this.visibility = visibility;
+        this.isMain = isMain;
         this.pageNumber = pageNumber;
         this.user = user;
         this.userBook = userBook;

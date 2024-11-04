@@ -24,15 +24,12 @@ public class Review extends BaseTimeEntity {
     private String title;
 
     @NotNull
-    private String content;
-
-    private Long pageNumber;
-
-    @ColumnDefault("false")
-    private boolean isMain;
+    private String reviewContent;
 
     @NotNull
     private Visibility visibility;
+
+    private String color;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", updatable = false)
@@ -47,15 +44,30 @@ public class Review extends BaseTimeEntity {
     private UserBook userBook;
 
     @Builder
-    public Review(String title, String content, Long pageNumber, boolean isMain,
+    public Review(String title, String reviewContent, String color,
                   Visibility visibility, User user, UserBook userBook) {
         this.title = title;
-        this.content = content;
-        this.pageNumber = pageNumber;
-        this.isMain = isMain;
+        this.reviewContent = reviewContent;
+        this.color = color;
         this.visibility = visibility;
         this.user = user;
         this.userBook = userBook;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateContent(String reviewContent) {
+        this.reviewContent = reviewContent;
+    }
+
+    public void updateVisibility(Visibility visibility) {
+        this.visibility = visibility;
+    }
+
+    public void updateColor(String color) {
+        this.color = color;
     }
 
 }

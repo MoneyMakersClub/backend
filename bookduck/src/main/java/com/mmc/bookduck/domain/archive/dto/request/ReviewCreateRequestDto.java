@@ -1,23 +1,23 @@
 package com.mmc.bookduck.domain.archive.dto.request;
 
+import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.common.Visibility;
-import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.user.entity.User;
 
-public record ExcerptCreateRequestDto(
-        String excerptContent,
+public record ReviewCreateRequestDto(
+        String title,
+        String reviewContent,
+        String color,
         Visibility visibility,
-        Boolean isMain,
-        Long pageNumber,
         Long userBookId
 ) {
-    public Excerpt toEntity(User user, UserBook userBook, boolean isMain) {
-        return Excerpt.builder()
-                .excerptContent(excerptContent)
+    public Review toEntity(User user, UserBook userBook, String color) {
+        return Review.builder()
+                .title(title)
+                .reviewContent(reviewContent)
+                .color(color)
                 .visibility(visibility)
-                .isMain(isMain)
-                .pageNumber(pageNumber)
                 .user(user)
                 .userBook(userBook)
                 .build();
