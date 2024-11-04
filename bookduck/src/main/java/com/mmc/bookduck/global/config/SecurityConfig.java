@@ -94,7 +94,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll() // 임시로 모두 오픈
                 )
                 // X-Frame-Options: SAME ORIGIN으로 설정
                 .headers(header -> header
