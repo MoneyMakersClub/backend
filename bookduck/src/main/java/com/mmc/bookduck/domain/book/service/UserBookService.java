@@ -180,7 +180,7 @@ public class UserBookService {
         OneLineRating oneLineRating = oneLineRatingRepository.findByUserBook(userBook)
                 .orElse(null);
 
-        double ratingAverage = getRatingAverage(findAllUserBookByBookInfo(userBook.getBookInfo()));
+        Double ratingAverage = bookInfoService.getRatingAverage(userBook.getBookInfo());
 
         return new BookInfoBasicResponseDto(
                 ratingAverage,
@@ -226,22 +226,6 @@ public class UserBookService {
     @Transactional(readOnly = true)
     public List<UserBook> findAllUserBookByBookInfo(BookInfo bookInfo){
         return userBookRepository.findAllByBookInfo(bookInfo);
-    }
-
-    @Transactional(readOnly = true)
-    public double getRatingAverage(List<UserBook> userBookList) {
-
-        double totalRating = 0.0;
-        int count = 0;
-
-        for(UserBook book : userBookList){
-            Optional<OneLineRating> oneLineRating = oneLineRatingRepository.findByUserBook(book);
-            if (oneLineRating.isPresent()) {
-                totalRating += oneLineRating.get().getRating();
-                count++;
-            }
-        }
-        return count > 0 ? totalRating / count : 0.0;
     }
 
     @Transactional(readOnly = true)

@@ -4,6 +4,7 @@ import com.mmc.bookduck.domain.book.dto.common.CustomBookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
 import com.mmc.bookduck.domain.book.service.BookInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,9 @@ public class BookInfoController {
 
     // 도서목록 GET(API)
     @GetMapping("/search")
-    public ResponseEntity<BookListResponseDto> searchBookList(@RequestParam(name = "keyword") final String keyword,
-                                                             @RequestParam final Long page,
-                                                             @RequestParam final Long size){
+    public ResponseEntity<BookListResponseDto<BookUnitResponseDto>> searchBookList(@RequestParam(name = "keyword") final String keyword,
+                                                                                   @RequestParam final Long page,
+                                                                                   @RequestParam final Long size){
 
         return ResponseEntity.ok(bookInfoService.searchBookList(keyword, page, size));
     }
@@ -46,7 +47,7 @@ public class BookInfoController {
 
     // 커스텀 도서 상세 조회 - 기본 정보 + 사용자의 한줄평,별점
     @GetMapping("/custom/{bookinfoId}/additional")
-    public ResponseEntity<BookInfoBasicResponseDto> getApiBookAdditional(@PathVariable(name = "bookinfoId") final Long bookInfoId){
+    public ResponseEntity<BookInfoBasicResponseDto> getCustomBookBasic(@PathVariable(name = "bookinfoId") final Long bookInfoId){
         return ResponseEntity.ok(bookInfoService.getCustomBookBasic(bookInfoId));
     }
 }

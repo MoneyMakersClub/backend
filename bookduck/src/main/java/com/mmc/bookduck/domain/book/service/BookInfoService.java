@@ -12,7 +12,6 @@ import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.Genre;
-import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.BookInfoRepository;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
@@ -108,20 +107,20 @@ public class BookInfoService {
         String responseBody = googleBooksApiService.searchOneBook(providerId);
         BookInfoDetailDto additional = parseBookDetail(responseBody);
 
-        Double ratingAverage;
-        ReadStatus readStatus;
-        String myOneLine;
-        Double myRating;
-
         Optional<BookInfo> bookInfo = bookInfoRepository.findByProviderId(providerId);
         if(bookInfo.isPresent()){
-            // ratingAverage = getBookRating(bookInfo); -> 별점, 한줄평 응답 추후 수정
             Optional<UserBook> userBook = userBookRepository.findByUserAndBookInfo(userService.getCurrentUser(), bookInfo.get());
             if(userBook.isPresent()){
-                // 별점 한줄평 개발 후 추후 수정
-                return new BookInfoBasicResponseDto(null, null, null, null, additional);
+                Optional<OneLineRating> oneLineRating = oneLineRatingRepository.findByUserBook(userBook.get());
+                if(oneLineRating.isPresent()){
+                    return new BookInfoBasicResponseDto(getRatingAverage(bookInfo.get()), oneLineRating.get().getOneLineContent(),
+                            oneLineRating.get().getRating(), userBook.get().getReadStatus(), additional);
+                }else{
+                    return new BookInfoBasicResponseDto(getRatingAverage(bookInfo.get()), null, null,
+                            userBook.get().getReadStatus(), additional);
+                }
             }else{
-                return new BookInfoBasicResponseDto(null, null, null, null, additional);
+                return new BookInfoBasicResponseDto(getRatingAverage(bookInfo.get()), null, null, null, additional);
             }
         }
         else{
@@ -247,5 +246,26 @@ public class BookInfoService {
                 oneLineRating!=null ? oneLineRating.getRating() : null,
                 userBook.getReadStatus(),
                 detailDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Double getRatingAverage(BookInfo bookInfo) {
+        double totalRating = 0.0;
+        int count = 0;
+
+        List<UserBook> userBookList = userBookRepository.findAllByBookInfo(bookInfo);
+        if(userBookList.isEmpty()){
+            // 별점 아예 없는 경우에는 NULL
+            return null;
+        }
+
+        for(UserBook book : userBookList){
+            Optional<OneLineRating> oneLineRating = oneLineRatingRepository.findByUserBook(book);
+            if (oneLineRating.isPresent()) {
+                totalRating += oneLineRating.get().getRating();
+                count++;
+            }
+        }
+        return count > 0 ? totalRating / count : 0.0;
     }
 }
