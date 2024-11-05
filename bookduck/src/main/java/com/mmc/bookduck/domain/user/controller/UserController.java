@@ -31,6 +31,12 @@ public class UserController {
         return ResponseEntity.ok().body(userGrowthService.getUserInfo(userId));
     }
 
+    @Operation(summary = "유저 레벨, 레벨업 미션 조회", description = "유저의 레벨과 레벨업 미션들을 조회합니다.")
+    @GetMapping("/{userId}/growth")
+    public ResponseEntity<?> getUserGrowthInfo(@PathVariable final Long userId) {
+        return ResponseEntity.ok().body(userGrowthService.getUserGrowthInfo(userId));
+    }
+
     @Operation(summary = "유저 독서 리포트 조회 - 통계", description = "유저의 독서 리포트 중 통계를 조회합니다.")
     @GetMapping("/{userId}/statistics")
     public ResponseEntity<?> getUserStatistics(@PathVariable final Long userId) {

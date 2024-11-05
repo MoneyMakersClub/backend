@@ -7,9 +7,14 @@ import com.mmc.bookduck.domain.excerpt.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.review.repository.ReviewRepository;
 import com.mmc.bookduck.domain.user.dto.common.MostReadGenreUnitDto;
 import com.mmc.bookduck.domain.user.dto.common.MonthlyBookCountUnitDto;
+import com.mmc.bookduck.domain.user.dto.response.UserGrowthInfoResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserInfoResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserStatisticsResponseDto;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.entity.UserGrowth;
+import com.mmc.bookduck.domain.user.repository.UserGrowthRepository;
+import com.mmc.bookduck.global.exception.CustomException;
+import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,10 +30,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserGrowthService {
-    private final UserService userService;
+    private final UserGrowthRepository userGrowthRepository;
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
     private final UserBookRepository userBookRepository;
+    private final UserService userService;
 
     @Transactional(readOnly = true)
     public UserInfoResponseDto getUserInfo(Long userId) {
@@ -38,6 +44,16 @@ public class UserGrowthService {
         long excerptCount = excerptRepository.countByUserAndCreatedTimeThisYear(user, currentYear);
         long bookCount = (reviewCount + excerptCount);
         return new UserInfoResponseDto(user.getNickname(), bookCount);
+    }
+
+    @Transactional(readOnly = true)
+    public UserGrowthInfoResponseDto getUserGrowthInfo(Long userId) {
+        User user = userService.getUserByUserId(userId);
+        UserGrowth userGrowth = userGrowthRepository.findByUser(user)
+                .orElseThrow(()-> new CustomException(ErrorCode.USERGROWTH_NOT_FOUND));
+
+        int level = userGrowth.getLevel();
+
     }
 
     @Transactional(readOnly = true)

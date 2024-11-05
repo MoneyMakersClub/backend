@@ -46,6 +46,7 @@ public enum ErrorCode {
     // 각 리소스를 찾지 못함
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
     USERSETTING_NOT_FOUND(404, "사용자 설정을 찾을 수 없습니다."),
+    USERGROWTH_NOT_FOUND(404, "사용자 성장상태를 찾을 수 없습니다."),
     FRIEND_REQUEST_NOT_FOUND(404, "친구 요청을 찾을 수 없습니다."),
     FRIEND_NOT_FOUND(404, "친구를 찾을 수 없습니다."),
     BOOKINFO_NOT_FOUND(404, "책 정보를 찾을 수 없습니다."),
