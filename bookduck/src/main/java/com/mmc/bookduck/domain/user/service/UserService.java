@@ -23,7 +23,6 @@ import static com.mmc.bookduck.global.common.EscapeSpecialCharactersService.esca
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final UserGrowthService userGrowthService;
 
     @Transactional(readOnly = true)
     public User getCurrentUser() throws CustomException {
@@ -86,12 +85,5 @@ public class UserService {
     @Transactional(readOnly = true)
     public boolean existsByNickname(String nickname) {
         return userRepository.existsByNickname(nickname);
-    }
-
-    @Transactional(readOnly = true)
-    public UserInfoResponseDto getUserInfo(Long userId) {
-        User user = getUserByUserId(userId);
-        long bookCount = userGrowthService.countBookRecordsOfThisYear(user);
-        return new UserInfoResponseDto(user.getNickname(), bookCount);
     }
 }
