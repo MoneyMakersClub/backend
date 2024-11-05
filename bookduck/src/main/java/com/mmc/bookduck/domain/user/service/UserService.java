@@ -1,8 +1,10 @@
 package com.mmc.bookduck.domain.user.service;
 
 import com.mmc.bookduck.domain.user.dto.common.UserUnitDto;
+import com.mmc.bookduck.domain.user.dto.response.UserInfoResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserSearchResponseDto;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.entity.UserGrowth;
 import com.mmc.bookduck.domain.user.entity.UserStatus;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -21,6 +23,7 @@ import static com.mmc.bookduck.global.common.EscapeSpecialCharactersService.esca
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserGrowthService userGrowthService;
 
     @Transactional(readOnly = true)
     public User getCurrentUser() throws CustomException {
@@ -41,9 +44,15 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User getActiveUserByUserId(Long userId) throws CustomException {
+        User user = getUserByUserId(userId);
+        validateActiveUserStatus(user);
+        return user;
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserByUserId(Long userId) throws CustomException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        validateActiveUserStatus(user);
         return user;
     }
 
@@ -77,5 +86,12 @@ public class UserService {
     @Transactional(readOnly = true)
     public boolean existsByNickname(String nickname) {
         return userRepository.existsByNickname(nickname);
+    }
+
+    @Transactional(readOnly = true)
+    public UserInfoResponseDto getUserInfo(Long userId) {
+        User user = getUserByUserId(userId);
+        long bookCount = userGrowthService.countBookRecordsOfThisYear(user);
+        return new UserInfoResponseDto(user.getNickname(), bookCount);
     }
 }
