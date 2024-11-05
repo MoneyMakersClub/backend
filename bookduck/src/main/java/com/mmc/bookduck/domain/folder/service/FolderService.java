@@ -2,9 +2,11 @@ package com.mmc.bookduck.domain.folder.service;
 
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
+import com.mmc.bookduck.domain.folder.dto.common.CandidateFolderBookDto;
 import com.mmc.bookduck.domain.folder.dto.common.FolderBookCoverListDto;
 import com.mmc.bookduck.domain.folder.dto.request.FolderRequestDto;
 import com.mmc.bookduck.domain.folder.dto.response.AllFolderListResponseDto;
+import com.mmc.bookduck.domain.folder.dto.response.CandidateFolderBookListResponseDto;
 import com.mmc.bookduck.domain.folder.dto.response.FolderBookListResponseDto;
 import com.mmc.bookduck.domain.folder.dto.common.FolderBookUnitDto;
 import com.mmc.bookduck.domain.folder.dto.response.FolderResponseDto;
@@ -12,7 +14,6 @@ import com.mmc.bookduck.domain.folder.entity.Folder;
 import com.mmc.bookduck.domain.folder.entity.FolderBook;
 import com.mmc.bookduck.domain.folder.repository.FolderRepository;
 import com.mmc.bookduck.domain.user.entity.User;
-import com.mmc.bookduck.domain.user.repository.UserRepository;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -36,6 +37,9 @@ public class FolderService {
     // 폴더 생성
     public FolderResponseDto createFolder(FolderRequestDto dto) {
         User user = userService.getCurrentUser();
+        if(folderRepository.existsByFolderNameAndUser(dto.folderName(), user)){
+            throw new CustomException(ErrorCode.FOLDER_ALREADY_EXISTS);
+        }
         Folder folder = new Folder(dto.folderName(), user);
 
         Folder savedFolder = folderRepository.save(folder);
@@ -133,7 +137,6 @@ public class FolderService {
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
-
     }
 
     // 전체 폴더 목록 조회
@@ -179,13 +182,32 @@ public class FolderService {
         }
     }
 
-
-    /*
+    @Transactional(readOnly = true)
     public CandidateFolderBookListResponseDto getCandidateBooks(Long folderId) {
+        User user = userService.getCurrentUser();
         Folder folder = findFolderById(folderId);
 
-        //folder
-        //return new CandidateFolderBookListResponseDto(folderId, coverList);
+        if(!(folder.getUser().equals(user))){
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+        }
+
+        List<FolderBook> folderBooks = folder.getFolderBooks();
+        List<UserBook> userBooks = userBookService.findAllByUser(user);
+
+        List<CandidateFolderBookDto> dtoList = new ArrayList<>();
+
+        for(UserBook userBook: userBooks){
+            for(FolderBook folderBook: folderBooks){
+                if(userBook.equals(folderBook.getUserBook())){
+                    userBooks.remove(userBook);
+                    break;
+                }
+            }
+        }
+
+        for(UserBook userBook: userBooks){
+            dtoList.add(CandidateFolderBookDto.from(userBook));
+        }
+        return new CandidateFolderBookListResponseDto(dtoList);
     }
-    */
 }
