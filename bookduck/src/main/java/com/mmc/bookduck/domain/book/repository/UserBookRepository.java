@@ -52,7 +52,7 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
             "ORDER BY COUNT(ub) DESC")
     List<Object[]> findTopCategoriesByUser(@Param("user") User user, Pageable pageable);
 
-    // 유저가 가장 많이 읽은 작가
+    // 유저가 가장 많이 읽은 작가들
     @Query(value = "SELECT b.author, COUNT(ub) AS bookCount FROM UserBook ub " +
             "JOIN ub.bookInfo b " +
             "WHERE ub.user = :user " +
@@ -60,10 +60,10 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
             "ORDER BY bookCount DESC")
     List<Object[]> findMostReadAuthorByUser(@Param("user") User user);
 
-    // 작가명으로 UserBook 찾기
+    // BookInfo의 작가명으로 UserBook 찾기
     List<UserBook> findAllByBookInfo_Author(String author);
 
-    // 사용자의 UserBook들 올해 상반기/하반기별로 조회
+    // 유저의 UserBook들 올해 상반기/하반기별로 조회
     @Query("SELECT ub FROM UserBook ub WHERE ub.user = :user AND " +
             "((:isFirstHalf = true AND MONTH(ub.createdTime) BETWEEN 1 AND 6) OR " +
             "(:isFirstHalf = false AND MONTH(ub.createdTime) BETWEEN 7 AND 12)) AND " +
