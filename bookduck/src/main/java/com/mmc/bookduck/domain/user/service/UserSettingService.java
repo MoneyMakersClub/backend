@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -59,9 +62,16 @@ public class UserSettingService {
     public void updateOptions(UserSettingUpdateRequestDto requestDto) {
         User user = userService.getCurrentUser();
         UserSetting userSetting = getUserSettingByUser(user);
-        // 트랜잭션 커밋 시 자동 저장
-        userSetting.updateIsPushAlarmEnabled(requestDto.isPushAlarmEnabled());
-        userSetting.updateIsFriendRequestEnabled(requestDto.isFriendRequestEnabled());
-        userSetting.updateRecordFont(requestDto.recordFont());
+
+        // null이 아닌 설정 옵션만 업데이트 진행
+        updateSetting(requestDto.isPushAlarmEnabled(), userSetting::updateIsPushAlarmEnabled);
+        updateSetting(requestDto.isFriendRequestEnabled(), userSetting::updateIsFriendRequestEnabled);
+        updateSetting(requestDto.recordFont(), userSetting::updateRecordFont);
+        userSettingRepository.save(userSetting);
+    }
+
+    // value가 null이 아닐 경우 updateFunction을 실행
+    private <T> void updateSetting(T value, Consumer<T> updateFunction) {
+        Optional.ofNullable(value).ifPresent(updateFunction);
     }
 }
