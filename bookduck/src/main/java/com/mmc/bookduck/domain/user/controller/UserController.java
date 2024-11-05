@@ -37,9 +37,9 @@ public class UserController {
         return ResponseEntity.ok().body(userGrowthService.getUserStatistics(userId));
     }
 
-    @Operation(summary = "유저 독서 리포트 조회 - AI", description = "유저의 독서 리포트 중 AI부분을 조회합니다.")
-    @GetMapping("/{userId}/ai")
-    public ResponseEntity<?> getUserKeywordAnalysis(@PathVariable final Long userId) {
-        return ResponseEntity.ok().body(userGrowthService.getUserKeywordAnalysis(userId));
-    }
+//    @Operation(summary = "유저 독서 리포트 조회 - AI", description = "유저의 독서 리포트 중 AI부분을 조회합니다.")
+//    @GetMapping("/{userId}/ai")
+//    public ResponseEntity<?> getUserKeywordAnalysis(@PathVariable final Long userId) {
+//        return ResponseEntity.ok().body(userGrowthService.getUserKeywordAnalysis(userId));
+//    }
 }
