@@ -16,16 +16,16 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @Operation(summary = "유저 정보 조회", description = "유저의 닉네임과 기록 수를 조회합니다.")
-    @GetMapping("/{userId}")
-    public ResponseEntity<?> getUserInfo(@PathVariable final Long userId) {
-        return ResponseEntity.ok().body(userService.getUserInfo(userId));
-    }
-
     @Operation(summary = "유저 검색", description = "유저를 검색합니다.")
     @GetMapping("/search")
     public ResponseEntity<?> searchUsers(@RequestParam("keyword") final String keyword,
                                            @PageableDefault(size = 20) final Pageable pageable) {
         return ResponseEntity.ok().body(userService.searchUsers(keyword, pageable));
+    }
+    
+    @Operation(summary = "유저 정보 조회", description = "유저의 닉네임과 기록 수를 조회합니다.")
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getUserInfo(@PathVariable final Long userId) {
+        return ResponseEntity.ok().body(userService.getUserInfo(userId));
     }
 }
