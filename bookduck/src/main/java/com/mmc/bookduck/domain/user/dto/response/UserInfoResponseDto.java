@@ -1,4 +1,7 @@
 package com.mmc.bookduck.domain.user.dto.response;
 
-public record UserInfoResponseDto () {
+public record UserInfoResponseDto (
+        String nickname,
+        long bookCount
+) {
 }
