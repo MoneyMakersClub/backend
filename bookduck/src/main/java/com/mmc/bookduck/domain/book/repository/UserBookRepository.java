@@ -66,6 +66,9 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
     // 사용자의 UserBook들 올해 상반기/하반기별로 조회
     @Query("SELECT ub FROM UserBook ub WHERE ub.user = :user AND " +
             "((:isFirstHalf = true AND MONTH(ub.createdTime) BETWEEN 1 AND 6) OR " +
-            "(:isFirstHalf = false AND MONTH(ub.createdTime) BETWEEN 7 AND 12))")
-    List<UserBook> findAllByUserAndCreatedInHalf(@Param("user") User user, @Param("isFirstHalf") boolean isFirstHalf);
+            "(:isFirstHalf = false AND MONTH(ub.createdTime) BETWEEN 7 AND 12)) AND " +
+            "ub.readStatus = :readStatus")
+    List<UserBook> findAllByUserAndCreatedInHalfWithReadStatus(@Param("user") User user,
+                                                               @Param("isFirstHalf") boolean isFirstHalf,
+                                                               @Param("readStatus") ReadStatus readStatus);
 }

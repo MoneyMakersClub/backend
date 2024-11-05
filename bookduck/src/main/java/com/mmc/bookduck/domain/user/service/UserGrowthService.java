@@ -63,8 +63,8 @@ public class UserGrowthService {
         // 3. 올해 현재 분기(상반기/하반기) 월별 독서 수
         int currentMonth = java.time.LocalDate.now().getMonthValue();
         boolean isFirstHalfOfYear = (currentMonth <= 6);
-        // 해당 기간의 UserBook 조회 (TODO: ReadStatus 적용해야 하는지 확인 필요)
-        List<UserBook> userBooksForCurrentYearHalf = userBookRepository.findAllByUserAndCreatedInHalf(user, isFirstHalfOfYear);
+        // 해당 기간의 UserBook 조회 (TODO: ReadStatus 재확인 필요)
+        List<UserBook> userBooksForCurrentYearHalf = userBookRepository.findAllByUserAndCreatedInHalfWithReadStatus(user, isFirstHalfOfYear, ReadStatus.FINISHED);
         // 월별 독서 수를 저장할 Map
         Map<Integer, Long> monthlyCounts = new HashMap<>();
         // 각 책의 생성 월에 따라 카운트
