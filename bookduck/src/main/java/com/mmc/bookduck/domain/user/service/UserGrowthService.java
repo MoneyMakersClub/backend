@@ -49,39 +49,46 @@ public class UserGrowthService {
         List<MostReadGenreUnitDto> mostReadGenres = topCategoryResults.stream()
                 .map(result -> new MostReadGenreUnitDto((String) result[0], (Long) result[1]))
                 .toList();
-        String duckTitle = mostReadGenres.get(0).genreName();
+        // 널 체크
+        String duckTitle = mostReadGenres.isEmpty() ? null : mostReadGenres.get(0).genreName();
 
-        // 2. 작성한 리뷰와 발췌 수
+
+        // 2. 발췌 수, 감상평 수, 완독한 책 수
         long excerptCount = excerptRepository.countByUser(user);
         long reviewCount = reviewRepository.countByUser(user);
         List<UserBook> userBooks = userBookRepository.findByUserAndReadStatus(user, ReadStatus.FINISHED);
         long finishedBookCount = userBooks.size();
 
-        // 3. 월별 독서 수
-        // 현재 월
+
+        // 3. 올해 현재 분기(상반기/하반기) 월별 독서 수
         int currentMonth = java.time.LocalDate.now().getMonthValue();
         boolean isFirstHalfOfYear = (currentMonth <= 6);
-        // 해당 기간의 UserBook 조회
+        // 해당 기간의 UserBook 조회 (TODO: ReadStatus 적용해야 하는지 확인 필요)
         List<UserBook> userBooksForCurrentYearHalf = userBookRepository.findAllByUserAndCreatedInHalf(user, isFirstHalfOfYear);
         // 월별 독서 수를 저장할 Map
         Map<Integer, Long> monthlyCounts = new HashMap<>();
-        // userBooksForCurrentYearHalf에서 각 책의 생성 월에 따라 카운트
+        // 각 책의 생성 월에 따라 카운트
         for (UserBook userBook : userBooksForCurrentYearHalf) {
             int month = userBook.getCreatedTime().getMonthValue();
             monthlyCounts.put(month, monthlyCounts.getOrDefault(month, 0L) + 1);
         }
+        // 월별 책 권수
         List<MonthlyBookCountUnitDto> monthlyBookCounts = monthlyCounts.entrySet().stream()
                 .map(entry -> new MonthlyBookCountUnitDto(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparingInt(MonthlyBookCountUnitDto::month)) // 월 기준으로 정렬
                 .collect(Collectors.toList());
 
+
         // 4. 가장 많이 읽은 작가, 책표지들
+        // 가장 많이 읽은 작가
         List<Object[]> topAuthorsResults = userBookRepository.findMostReadAuthorByUser(user);
-        String mostReadAuthor = topAuthorsResults.isEmpty() ? null : (String) topAuthorsResults.get(0)[0]; // 가장 많이 읽은 작가
+        String mostReadAuthor = topAuthorsResults.isEmpty() ? null : (String) topAuthorsResults.get(0)[0];
+        // 해당 작가의 책표지들
         List<UserBook> mostReadAuthorBooks = userBookRepository.findAllByBookInfo_Author(mostReadAuthor);
         List<String> imgPaths = mostReadAuthorBooks.stream()
                 .map(userBook -> userBook.getBookInfo().getImgPath())
                 .toList();
+
 
         return new UserStatisticsResponseDto(
                 user.getNickname(),
