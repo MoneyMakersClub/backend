@@ -31,7 +31,7 @@ public class BookInfo {
 
     private String publishDate; // null 가능, 연도만 제공될 수 있음
 
-    @Column(length = 65535)
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private String category;
