@@ -20,7 +20,7 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "유저 검색", description = "유저를 검색합니다.")
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<?> searchUsers(@RequestParam("keyword") final String keyword,
                                            @PageableDefault(size = 20) final Pageable pageable) {
         return ResponseEntity.ok().body(userService.searchUsers(keyword, pageable));
