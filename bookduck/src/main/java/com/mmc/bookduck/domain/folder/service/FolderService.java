@@ -38,7 +38,7 @@ public class FolderService {
     public FolderResponseDto createFolder(FolderRequestDto dto) {
         User user = userService.getCurrentUser();
         if(folderRepository.existsByFolderNameAndUser(dto.folderName(), user)){
-            throw new CustomException(ErrorCode.FOLDER_ALREADY_EXISTS);
+            throw new CustomException(ErrorCode.FOLDERNAME_ALREADY_EXISTS);
         }
         Folder folder = new Folder(dto.folderName(), user);
 
