@@ -45,8 +45,6 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
     List<UserBook> findAllByBookInfo(BookInfo bookInfo);
     
     List<UserBook> findAllByUser(User user);
-
-    List<UserBook> findAllByUser(User user);
   
     // 유저가 가장 많이 읽은 카테고리들
     @Query(value = "SELECT bi.category, COUNT(ub) FROM UserBook ub " +
@@ -72,8 +70,7 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
             "((:isFirstHalf = true AND MONTH(ub.createdTime) BETWEEN 1 AND 6) OR " +
             "(:isFirstHalf = false AND MONTH(ub.createdTime) BETWEEN 7 AND 12)) AND " +
             "ub.readStatus = :readStatus")
-    List<UserBook> 
-      AndCreatedInHalfWithReadStatus(@Param("user") User user,
+    List<UserBook> findAllByUserAndCreatedInHalfWithReadStatus(@Param("user") User user,
                                                                @Param("isFirstHalf") boolean isFirstHalf,
                                                                @Param("readStatus") ReadStatus readStatus);
 }
