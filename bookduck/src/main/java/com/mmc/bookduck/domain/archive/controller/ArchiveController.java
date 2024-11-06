@@ -3,7 +3,9 @@ package com.mmc.bookduck.domain.archive.controller;
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.response.ArchiveResponseDto;
 import com.mmc.bookduck.domain.archive.service.ArchiveService;
+import com.mmc.bookduck.domain.archive.service.ExcerptService;
 import com.mmc.bookduck.domain.archive.service.OcrService;
+import com.mmc.bookduck.domain.archive.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -21,6 +23,8 @@ import java.io.IOException;
 public class ArchiveController {
     private final OcrService ocrService;
     private final ArchiveService archiveService;
+    private final ExcerptService excerptService;
+    private final ReviewService reviewService;
 
     @PostMapping("/excerpts/ocr")
     @Operation(summary = "OCR을 통한 텍스트 추출", description = "이미지를 업로드하여 텍스트를 OCR로 추출합니다.")
@@ -35,4 +39,18 @@ public class ArchiveController {
         ArchiveResponseDto responseDto = archiveService.createArchive(requestDto);
         return ResponseEntity.ok(responseDto);
     }
-}
+
+    @GetMapping("/excerpts/{excerptId}")
+    @Operation(summary = "발췌 조회", description = "발췌 내용을 조회하며, 아카이브된 경우 감상평도 함께 조회합니다.")
+    public ResponseEntity<?> getExcerptWithArchive(@PathVariable("excerptId") final Long excerptId) {
+        ArchiveResponseDto responseDto = archiveService.getArchive(excerptId, "excerpt");
+        return ResponseEntity.ok(responseDto);
+        }
+
+    @GetMapping("/reviews/{reviewId}")
+    @Operation(summary = "감상평 조회", description = "감상평 내용을 조회하며, 아카이브된 경우 발췌도 함께 조회합니다.")
+    public ResponseEntity<?> getReviewWithArchive(@PathVariable("reviewId") final Long reviewId) {
+        ArchiveResponseDto responseDto = archiveService.getArchive(reviewId, "review");
+        return ResponseEntity.ok(responseDto);
+    }
+    }
