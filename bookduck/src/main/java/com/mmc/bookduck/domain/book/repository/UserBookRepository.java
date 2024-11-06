@@ -8,6 +8,7 @@ import com.mmc.bookduck.domain.user.entity.User;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -42,6 +43,37 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
     List<UserBook> findByUserOrderByRating(User user);
 
     List<UserBook> findAllByBookInfo(BookInfo bookInfo);
+    
+    List<UserBook> findAllByUser(User user);
 
     List<UserBook> findAllByUser(User user);
+  
+    // 유저가 가장 많이 읽은 카테고리들
+    @Query(value = "SELECT bi.category, COUNT(ub) FROM UserBook ub " +
+            "JOIN ub.bookInfo bi " +
+            "WHERE ub.user = :user " +
+            "GROUP BY bi.category " +
+            "ORDER BY COUNT(ub) DESC")
+    List<Object[]> findTopCategoriesByUser(@Param("user") User user, Pageable pageable);
+
+    // 유저가 가장 많이 읽은 작가들
+    @Query(value = "SELECT b.author, COUNT(ub) AS bookCount FROM UserBook ub " +
+            "JOIN ub.bookInfo b " +
+            "WHERE ub.user = :user " +
+            "GROUP BY b.author " +
+            "ORDER BY bookCount DESC")
+    List<Object[]> findMostReadAuthorByUser(@Param("user") User user);
+
+    // BookInfo의 작가명으로 UserBook 찾기
+    List<UserBook> findAllByBookInfo_Author(String author);
+
+    // 유저의 UserBook들 올해 상반기/하반기별로 조회
+    @Query("SELECT ub FROM UserBook ub WHERE ub.user = :user AND " +
+            "((:isFirstHalf = true AND MONTH(ub.createdTime) BETWEEN 1 AND 6) OR " +
+            "(:isFirstHalf = false AND MONTH(ub.createdTime) BETWEEN 7 AND 12)) AND " +
+            "ub.readStatus = :readStatus")
+    List<UserBook> 
+      AndCreatedInHalfWithReadStatus(@Param("user") User user,
+                                                               @Param("isFirstHalf") boolean isFirstHalf,
+                                                               @Param("readStatus") ReadStatus readStatus);
 }
