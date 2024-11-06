@@ -1,4 +1,4 @@
-package com.mmc.bookduck.domain.review.entity;
+package com.mmc.bookduck.domain.archive.entity;
 
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.common.Visibility;
@@ -21,18 +21,15 @@ public class Review extends BaseTimeEntity {
     private Long reviewId;
 
     @NotNull
-    private String title;
+    private String reviewTitle;
 
     @NotNull
-    private String content;
+    private String reviewContent;
 
-    private Long pageNumber;
-
-    @ColumnDefault("false")
-    private boolean isMain;
-
-    @NotNull
+    @Enumerated(EnumType.STRING)
     private Visibility visibility;
+
+    private String color;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", updatable = false)
@@ -47,15 +44,30 @@ public class Review extends BaseTimeEntity {
     private UserBook userBook;
 
     @Builder
-    public Review(String title, String content, Long pageNumber, boolean isMain,
+    public Review(String reviewTitle, String reviewContent, String color,
                   Visibility visibility, User user, UserBook userBook) {
-        this.title = title;
-        this.content = content;
-        this.pageNumber = pageNumber;
-        this.isMain = isMain;
+        this.reviewTitle = reviewTitle;
+        this.reviewContent = reviewContent;
+        this.color = color;
         this.visibility = visibility;
         this.user = user;
         this.userBook = userBook;
+    }
+
+    public void updateReviewTitle(String reviewTitle) {
+        this.reviewTitle = reviewTitle;
+    }
+
+    public void updateContent(String reviewContent) {
+        this.reviewContent = reviewContent;
+    }
+
+    public void updateVisibility(Visibility visibility) {
+        this.visibility = visibility;
+    }
+
+    public void updateColor(String color) {
+        this.color = color;
     }
 
 }
