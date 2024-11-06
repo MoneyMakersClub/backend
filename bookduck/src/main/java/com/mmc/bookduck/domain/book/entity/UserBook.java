@@ -5,6 +5,7 @@ import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -21,6 +22,15 @@ public class UserBook extends BaseTimeEntity {
     @NotNull
     private ReadStatus readStatus;
 
+    @ColumnDefault("false")
+    private boolean isExcerptExpGiven;
+
+    @ColumnDefault("false")
+    private boolean isReviewExpGiven;
+
+    @ColumnDefault("false")
+    private boolean isOlrExpGiven;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", updatable = false)
     @NotNull
@@ -33,15 +43,32 @@ public class UserBook extends BaseTimeEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private BookInfo bookInfo;
 
-
     @Builder
     public UserBook(ReadStatus readStatus, User user, BookInfo bookInfo) {
         this.readStatus = readStatus;
         this.user = user;
         this.bookInfo = bookInfo;
+        this.isExcerptExpGiven = false;
+        this.isReviewExpGiven = false;
+        this.isOlrExpGiven = false;
     }
 
     public void changeReadStatus(ReadStatus readStatus) {
         this.readStatus = readStatus;
+    }
+
+    // Excerpt 경험치 상태 변경
+    public void markExcerptExpGiven() {
+        this.isExcerptExpGiven = true;
+    }
+
+    // Review 경험치 상태 변경
+    public void markReviewExpGiven() {
+        this.isReviewExpGiven = true;
+    }
+
+    // Olr 경험치 상태 변경
+    public void markOlrExpGiven() {
+        this.isOlrExpGiven = true;
     }
 }
