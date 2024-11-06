@@ -1,10 +1,10 @@
 package com.mmc.bookduck.domain.user.service;
 
+import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
+import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
-import com.mmc.bookduck.domain.excerpt.repository.ExcerptRepository;
-import com.mmc.bookduck.domain.review.repository.ReviewRepository;
 import com.mmc.bookduck.domain.user.dto.common.MonthlyBookCountUnitDto;
 import com.mmc.bookduck.domain.user.dto.common.MostReadGenreUnitDto;
 import com.mmc.bookduck.domain.user.dto.response.UserStatisticsResponseDto;

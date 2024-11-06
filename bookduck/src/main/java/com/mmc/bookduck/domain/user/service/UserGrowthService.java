@@ -1,8 +1,8 @@
 package com.mmc.bookduck.domain.user.service;
 
+import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
+import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
-import com.mmc.bookduck.domain.excerpt.repository.ExcerptRepository;
-import com.mmc.bookduck.domain.review.repository.ReviewRepository;
 import com.mmc.bookduck.domain.user.dto.response.UserGrowthInfoResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserInfoResponseDto;
 import com.mmc.bookduck.domain.user.entity.User;
