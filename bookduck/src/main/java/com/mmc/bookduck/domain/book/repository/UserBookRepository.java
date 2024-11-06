@@ -43,9 +43,9 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
     List<UserBook> findByUserOrderByRating(User user);
 
     List<UserBook> findAllByBookInfo(BookInfo bookInfo);
-    
+
     List<UserBook> findAllByUser(User user);
-  
+
     // 유저가 가장 많이 읽은 카테고리들
     @Query(value = "SELECT bi.category, COUNT(ub) FROM UserBook ub " +
             "JOIN ub.bookInfo bi " +

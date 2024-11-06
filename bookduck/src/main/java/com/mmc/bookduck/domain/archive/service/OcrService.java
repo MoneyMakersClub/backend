@@ -1,4 +1,4 @@
-package com.mmc.bookduck.domain.excerpt.service;
+package com.mmc.bookduck.domain.archive.service;
 
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
