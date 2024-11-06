@@ -1,6 +1,6 @@
 package com.mmc.bookduck.domain.review.repository;
 
-import com.mmc.bookduck.domain.review.entity.Review;
+import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
