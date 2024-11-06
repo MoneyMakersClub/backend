@@ -44,23 +44,21 @@ public class UserGrowthService {
     }
 
     @Transactional(readOnly = true)
-    public UserGrowthInfoResponseDto getUserGrowthInfo(Long userId) {
+    public UserGrowthInfoResponseDto getUserLevelInfo(Long userId) {
         UserGrowth userGrowth = getUserGrowthByUserId(userId);
+        long expInCurrentLevel = userGrowth.getCumulativeExp(); // 현재 레벨의 경험치
 
-        // 현재 레벨과 누적 경험치
-        int level = userGrowth.getLevel();
-        long cumulativeExp = userGrowth.getCumulativeExp();
+        int level = 1;
+        long expThreshold = userGrowth.calculateExpThresholdForNextLevel(level); // 첫 레벨의 경계값 계산
 
-        // 현재 레벨의 기준 경험치와 다음 레벨 기준 경험치 계산
-        long currentLevelExpThreshold = userGrowth.calculateExpThresholdForLevel(level);
-        long nextLevelExpThreshold = userGrowth.calculateExpThresholdForLevel(level + 1);
+        // 레벨을 계산하고, 각 레벨마다 해당 경계값을 재계산
+        while (expInCurrentLevel >= expThreshold) {
+            level++;
+            expInCurrentLevel -= expThreshold;
+            expThreshold = userGrowth.calculateExpThresholdForNextLevel(level);  // 다음 레벨에 맞는 경계값을 계산
+        }
 
-        // 이번 레벨에서 쌓은 경험치와 다음 레벨로 넘어가기 위한 경험치 계산
-        long expInCurrentLevel = cumulativeExp - currentLevelExpThreshold;
-        long expToNextLevel = nextLevelExpThreshold - currentLevelExpThreshold;
-
-        // 응답 DTO 생성 및 반환
-        return new UserGrowthInfoResponseDto(level, expInCurrentLevel, expToNextLevel);
+        return new UserGrowthInfoResponseDto(level, expInCurrentLevel, userGrowth.calculateExpThresholdForNextLevel(level));
     }
 
     // 경험치 증가 메소드
