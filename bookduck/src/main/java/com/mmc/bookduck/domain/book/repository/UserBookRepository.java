@@ -70,8 +70,7 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
             "((:isFirstHalf = true AND MONTH(ub.createdTime) BETWEEN 1 AND 6) OR " +
             "(:isFirstHalf = false AND MONTH(ub.createdTime) BETWEEN 7 AND 12)) AND " +
             "ub.readStatus = :readStatus")
-    List<UserBook>
-    AndCreatedInHalfWithReadStatus(@Param("user") User user,
-                                   @Param("isFirstHalf") boolean isFirstHalf,
-                                   @Param("readStatus") ReadStatus readStatus);
+    List<UserBook> findAllByUserAndCreatedInHalfWithReadStatus(@Param("user") User user,
+                                                               @Param("isFirstHalf") boolean isFirstHalf,
+                                                               @Param("readStatus") ReadStatus readStatus);
 }
