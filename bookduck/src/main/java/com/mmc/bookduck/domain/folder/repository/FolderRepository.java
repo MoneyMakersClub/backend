@@ -11,4 +11,6 @@ public interface FolderRepository extends JpaRepository<Folder, Long> {
     Optional<Folder> findById(Long folderId);
 
     List<Folder> findAllByUser(User user);
+
+    boolean existsByFolderNameAndUser(String folderName, User user);
 }
