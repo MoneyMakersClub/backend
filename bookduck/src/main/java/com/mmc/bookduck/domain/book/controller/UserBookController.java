@@ -7,7 +7,8 @@ import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
 import com.mmc.bookduck.domain.book.service.UserBookService;
-import java.io.IOException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@Tag(name = "Books", description = "Books 관련 API입니다.")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/books")
@@ -22,20 +24,23 @@ public class UserBookController {
 
     private final UserBookService userBookService;
 
+    @Operation(summary = "서재에 책 추가", description = "사용자의 서재에 책을 추가합니다.")
     @PostMapping
     public ResponseEntity<UserBookResponseDto> addUserBook(@RequestBody UserBookRequestDto dto){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userBookService.addUserBook(dto));
     }
 
-    // 서재에서 책 삭제
+
+    @Operation(summary = "서재에서 책 삭제", description = "사용자의 서재에서 책을 삭제합니다.")
     @DeleteMapping("/{userBookId}")
     public ResponseEntity<String> deleteUserBook(@PathVariable final Long userBookId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userBookService.deleteUserBook(userBookId));
     }
 
-    // 서재 책 상태 변경
+
+    @Operation(summary = "서재 책 상태 변경", description = "사용자의 서재의 책 상태를 변경합니다.")
     @PatchMapping("/{userBookId}")
     public ResponseEntity<UserBookResponseDto> updateUserBookStatus(@PathVariable final Long userBookId,
                                                                     @RequestParam(name = "status") final String status){
@@ -43,7 +48,8 @@ public class UserBookController {
                 .body(userBookService.updateUserBookStatus(userBookId, status));
     }
 
-    // 서재 전체 조회
+
+    @Operation(summary = "서재 책 목록 조회", description = "사용자의 서재 책 전체 목록을 조회합니다.")
     @GetMapping("/list")
     public ResponseEntity<UserBookListResponseDto> getAllUserBook(@RequestParam(name = "sort") final String sort){
 
@@ -51,7 +57,8 @@ public class UserBookController {
                 .body(userBookService.getAllUserBook(sort));
     }
 
-    // 서재 책 상태별 조회
+
+    @Operation(summary = "상태별 서재 책 목록 조회", description = "사용자의 서재 책 목록을 상태별로 조회합니다.")
     @GetMapping("/filter")
     public ResponseEntity<UserBookListResponseDto> getStatusUserBook(@RequestParam(name = "status") final List<String> statusList,
                                                                      @RequestParam(name = "sort") final String sort){
@@ -60,7 +67,8 @@ public class UserBookController {
                 .body(userBookService.getStatusUserBook(statusList, sort));
     }
 
-    // 서재 책 상세 조회 - 기본 정보
+
+    @Operation(summary = "서재 책 상세-기본 정보 조회", description = "사용자의 서재 책의 기본 정보를 상세 조회합니다.(책 기본정보 + 현재 사용자의 별점&한줄평)")
     @GetMapping("/{userbookId}")
     public ResponseEntity<BookInfoBasicResponseDto> getUserBookInfoBasic(@PathVariable(name = "userbookId") final Long userbookId){
 
@@ -68,7 +76,8 @@ public class UserBookController {
                 .body(userBookService.getUserBookInfoBasic(userbookId));
     }
 
-    // 서재 책 상세 조회 - 추가 정보
+
+    @Operation(summary = "서재 책 상세-추가 정보 조회", description = "사용자의 서재 책의 추가 정보를 상세 조회합니다.(현재 책에 대한 다른 사용자들의 별점&한줄평 목록 3개)")
     @GetMapping("/{userbookId}/additional")
     public ResponseEntity<BookInfoAdditionalResponseDto> getUserBookInfoAdditional(@PathVariable(name = "userbookId") final Long userbookId){
 
@@ -76,7 +85,8 @@ public class UserBookController {
                 .body(userBookService.getUserBookInfoAdditional(userbookId));
     }
 
-    // custom book 저장
+
+    @Operation(summary = "책 직접 등록", description = "사용자가 책을 직접 등록합니다.")
     @PostMapping("/custom")
     public ResponseEntity<BookInfoBasicResponseDto> createCustomBook(@RequestBody final CustomBookRequestDto requestDto,
                                                                      @RequestParam final MultipartFile coverImage) {
