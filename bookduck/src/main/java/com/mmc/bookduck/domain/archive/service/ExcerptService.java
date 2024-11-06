@@ -5,6 +5,7 @@ import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
+import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -24,7 +25,8 @@ public class ExcerptService {
     public Excerpt createExcerpt(ExcerptCreateRequestDto requestDto){
         User user = userService.getCurrentUser();
         UserBook userBook = userBookService.findUserBookById(requestDto.userBookId());
-        Excerpt excerpt = requestDto.toEntity(user, userBook, false);
+        Visibility visibility = requestDto.visibility() != null ? requestDto.visibility() : Visibility.PUBLIC;
+        Excerpt excerpt = requestDto.toEntity(user, userBook, false, visibility);
         return excerptRepository.save(excerpt);
     }
 

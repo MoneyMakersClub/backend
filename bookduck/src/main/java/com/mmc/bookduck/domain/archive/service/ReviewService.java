@@ -5,6 +5,7 @@ import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
+import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -25,7 +26,8 @@ public class ReviewService {
         User user = userService.getCurrentUser();
         UserBook userBook = userBookService.findUserBookById(requestDto.userBookId());
         String color = requestDto.color() != null ? requestDto.color() : "#FFFFFF";
-        Review review = requestDto.toEntity(user, userBook, color);
+        Visibility visibility = requestDto.visibility() != null ? requestDto.visibility() : Visibility.PUBLIC;
+        Review review = requestDto.toEntity(user, userBook, color, visibility);
         return reviewRepository.save(review);
     }
 

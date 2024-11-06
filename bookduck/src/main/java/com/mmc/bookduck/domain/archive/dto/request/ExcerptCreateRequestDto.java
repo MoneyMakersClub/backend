@@ -12,7 +12,7 @@ public record ExcerptCreateRequestDto(
         @NotNull Long pageNumber,
         @NotNull Long userBookId
 ) {
-    public Excerpt toEntity(User user, UserBook userBook, boolean isMain) {
+    public Excerpt toEntity(User user, UserBook userBook, boolean isMain, Visibility visibility) {
         return Excerpt.builder()
                 .excerptContent(excerptContent)
                 .visibility(visibility)

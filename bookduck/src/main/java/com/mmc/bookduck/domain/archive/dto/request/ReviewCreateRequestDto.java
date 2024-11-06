@@ -13,7 +13,7 @@ public record ReviewCreateRequestDto(
         Visibility visibility,
         @NotNull Long userBookId
 ) {
-    public Review toEntity(User user, UserBook userBook, String color) {
+    public Review toEntity(User user, UserBook userBook, String color, Visibility visibility) {
         return Review.builder()
                 .reviewTitle(reviewTitle)
                 .reviewContent(reviewContent)
