@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.book.service;
 
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
+import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
@@ -17,6 +18,7 @@ import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
+import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -70,18 +73,17 @@ public class UserBookService {
     // 서재에서 책 삭제
     public String deleteUserBook(Long userBookId) {
         UserBook userBook = findUserBookById(userBookId);
-
-        //임시 User
-        Long userId = userService.getCurrentUser().getUserId();
+        User user = userService.getCurrentUser();
 
         // 권한체크
-        if(userBook.getUser().getUserId().equals(userId)){
+        if(userBook.getUser().getUserId().equals(user.getUserId())){
 
             BookInfo bookInfo = userBook.getBookInfo();
             Long createdUserId = bookInfo.getCreatedUserId();
+
             // 사용자가 직접 등록한 책이면 bookInfo도 같이 삭제
-            if(createdUserId != null && createdUserId.equals(userId)){
-                bookInfoService.deleteBookInfo(bookInfo.getBookInfoId());
+            if(createdUserId != null && createdUserId.equals(user.getUserId())){
+                bookInfoService.deleteCustomBookInfo(bookInfo.getBookInfoId());
             }
             userBookRepository.delete(userBook);
         }else{
@@ -100,11 +102,10 @@ public class UserBookService {
 
         UserBook userBook = findUserBookById(userBookId);
 
-        //임시 User
-        Long userId = userService.getCurrentUser().getUserId();
+        User user = userService.getCurrentUser();
 
         // 권한체크
-        if(userBook.getUser().getUserId().equals(userId)){
+        if(userBook.getUser().getUserId().equals(user.getUserId())){
             userBook.changeReadStatus(ReadStatus.valueOf(status));
 
             return UserBookResponseDto.from(userBook);
@@ -175,7 +176,7 @@ public class UserBookService {
         UserBook userBook = findUserBookById(userBookId);
 
         String koreanGenreName = genreService.genreNameToKorean(userBook.getBookInfo().getGenre());
-        BookInfoDetailDto detailDto = BookInfoDetailDto.from(userBook, koreanGenreName);
+        BookInfoDetailDto detailDto = BookInfoDetailDto.from(userBook.getBookInfo(), koreanGenreName);
 
         OneLineRating oneLineRating = oneLineRatingRepository.findByUserBook(userBook)
                 .orElse(null);
@@ -247,5 +248,27 @@ public class UserBookService {
     @Transactional(readOnly = true)
     public List<UserBook> findAllByUser(User user) {
         return userBookRepository.findAllByUser(user);
+    }
+
+    //customBook 추가
+    public BookInfoBasicResponseDto createCustomBook(CustomBookRequestDto requestDto, MultipartFile coverImage) {
+        User user = userService.getCurrentUser();
+        BookInfo bookInfo = bookInfoService.saveCustomBookInfo(requestDto, coverImage, user);
+
+        UserBook userBook = new UserBook(ReadStatus.NOT_STARTED, user, bookInfo);
+        UserBook savedUserBook = userBookRepository.save(userBook);
+
+        String koreanGenre = genreService.genreNameToKorean(bookInfo.getGenre());
+        BookInfoDetailDto detailDto = BookInfoDetailDto.from(savedUserBook.getBookInfo(), koreanGenre);
+
+        OneLineRating oneLineRating = oneLineRatingRepository.findByUserBook(userBook)
+                .orElse(null);
+
+        return new BookInfoBasicResponseDto(
+                null,
+                oneLineRating!=null ? oneLineRating.getOneLineContent() : null,
+                oneLineRating!=null ? oneLineRating.getRating() : null,
+                savedUserBook.getReadStatus(),
+                detailDto);
     }
 }

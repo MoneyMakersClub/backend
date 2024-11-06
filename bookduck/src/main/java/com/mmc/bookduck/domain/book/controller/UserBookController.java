@@ -1,16 +1,19 @@
 package com.mmc.bookduck.domain.book.controller;
 
+import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
 import com.mmc.bookduck.domain.book.service.UserBookService;
+import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -71,5 +74,13 @@ public class UserBookController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userBookService.getUserBookInfoAdditional(userbookId));
+    }
+
+    // custom book 저장
+    @PostMapping("/custom")
+    public ResponseEntity<BookInfoBasicResponseDto> createCustomBook(@RequestBody final CustomBookRequestDto requestDto,
+                                                                     @RequestParam final MultipartFile coverImage) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body((userBookService.createCustomBook(requestDto, coverImage)));
     }
 }

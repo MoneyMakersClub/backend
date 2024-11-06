@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.book.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
@@ -9,6 +10,7 @@ import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.Genre;
+import com.mmc.bookduck.domain.book.entity.GenreName;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.BookInfoRepository;
@@ -16,9 +18,11 @@ import com.mmc.bookduck.domain.book.repository.GenreRepository;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
+import com.mmc.bookduck.global.S3.S3Service;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.google.GoogleBooksApiService;
+import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +40,7 @@ public class BookInfoService {
     private final UserBookRepository userBookRepository;
     private final GenreService genreService;
     private final GoogleBooksApiService googleBooksApiService;
+    private final S3Service s3Service;
 
 
     // api 도서 목록 조회
@@ -199,11 +205,19 @@ public class BookInfoService {
         return bookInfoRepository.findByProviderId(providerId);
     }
 
-    // bookInfo 삭제
-    public void deleteBookInfo(Long bookInfoId) {
+    // custom bookInfo 삭제
+    public void deleteCustomBookInfo(Long bookInfoId) {
         BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
                 .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
         bookInfoRepository.delete(bookInfo);
+    }
+
+    public BookInfo saveCustomBookInfo (CustomBookRequestDto dto, MultipartFile coverImage, User user) {
+        String imgPath = s3Service.uploadFile(coverImage);
+
+        Genre genre = genreService.findOrCreateGenreByGenreName(GenreName.valueOf("OTHERS"));
+        BookInfo bookInfo = dto.toEntity(imgPath, genre, user.getUserId());
+        return bookInfoRepository.save(bookInfo);
     }
 
     /*
