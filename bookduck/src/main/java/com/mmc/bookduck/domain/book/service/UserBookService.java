@@ -243,4 +243,9 @@ public class UserBookService {
         }
         return count > 0 ? totalRating / count : 0.0;
     }
+
+    @Transactional(readOnly = true)
+    public List<UserBook> findAllByUser(User user) {
+        return userBookRepository.findAllByUser(user);
+    }
 }

@@ -42,4 +42,6 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
     List<UserBook> findByUserOrderByRating(User user);
 
     List<UserBook> findAllByBookInfo(BookInfo bookInfo);
+
+    List<UserBook> findAllByUser(User user);
 }
