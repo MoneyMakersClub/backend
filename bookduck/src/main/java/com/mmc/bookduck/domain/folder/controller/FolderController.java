@@ -2,21 +2,25 @@ package com.mmc.bookduck.domain.folder.controller;
 
 import com.mmc.bookduck.domain.folder.dto.request.FolderRequestDto;
 import com.mmc.bookduck.domain.folder.dto.response.AllFolderListResponseDto;
+import com.mmc.bookduck.domain.folder.dto.response.CandidateFolderBookListResponseDto;
 import com.mmc.bookduck.domain.folder.dto.response.FolderBookListResponseDto;
 import com.mmc.bookduck.domain.folder.dto.response.FolderResponseDto;
 import com.mmc.bookduck.domain.folder.service.FolderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Folder", description = "Folder 관련 API입니다.")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/folders")
 public class FolderController {
     private final FolderService folderService;
 
-    // 폴더생성
+    @Operation(summary = "폴더 생성", description = "폴더를 생성합니다.")
     @PostMapping
     public ResponseEntity<FolderResponseDto> createFolder(@RequestBody FolderRequestDto dto){
 
@@ -24,7 +28,7 @@ public class FolderController {
                 .body(folderService.createFolder(dto));
     }
 
-    //폴더 수정
+    @Operation(summary = "폴더 이름 수정", description = "폴더의 이름을 수정합니다.")
     @PatchMapping("/{folderId}")
     public ResponseEntity<FolderResponseDto> updateFolder(@PathVariable final Long folderId,
                                                           @RequestBody FolderRequestDto dto){
@@ -33,7 +37,7 @@ public class FolderController {
                 .body(folderService.updateFolder(folderId, dto));
     }
 
-    // 폴더 삭제
+    @Operation(summary = "폴더 삭제", description = "폴더를 삭제합니다.")
     @DeleteMapping("/{folderId}")
     public ResponseEntity<String> deleteFolder(@PathVariable(name = "folderId") final Long folderId){
 
@@ -41,7 +45,8 @@ public class FolderController {
                 .body(folderService.deleteFolder(folderId));
     }
 
-    // 폴더에 책 추가
+
+    @Operation(summary = "폴더에 책 추가", description = "폴더에 책을 추가합니다.")
     @PostMapping("/{folderId}/books/{userbookId}")
     public ResponseEntity<FolderBookListResponseDto> addFolderBook(@PathVariable(name="folderId") final Long folderId,
                                                                    @PathVariable(name="userbookId") final Long userBookId){
@@ -49,18 +54,17 @@ public class FolderController {
                 .body(folderService.addFolderBook(folderId, userBookId));
     }
 
-    /*
-    // 폴더에 추가할 후보 책 리스트 조회
+
+    @Operation(summary = "폴더에 추가할 책 목록 조회", description = "폴더에 추가할 수 있는 서재 책 목록을 조회합니다.")
     @GetMapping("/{folderId}/books/candidates")
     public ResponseEntity<CandidateFolderBookListResponseDto> getCandidateBooks(@PathVariable(name="folderId") final Long folderId){
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(folderService.getCandidateBooks(folderId));
     }
-    */
 
 
-    //폴더에서 책 삭제
+    @Operation(summary = "폴더에서 책 삭제", description = "폴더에서 책을 삭제합니다.")
     @DeleteMapping("/{folderId}/books/{folderbookId}")
     public ResponseEntity<FolderBookListResponseDto> deleteFolderBook(@PathVariable(name="folderId") final Long folderId,
                                                                       @PathVariable(name="folderbookId") final Long folderBookId){
@@ -68,7 +72,7 @@ public class FolderController {
                 .body(folderService.deleteFolderBook(folderId, folderBookId));
     }
 
-    //폴더 리스트 조회
+    @Operation(summary = "전체 폴더 목록 조회", description = "현재 사용자의 전체 폴더 목록을 조회합니다.")
     @GetMapping("/list")
     public ResponseEntity<AllFolderListResponseDto> getAllFolderList(){
 
@@ -76,7 +80,8 @@ public class FolderController {
                 .body(folderService.getAllFolderList());
     }
 
-    //폴더별 책 목록 조회
+
+    @Operation(summary = "폴더별 책 목록 조회", description = "폴더에 포함된 책 목록을 조회합니다.")
     @GetMapping("/{folderId}/books")
     public ResponseEntity<FolderBookListResponseDto> getFolderBookList(@PathVariable(name="folderId") final Long folderId){
 
@@ -84,10 +89,11 @@ public class FolderController {
                 .body((folderService.getFolderBookList(folderId)));
     }
 
-    //폴더별&상태별 책 목록 조회
+
+    @Operation(summary = "폴더별&상태별 책 목록 조회", description = "폴더에 포함된 책에서 특정 상태의 책 목록을 조회합니다.")
     @GetMapping("/{folderId}/books/filter")
     public ResponseEntity<FolderBookListResponseDto> getFolderBookListStatus(@PathVariable(name="folderId") final Long folderId,
-                                                                       @RequestParam(name="status") final String status){
+                                                                             @RequestParam(name="status") final String status){
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body((folderService.getFolderBookListStatus(folderId, status)));

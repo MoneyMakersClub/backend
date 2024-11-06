@@ -8,7 +8,6 @@ public record ExcerptResponseDto(
         String excerptContent,
         Visibility visibility,
         Long pageNumber,
-        String color,
         Long userBookId
 ) {
     public static ExcerptResponseDto from(Excerpt excerpt) {
@@ -17,7 +16,6 @@ public record ExcerptResponseDto(
                 excerpt.getExcerptContent(),
                 excerpt.getVisibility(),
                 excerpt.getPageNumber(),
-                excerpt.getColor(),
                 excerpt.getUserBook().getUserBookId()
         );
     }
