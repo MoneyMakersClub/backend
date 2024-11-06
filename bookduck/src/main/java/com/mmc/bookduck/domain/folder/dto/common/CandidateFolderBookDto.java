@@ -1,24 +1,22 @@
-package com.mmc.bookduck.domain.book.dto.response;
+package com.mmc.bookduck.domain.folder.dto.common;
 
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 
-public record UserBookResponseDto(
+public record CandidateFolderBookDto(
         Long userBookId,
         String title,
         String author,
         String imgPath,
-        ReadStatus readStatus,
-        Long bookInfoId
+        ReadStatus readStatus
 ) {
-    public static UserBookResponseDto from(UserBook userBook) {
-        return new UserBookResponseDto(
+    public static CandidateFolderBookDto from(UserBook userBook) {
+        return new CandidateFolderBookDto(
                 userBook.getUserBookId(),
                 userBook.getBookInfo().getTitle(),
                 userBook.getBookInfo().getAuthor(),
                 userBook.getBookInfo().getImgPath(),
-                userBook.getReadStatus(),
-                userBook.getBookInfo().getBookInfoId()
+                userBook.getReadStatus()
         );
     }
 }
