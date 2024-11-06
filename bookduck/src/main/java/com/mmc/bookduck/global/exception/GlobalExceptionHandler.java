@@ -23,8 +23,7 @@ public class GlobalExceptionHandler {
                 e.getErrorCode().getMessage(),
                 request.getRequestURI()
         );
-        log.info("메시지: "+e.getMessage());
-        e.printStackTrace();
+        log.info("메시지: [" + errorDto.errorCode() + "] " + errorDto.message());
         return new ResponseEntity<>(errorDto, HttpStatusCode.valueOf(e.getErrorCode().getStatus()));
     }
 
