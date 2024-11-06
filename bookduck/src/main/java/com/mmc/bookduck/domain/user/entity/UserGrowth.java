@@ -39,10 +39,6 @@ public class UserGrowth {
         this.cumulativeExp = 0L;
     }
 
-    // 레벨업
-    public void incrementLevel() {
-        this.level += 1;
-    }
 
     // 경험치 획득
     public boolean gainExp(int exp) {
@@ -52,12 +48,17 @@ public class UserGrowth {
         return this.level > previousLevel;  // 레벨업이 되면 true 반환
     }
 
+    // 레벨업 확인
     private void checkLevelUp() {
         long expThreshold = calculateExpThresholdForLevel(level);  // 현재 레벨의 기준 경험치 계산
         while (this.cumulativeExp >= expThreshold) {
             incrementLevel();
             expThreshold = calculateExpThresholdForLevel(level);  // 새 레벨 기준 경험치로 업데이트
         }
+    }
+
+    public void incrementLevel() {
+        this.level += 1;
     }
 
     public long calculateExpThresholdForLevel(int level) {
