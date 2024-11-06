@@ -9,10 +9,9 @@ public record ExcerptCreateRequestDto(
         String excerptContent,
         Visibility visibility,
         Long pageNumber,
-        String color,
         Long userBookId
 ) {
     public Excerpt toEntity(User user, UserBook userBook) {
-        return new Excerpt(excerptContent, visibility, pageNumber, color, user, userBook);
+        return new Excerpt(excerptContent, visibility, pageNumber, user, userBook);
     }
 }
