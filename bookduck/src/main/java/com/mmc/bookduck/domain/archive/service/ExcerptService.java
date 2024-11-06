@@ -24,8 +24,7 @@ public class ExcerptService {
     public Excerpt createExcerpt(ExcerptCreateRequestDto requestDto){
         User user = userService.getCurrentUser();
         UserBook userBook = userBookService.findUserBookById(requestDto.userBookId());
-        boolean isMain = requestDto.isMain() != null ? requestDto.isMain() : false;
-        Excerpt excerpt = requestDto.toEntity(user, userBook, isMain);
+        Excerpt excerpt = requestDto.toEntity(user, userBook, false);
         return excerptRepository.save(excerpt);
     }
 

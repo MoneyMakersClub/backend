@@ -9,7 +9,6 @@ import jakarta.validation.constraints.NotNull;
 public record ExcerptCreateRequestDto(
         @NotNull String excerptContent,
         @NotNull Visibility visibility,
-        Boolean isMain,
         @NotNull Long pageNumber,
         @NotNull Long userBookId
 ) {
