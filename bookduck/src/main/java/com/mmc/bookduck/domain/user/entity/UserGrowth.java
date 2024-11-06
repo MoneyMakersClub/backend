@@ -50,10 +50,10 @@ public class UserGrowth {
 
     // 레벨업 확인
     private void checkLevelUp() {
-        long expThreshold = calculateExpThresholdForLevel(level);  // 현재 레벨의 기준 경험치 계산
+        long expThreshold = calculateExpThresholdForNextLevel(level);  // 다음 레벨의 기준 경험치 계산
         while (this.cumulativeExp >= expThreshold) {
             incrementLevel();
-            expThreshold = calculateExpThresholdForLevel(level);  // 새 레벨 기준 경험치로 업데이트
+            expThreshold = calculateExpThresholdForNextLevel(level);  // 다음 레벨 기준 경험치로 업데이트
         }
     }
 
@@ -61,7 +61,7 @@ public class UserGrowth {
         this.level += 1;
     }
 
-    public long calculateExpThresholdForLevel(int level) {
-        return 100L * level;  // 예시: 각 레벨당 100 * 레벨의 경험치 필요
+    public long calculateExpThresholdForNextLevel(int level) {
+        return 50L + 50L * level;  // 레벨에 따라 증가
     }
 }
