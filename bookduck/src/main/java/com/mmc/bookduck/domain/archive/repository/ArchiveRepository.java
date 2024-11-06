@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface ArchiveRepository extends JpaRepository<Archive, Long> {
-    Optional<Archive> findByExcerptId(Long excerptId);
+    Optional<Archive> findByExcerpt_ExcerptId(Long excerptId);
 
-    Optional<Archive> findByReviewId(Long reviewId);
+    Optional<Archive> findByReview_ReviewId(Long reviewId);
 
 }

@@ -45,9 +45,9 @@ public class ArchiveService {
         Archive archive = null;
 
         if ("excerpt".equals(type)) {
-            archive = archiveRepository.findByExcerptId(id).orElse(null);
+            archive = archiveRepository.findByExcerpt_ExcerptId(id).orElse(null);
         } else if ("review".equals(type)) {
-            archive = archiveRepository.findByReviewId(id).orElse(null);
+            archive = archiveRepository.findByReview_ReviewId(id).orElse(null);
         }
 
         if (archive != null) {
