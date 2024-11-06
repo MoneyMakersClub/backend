@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.user.controller;
 
 import com.mmc.bookduck.domain.user.service.UserGrowthService;
+import com.mmc.bookduck.domain.user.service.UserReadingReportService;
 import com.mmc.bookduck.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final UserGrowthService userGrowthService;
+    private final UserReadingReportService userReadingReportService;
 
     @Operation(summary = "유저 검색", description = "유저를 검색합니다.")
     @GetMapping("/search")
@@ -31,10 +33,16 @@ public class UserController {
         return ResponseEntity.ok().body(userGrowthService.getUserInfo(userId));
     }
 
+    @Operation(summary = "유저 레벨, 레벨업 미션 조회", description = "유저의 레벨과 레벨업 미션들을 조회합니다.")
+    @GetMapping("/{userId}/growth")
+    public ResponseEntity<?> getUserGrowthInfo(@PathVariable final Long userId) {
+        return ResponseEntity.ok().body(userGrowthService.getUserGrowthInfo(userId));
+    }
+
     @Operation(summary = "유저 독서 리포트 조회 - 통계", description = "유저의 독서 리포트 중 통계를 조회합니다.")
     @GetMapping("/{userId}/statistics")
     public ResponseEntity<?> getUserStatistics(@PathVariable final Long userId) {
-        return ResponseEntity.ok().body(userGrowthService.getUserStatistics(userId));
+        return ResponseEntity.ok().body(userReadingReportService.getUserStatistics(userId));
     }
 
 //    @Operation(summary = "유저 독서 리포트 조회 - AI", description = "유저의 독서 리포트 중 AI부분을 조회합니다.")
