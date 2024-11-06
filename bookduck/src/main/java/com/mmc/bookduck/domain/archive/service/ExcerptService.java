@@ -30,6 +30,7 @@ public class ExcerptService {
         return excerptRepository.save(excerpt);
     }
 
+    @Transactional(readOnly = true)
     public Excerpt getExcerptById(Long excerptId) {
         return excerptRepository.findById(excerptId)
                 .orElseThrow(() -> new CustomException(ErrorCode.EXCERPT_NOT_FOUND));

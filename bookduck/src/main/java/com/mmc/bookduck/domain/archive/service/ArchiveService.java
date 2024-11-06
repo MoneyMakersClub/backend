@@ -41,9 +41,9 @@ public class ArchiveService {
         return createArchiveResponseDto(excerpt, review);
     }
 
+    @Transactional(readOnly = true)
     public ArchiveResponseDto getArchive(Long id, String type) {
         Archive archive = null;
-
         if ("excerpt".equals(type)) {
             archive = archiveRepository.findByExcerpt_ExcerptId(id).orElse(null);
         } else if ("review".equals(type)) {
