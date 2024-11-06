@@ -1,6 +1,5 @@
-package com.mmc.bookduck.domain.excerpt.service;
+package com.mmc.bookduck.domain.archive.service;
 
-import lombok.extern.slf4j.Slf4j;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.google.GoogleCloudUploadService;

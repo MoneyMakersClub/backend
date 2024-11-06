@@ -1,8 +1,10 @@
 package com.mmc.bookduck.domain.user.service;
 
 import com.mmc.bookduck.domain.user.dto.common.UserUnitDto;
+import com.mmc.bookduck.domain.user.dto.response.UserInfoResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserSearchResponseDto;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.entity.UserGrowth;
 import com.mmc.bookduck.domain.user.entity.UserStatus;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -41,9 +43,15 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User getActiveUserByUserId(Long userId) throws CustomException {
+        User user = getUserByUserId(userId);
+        validateActiveUserStatus(user);
+        return user;
+    }
+
+    @Transactional(readOnly = true)
+    public User getUserByUserId(Long userId) throws CustomException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        validateActiveUserStatus(user);
         return user;
     }
 

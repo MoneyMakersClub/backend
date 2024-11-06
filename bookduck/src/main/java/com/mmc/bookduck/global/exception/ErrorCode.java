@@ -46,6 +46,7 @@ public enum ErrorCode {
     // 각 리소스를 찾지 못함
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
     USERSETTING_NOT_FOUND(404, "사용자 설정을 찾을 수 없습니다."),
+    USERGROWTH_NOT_FOUND(404, "사용자 성장상태를 찾을 수 없습니다."),
     FRIEND_REQUEST_NOT_FOUND(404, "친구 요청을 찾을 수 없습니다."),
     FRIEND_NOT_FOUND(404, "친구를 찾을 수 없습니다."),
     BOOKINFO_NOT_FOUND(404, "책 정보를 찾을 수 없습니다."),
@@ -75,7 +76,7 @@ public enum ErrorCode {
     REVIEW_ALREADY_EXISTS(409, "이미 존재하는 감상평입니다."),
     EXCERPT_ALREADY_EXISTS(409, "이미 존재하는 발췌입니다."),
     ALARM_ALREADY_EXISTS(409, "이미 존재하는 알림입니다."),
-    FOLDER_ALREADY_EXISTS(409, "이미 존재하는 폴더입니다."),
+    FOLDERNAME_ALREADY_EXISTS(409, "이미 존재하는 폴더 이름입니다."),
     FOLDERBOOK_ALREADY_EXISTS(409, "이미 폴더 내에 존재하는 책입니다."),
     BADGE_ALREADY_EXISTS(409, "이미 존재하는 뱃지입니다."),
     ITEM_ALREADY_EXISTS(409, "이미 존재하는 아이템입니다."),

@@ -1,8 +1,7 @@
-package com.mmc.bookduck.domain.review.entity;
+package com.mmc.bookduck.domain.archive.entity;
 
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.common.Visibility;
-import com.mmc.bookduck.domain.reviewheart.entity.ReviewHeart;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -11,9 +10,6 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,18 +21,15 @@ public class Review extends BaseTimeEntity {
     private Long reviewId;
 
     @NotNull
-    private String title;
+    private String reviewTitle;
 
     @NotNull
-    private String content;
+    private String reviewContent;
 
-    private Long pageNumber;
-
-    @ColumnDefault("false")
-    private boolean isMain;
-
-    @NotNull
+    @Enumerated(EnumType.STRING)
     private Visibility visibility;
+
+    private String color;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", updatable = false)
@@ -50,30 +43,31 @@ public class Review extends BaseTimeEntity {
     @OnDelete(action = OnDeleteAction.CASCADE) // 다대일 단방향이므로 설정
     private UserBook userBook;
 
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReviewHeart> reviewHearts;
-
     @Builder
-    public Review(String title, String content, Long pageNumber, boolean isMain,
+    public Review(String reviewTitle, String reviewContent, String color,
                   Visibility visibility, User user, UserBook userBook) {
-        this.title = title;
-        this.content = content;
-        this.pageNumber = pageNumber;
-        this.isMain = isMain;
+        this.reviewTitle = reviewTitle;
+        this.reviewContent = reviewContent;
+        this.color = color;
         this.visibility = visibility;
         this.user = user;
         this.userBook = userBook;
-        this.reviewHearts = new ArrayList<>();
     }
 
-    // reviewHeart 추가
-    public void addReviewHeart(ReviewHeart reviewHeart) {
-        reviewHearts.add(reviewHeart);
+    public void updateReviewTitle(String reviewTitle) {
+        this.reviewTitle = reviewTitle;
     }
 
-    // reviewHeart 삭제
-    public void removeReviewHeart(ReviewHeart reviewHeart) {
-        reviewHearts.remove(reviewHeart);
-        reviewHeart.setReview(null);
+    public void updateContent(String reviewContent) {
+        this.reviewContent = reviewContent;
     }
+
+    public void updateVisibility(Visibility visibility) {
+        this.visibility = visibility;
+    }
+
+    public void updateColor(String color) {
+        this.color = color;
+    }
+
 }
