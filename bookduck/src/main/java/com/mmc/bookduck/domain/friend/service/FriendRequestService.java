@@ -7,6 +7,7 @@ import com.mmc.bookduck.domain.friend.entity.FriendRequest;
 import com.mmc.bookduck.domain.friend.entity.FriendRequestStatus;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
 import com.mmc.bookduck.domain.friend.repository.FriendRequestRepository;
+import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -25,6 +26,7 @@ public class FriendRequestService {
     private final FriendRequestRepository friendRequestRepository;
     private final FriendRepository friendRepository;
     private final UserService userService;
+    private final UserItemService userItemService;
 
     // 친구 요청 전송
     public void sendFriendRequest(FriendRequestDto requestDto) {
@@ -68,7 +70,12 @@ public class FriendRequestService {
         User currentUser = userService.getCurrentUser();
         List<FriendRequestUnitDto> receivedList = friendRequestRepository.findAllByReceiverUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
-                .map(FriendRequestUnitDto::from)
+                .map(friendRequest -> FriendRequestUnitDto.from(
+                        friendRequest,
+                        friendRequest.getSender().getUserId(),
+                        friendRequest.getSender().getNickname(),
+                        userItemService.getEquippedItemOrDefault(friendRequest.getSender().getUserId())
+                ))
                 .collect(Collectors.toList());
         return FriendRequestListResponseDto.from(receivedList);
     }
@@ -79,7 +86,12 @@ public class FriendRequestService {
         User currentUser = userService.getCurrentUser();
         List<FriendRequestUnitDto> sentList = friendRequestRepository.findAllBySenderUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
-                .map(FriendRequestUnitDto::from)
+                .map(friendRequest -> FriendRequestUnitDto.from(
+                        friendRequest,
+                        friendRequest.getReceiver().getUserId(),
+                        friendRequest.getReceiver().getNickname(),
+                        userItemService.getEquippedItemOrDefault(friendRequest.getReceiver().getUserId())
+                ))
                 .collect(Collectors.toList());
         return FriendRequestListResponseDto.from(sentList);
     }
