@@ -62,13 +62,12 @@ public class UserGrowthService {
     }
 
     // 경험치 증가 메소드
-    // TODO: 수치 변경 필요
-    public void gainExcerptExp(UserBook userBook) {
-        gainExpForUser(userBook, 20, "Excerpt");
+    public void gainFinishedExp(UserBook userBook) {
+        gainExpForUser(userBook, 20, "Finished");
     }
 
-    public void gainReviewExp(UserBook userBook) {
-        gainExpForUser(userBook, 30, "Review");
+    public void gainArchiveExp(UserBook userBook) {
+        gainExpForUser(userBook, 30, "Archive");
     }
 
     public void gainOlrExp(UserBook userBook) {
@@ -86,8 +85,8 @@ public class UserGrowthService {
 
     private void markExpGiven(UserBook userBook, String experienceType) {
         switch (experienceType) {
-            case "Excerpt" -> userBook.markExcerptExpGiven();
-            case "Review" -> userBook.markReviewExpGiven();
+            case "Finished" -> userBook.markFinishedExpGiven();
+            case "Archive" -> userBook.markArchiveExpGiven();
             case "Olr" -> userBook.markOlrExpGiven();
             default -> throw new IllegalArgumentException("Unsupported experience type: " + experienceType);
         }

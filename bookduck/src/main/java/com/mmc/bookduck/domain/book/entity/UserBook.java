@@ -23,10 +23,10 @@ public class UserBook extends BaseTimeEntity {
     private ReadStatus readStatus;
 
     @ColumnDefault("false")
-    private boolean isExcerptExpGiven;
+    private boolean isFinishedExpGiven;
 
     @ColumnDefault("false")
-    private boolean isReviewExpGiven;
+    private boolean isArchiveExpGiven;
 
     @ColumnDefault("false")
     private boolean isOlrExpGiven;
@@ -48,8 +48,8 @@ public class UserBook extends BaseTimeEntity {
         this.readStatus = readStatus;
         this.user = user;
         this.bookInfo = bookInfo;
-        this.isExcerptExpGiven = false;
-        this.isReviewExpGiven = false;
+        this.isFinishedExpGiven = false;
+        this.isArchiveExpGiven = false;
         this.isOlrExpGiven = false;
     }
 
@@ -57,17 +57,17 @@ public class UserBook extends BaseTimeEntity {
         this.readStatus = readStatus;
     }
 
-    // Excerpt 경험치 상태 변경
-    public void markExcerptExpGiven() {
-        this.isExcerptExpGiven = true;
+    // 완독 경험치 획득 표시
+    public void markFinishedExpGiven() {
+        this.isFinishedExpGiven = true;
     }
 
-    // Review 경험치 상태 변경
-    public void markReviewExpGiven() {
-        this.isReviewExpGiven = true;
+    // 독서기록 경험치 획득 표시
+    public void markArchiveExpGiven() {
+        this.isArchiveExpGiven = true;
     }
 
-    // Olr 경험치 상태 변경
+    // 한줄평 경험치 획득 표시
     public void markOlrExpGiven() {
         this.isOlrExpGiven = true;
     }
