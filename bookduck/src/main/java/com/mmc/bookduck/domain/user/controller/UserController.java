@@ -25,7 +25,7 @@ public class UserController {
     @Operation(summary = "유저 검색", description = "유저를 검색합니다.")
     @GetMapping("/search")
     public ResponseEntity<?> searchUsers(@RequestParam("keyword") final String keyword,
-                                           @PageableDefault(size = 20) final Pageable pageable) {
+                                         @PageableDefault(size = 20) final Pageable pageable) {
         return ResponseEntity.ok().body(userService.searchUsers(keyword, pageable));
     }
 
@@ -38,7 +38,7 @@ public class UserController {
     @Operation(summary = "유저 레벨, 레벨업 미션 조회", description = "유저의 레벨과 레벨업 미션들을 조회합니다.")
     @GetMapping("/{userId}/growth")
     public ResponseEntity<?> getUserGrowthInfo(@PathVariable final Long userId) {
-        return ResponseEntity.ok().body(userGrowthService.getUserGrowthInfo(userId));
+        return ResponseEntity.ok().body(userGrowthService.getUserLevelInfo(userId));
     }
 
     @Operation(summary = "유저 독서 리포트 조회 - 통계", description = "유저의 독서 리포트 중 통계를 조회합니다.")
@@ -52,7 +52,6 @@ public class UserController {
 //    public ResponseEntity<?> getUserKeywordAnalysis(@PathVariable final Long userId) {
 //        return ResponseEntity.ok().body(userGrowthService.getUserKeywordAnalysis(userId));
 //    }
-
 
     @Operation(summary = "유저의 뱃지 목록 조회", description = "유저의 닉네임과 기록 수를 조회합니다.")
     @GetMapping("/{userId}/badges")
