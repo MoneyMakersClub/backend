@@ -64,33 +64,33 @@ public class FriendRequestService {
         friendRequestRepository.delete(request);
     }
 
-    // 보낸 친구 요청 목록 조회
-    @Transactional(readOnly = true)
-    public FriendRequestListResponseDto getSentFriendRequests() {
-        User currentUser = userService.getCurrentUser();
-        List<FriendRequestUnitDto> receivedList = friendRequestRepository.findAllByReceiverUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
-                .stream()
-                .map(friendRequest -> FriendRequestUnitDto.from(
-                        friendRequest,
-                        friendRequest.getReceiver().getUserId(),
-                        friendRequest.getReceiver().getNickname(),
-                        userItemService.getEquippedItemOrDefault(friendRequest.getReceiver().getUserId())
-                ))
-                .collect(Collectors.toList());
-        return FriendRequestListResponseDto.from(receivedList);
-    }
-
     // 받은 친구 요청 목록 조회
     @Transactional(readOnly = true)
     public FriendRequestListResponseDto getReceivedFriendRequests() {
         User currentUser = userService.getCurrentUser();
-        List<FriendRequestUnitDto> sentList = friendRequestRepository.findAllBySenderUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
+        List<FriendRequestUnitDto> receivedList = friendRequestRepository.findAllByReceiverUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
                 .map(friendRequest -> FriendRequestUnitDto.from(
                         friendRequest,
                         friendRequest.getSender().getUserId(),
                         friendRequest.getSender().getNickname(),
                         userItemService.getEquippedItemOrDefault(friendRequest.getSender().getUserId())
+                ))
+                .collect(Collectors.toList());
+        return FriendRequestListResponseDto.from(receivedList);
+    }
+
+    // 보낸 친구 요청 목록 조회
+    @Transactional(readOnly = true)
+    public FriendRequestListResponseDto getSentFriendRequests() {
+        User currentUser = userService.getCurrentUser();
+        List<FriendRequestUnitDto> sentList = friendRequestRepository.findAllBySenderUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
+                .stream()
+                .map(friendRequest -> FriendRequestUnitDto.from(
+                        friendRequest,
+                        friendRequest.getReceiver().getUserId(),
+                        friendRequest.getReceiver().getNickname(),
+                        userItemService.getEquippedItemOrDefault(friendRequest.getReceiver().getUserId())
                 ))
                 .collect(Collectors.toList());
         return FriendRequestListResponseDto.from(sentList);
