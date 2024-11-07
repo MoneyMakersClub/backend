@@ -70,7 +70,12 @@ public class FriendRequestService {
         User currentUser = userService.getCurrentUser();
         List<FriendRequestUnitDto> receivedList = friendRequestRepository.findAllByReceiverUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
-                .map(friendRequest -> FriendRequestUnitDto.from(friendRequest, userItemService.getEquippedItemOrDefault(friendRequest.getReceiver().getUserId())))
+                .map(friendRequest -> FriendRequestUnitDto.from(
+                        friendRequest,
+                        friendRequest.getReceiver().getUserId(),
+                        friendRequest.getReceiver().getNickname(),
+                        userItemService.getEquippedItemOrDefault(friendRequest.getReceiver().getUserId())
+                ))
                 .collect(Collectors.toList());
         return FriendRequestListResponseDto.from(receivedList);
     }
@@ -81,7 +86,12 @@ public class FriendRequestService {
         User currentUser = userService.getCurrentUser();
         List<FriendRequestUnitDto> sentList = friendRequestRepository.findAllBySenderUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
-                .map(friendRequest -> FriendRequestUnitDto.from(friendRequest, userItemService.getEquippedItemOrDefault(friendRequest.getReceiver().getUserId())))
+                .map(friendRequest -> FriendRequestUnitDto.from(
+                        friendRequest,
+                        friendRequest.getSender().getUserId(),
+                        friendRequest.getSender().getNickname(),
+                        userItemService.getEquippedItemOrDefault(friendRequest.getSender().getUserId())
+                ))
                 .collect(Collectors.toList());
         return FriendRequestListResponseDto.from(sentList);
     }

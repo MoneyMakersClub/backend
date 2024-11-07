@@ -6,14 +6,14 @@ import com.mmc.bookduck.domain.item.dto.common.UserItemEquippedDto;
 public record FriendRequestUnitDto(
         Long requestId,
         Long userId,
-        String receiverNickname,
+        String userNickname,
         UserItemEquippedDto userItemEquipped
 ) {
-    public static FriendRequestUnitDto from(FriendRequest friendRequest, UserItemEquippedDto userItemEquipped) {
+    public static FriendRequestUnitDto from(FriendRequest friendRequest, Long userId, String userNickname, UserItemEquippedDto userItemEquipped) {
         return new FriendRequestUnitDto(
                 friendRequest.getRequestId(),
-                friendRequest.getReceiver().getUserId(),
-                friendRequest.getReceiver().getNickname(),
+                userId,
+                userNickname,
                 userItemEquipped
         );
     }
