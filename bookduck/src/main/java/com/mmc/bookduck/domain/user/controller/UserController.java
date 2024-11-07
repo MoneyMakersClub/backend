@@ -1,6 +1,5 @@
 package com.mmc.bookduck.domain.user.controller;
 
-import com.mmc.bookduck.domain.badge.service.UserBadgeService;
 import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserReadingReportService;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -20,7 +19,6 @@ public class UserController {
     private final UserService userService;
     private final UserGrowthService userGrowthService;
     private final UserReadingReportService userReadingReportService;
-    private final UserBadgeService userBadgeService;
 
     @Operation(summary = "유저 검색", description = "유저를 검색합니다.")
     @GetMapping("/search")
@@ -53,9 +51,4 @@ public class UserController {
 //        return ResponseEntity.ok().body(userGrowthService.getUserKeywordAnalysis(userId));
 //    }
 
-    @Operation(summary = "유저의 뱃지 목록 조회", description = "유저의 닉네임과 기록 수를 조회합니다.")
-    @GetMapping("/{userId}/badges")
-    public ResponseEntity<?> getUserBadges(@PathVariable final Long userId) {
-        return ResponseEntity.ok().body(userBadgeService.getUserBadges(userId));
-    }
 }
