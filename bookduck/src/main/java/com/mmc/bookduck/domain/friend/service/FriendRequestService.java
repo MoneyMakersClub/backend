@@ -64,9 +64,9 @@ public class FriendRequestService {
         friendRequestRepository.delete(request);
     }
 
-    // 받은 친구 요청 목록 조회
+    // 보낸 친구 요청 목록 조회
     @Transactional(readOnly = true)
-    public FriendRequestListResponseDto getReceivedFriendRequests() {
+    public FriendRequestListResponseDto getSentFriendRequests() {
         User currentUser = userService.getCurrentUser();
         List<FriendRequestUnitDto> receivedList = friendRequestRepository.findAllByReceiverUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
@@ -80,9 +80,9 @@ public class FriendRequestService {
         return FriendRequestListResponseDto.from(receivedList);
     }
 
-    // 보낸 친구 요청 목록 조회
+    // 받은 친구 요청 목록 조회
     @Transactional(readOnly = true)
-    public FriendRequestListResponseDto getSentFriendRequests() {
+    public FriendRequestListResponseDto getReceivedFriendRequests() {
         User currentUser = userService.getCurrentUser();
         List<FriendRequestUnitDto> sentList = friendRequestRepository.findAllBySenderUserIdAndFriendRequestStatus(currentUser.getUserId(), FriendRequestStatus.PENDING)
                 .stream()
