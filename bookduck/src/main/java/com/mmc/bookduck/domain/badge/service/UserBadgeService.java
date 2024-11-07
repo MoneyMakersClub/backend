@@ -1,7 +1,7 @@
 package com.mmc.bookduck.domain.badge.service;
 
 import com.mmc.bookduck.domain.badge.dto.common.UserBadgeUnitDto;
-import com.mmc.bookduck.domain.badge.dto.response.UserBadgeResponseDto;
+import com.mmc.bookduck.domain.badge.dto.response.UserBadgeListResponseDto;
 import com.mmc.bookduck.domain.badge.entity.BadgeType;
 import com.mmc.bookduck.domain.badge.entity.UserBadge;
 import com.mmc.bookduck.domain.badge.repository.UserBadgeRepository;
@@ -23,7 +23,7 @@ public class UserBadgeService {
     private final UserService userService;
 
     @Transactional(readOnly = true)
-    public UserBadgeResponseDto getUserBadges(Long userId) {
+    public UserBadgeListResponseDto getUserBadges(Long userId) {
         User user = userService.getUserByUserId(userId);
         List<UserBadge> userBadges = userBadgeRepository.findAllByUser(user);
         List<UserBadge> uniqueUserBadges = deleteDuplicateUserBadges(userBadges);
@@ -35,10 +35,10 @@ public class UserBadgeService {
         // BadgeType에 따라 리스트 생성
         List<UserBadgeUnitDto> readBadgeList = convertToDtoList(badgesByType.getOrDefault(BadgeType.READ, List.of()));
         List<UserBadgeUnitDto> archiveBadgeList = convertToDtoList(badgesByType.getOrDefault(BadgeType.ARCHIVE, List.of()));
-        List<UserBadgeUnitDto> orlBadgeList = convertToDtoList(badgesByType.getOrDefault(BadgeType.ORL, List.of()));
+        List<UserBadgeUnitDto> ratingBadgeList = convertToDtoList(badgesByType.getOrDefault(BadgeType.RATING, List.of()));
         List<UserBadgeUnitDto> levelBadgeList = convertToDtoList(badgesByType.getOrDefault(BadgeType.LEVEL, List.of()));
 
-        return new UserBadgeResponseDto(readBadgeList, archiveBadgeList, orlBadgeList, levelBadgeList);
+        return UserBadgeListResponseDto.from(readBadgeList, archiveBadgeList, ratingBadgeList, levelBadgeList);
     }
 
     private List<UserBadgeUnitDto> convertToDtoList(List<UserBadge> userBadges) {
