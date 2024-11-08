@@ -5,6 +5,7 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 import java.util.List;
 
 public record BookInfoDetailDto(
+        Long bookInfoId,
         String publisher,
         String publishedDate,
         String description,
@@ -17,6 +18,7 @@ public record BookInfoDetailDto(
 
     public static BookInfoDetailDto from(UserBook userBook, String koreanGenreName) {
         return new BookInfoDetailDto(
+                userBook.getBookInfo().getBookInfoId(),
                 userBook.getBookInfo().getPublisher(),
                 userBook.getBookInfo().getPublishDate(),
                 userBook.getBookInfo().getDescription(),

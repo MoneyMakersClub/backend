@@ -1,6 +1,6 @@
 package com.mmc.bookduck.domain.book.controller;
 
-import com.mmc.bookduck.domain.book.dto.common.CustomBookUnitResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.CustomBookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
@@ -57,5 +57,12 @@ public class BookInfoController {
     @GetMapping("/custom/{bookinfoId}/additional")
     public ResponseEntity<BookInfoBasicResponseDto> getCustomBookBasic(@PathVariable(name = "bookinfoId") final Long bookInfoId){
         return ResponseEntity.ok(bookInfoService.getCustomBookBasic(bookInfoId));
+    }
+
+    @Operation(summary = "사용자가 직접 추가한 도서 정보 수정", description = "사용자가 직접 등록한 도서의 정보를 수정합니다.")
+    @PatchMapping("/custom/{bookinfoId}")
+    public ResponseEntity<BookInfoBasicResponseDto> updateCustomBookInfo(@PathVariable(name = "bookinfoId") final Long bookInfoId,
+                                                                         @RequestBody ){
+        return ResponseEntity.ok(bookInfoService.updateCustomBookInfo(bookInfoId));
     }
 }

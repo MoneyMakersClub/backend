@@ -3,7 +3,7 @@ package com.mmc.bookduck.domain.book.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
-import com.mmc.bookduck.domain.book.dto.common.CustomBookUnitResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.CustomBookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
@@ -160,7 +160,7 @@ public class BookInfoService {
             String koreanGenre = genreService.genreNameToKorean(genre);
 
             String language = getTextNode(info, "language");
-            return new BookInfoDetailDto(publisher, publishedDate, description, page, cate, genre.getGenreId(), koreanGenre, language);
+            return new BookInfoDetailDto(null, publisher, publishedDate, description, page, cate, genre.getGenreId(), koreanGenre, language);
 
         }catch(Exception e){
             throw new CustomException(ErrorCode.JSON_PARSING_ERROR);
@@ -224,7 +224,7 @@ public class BookInfoService {
         return new BookInfoAdditionalResponseDto(oneLineList);
     }
 
-    // custom 기본정보
+    // custom 기본 정보
     @Transactional(readOnly = true)
     public BookInfoBasicResponseDto getCustomBookBasic(Long bookInfoId) {
         User user = userService.getCurrentUser();
@@ -267,5 +267,9 @@ public class BookInfoService {
             }
         }
         return count > 0 ? totalRating / count : 0.0;
+    }
+
+    public BookInfoBasicResponseDto updateCustomBookInfo(Long bookInfoId) {
+
     }
 }

@@ -1,4 +1,4 @@
-package com.mmc.bookduck.domain.book.dto.common;
+package com.mmc.bookduck.domain.book.dto.response;
 
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import jakarta.validation.constraints.NotNull;
