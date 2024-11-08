@@ -82,11 +82,11 @@ public class UserBookService {
             BookInfo bookInfo = userBook.getBookInfo();
             Long createdUserId = bookInfo.getCreatedUserId();
 
+            userBookRepository.delete(userBook);
             // 사용자가 직접 등록한 책이면 bookInfo도 같이 삭제
             if(createdUserId != null && createdUserId.equals(user.getUserId())){
                 bookInfoService.deleteCustomBookInfo(bookInfo.getBookInfoId());
             }
-            userBookRepository.delete(userBook);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
@@ -259,6 +259,6 @@ public class UserBookService {
         UserBook userBook = new UserBook(ReadStatus.NOT_STARTED, user, bookInfo);
         UserBook savedUserBook = userBookRepository.save(userBook);
 
-        return CustomBookResponseDto.from(savedUserBook.getBookInfo(), null, null, savedUserBook.getReadStatus());
+        return CustomBookResponseDto.from(savedUserBook, null, null);
     }
 }
