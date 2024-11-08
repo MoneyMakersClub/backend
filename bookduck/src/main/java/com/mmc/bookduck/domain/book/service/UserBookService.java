@@ -6,6 +6,7 @@ import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
@@ -251,24 +252,13 @@ public class UserBookService {
     }
 
     //customBook 추가
-    public BookInfoBasicResponseDto createCustomBook(CustomBookRequestDto requestDto, MultipartFile coverImage) {
+    public CustomBookResponseDto createCustomBook(CustomBookRequestDto requestDto) {
         User user = userService.getCurrentUser();
-        BookInfo bookInfo = bookInfoService.saveCustomBookInfo(requestDto, coverImage, user);
+        BookInfo bookInfo = bookInfoService.saveCustomBookInfo(requestDto, user);
 
         UserBook userBook = new UserBook(ReadStatus.NOT_STARTED, user, bookInfo);
         UserBook savedUserBook = userBookRepository.save(userBook);
 
-        String koreanGenre = genreService.genreNameToKorean(bookInfo.getGenre());
-        BookInfoDetailDto detailDto = BookInfoDetailDto.from(savedUserBook.getBookInfo(), koreanGenre);
-
-        OneLineRating oneLineRating = oneLineRatingRepository.findByUserBook(userBook)
-                .orElse(null);
-
-        return new BookInfoBasicResponseDto(
-                null,
-                oneLineRating!=null ? oneLineRating.getOneLineContent() : null,
-                oneLineRating!=null ? oneLineRating.getRating() : null,
-                savedUserBook.getReadStatus(),
-                detailDto);
+        return CustomBookResponseDto.from(savedUserBook.getBookInfo(), null, null, savedUserBook.getReadStatus());
     }
 }

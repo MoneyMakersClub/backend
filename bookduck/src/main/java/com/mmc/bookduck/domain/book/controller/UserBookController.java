@@ -4,6 +4,7 @@ import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
 import com.mmc.bookduck.domain.book.service.UserBookService;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -87,10 +89,9 @@ public class UserBookController {
 
 
     @Operation(summary = "책 직접 등록", description = "사용자가 책을 직접 등록합니다.")
-    @PostMapping("/custom")
-    public ResponseEntity<BookInfoBasicResponseDto> createCustomBook(@RequestBody final CustomBookRequestDto requestDto,
-                                                                     @RequestParam final MultipartFile coverImage) {
+    @PostMapping(value = "/custom", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<CustomBookResponseDto> createCustomBook(@ModelAttribute final CustomBookRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body((userBookService.createCustomBook(requestDto, coverImage)));
+                .body((userBookService.createCustomBook(requestDto)));
     }
 }

@@ -6,17 +6,12 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import java.io.InputStream;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 @Service
