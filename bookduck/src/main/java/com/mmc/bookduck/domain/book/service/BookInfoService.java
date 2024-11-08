@@ -3,6 +3,7 @@ package com.mmc.bookduck.domain.book.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
+import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +42,7 @@ public class BookInfoService {
     private final GoogleBooksApiService googleBooksApiService;
     private final UserService userService;
     private final OneLineRatingRepository oneLineRatingRepository;
+    private final S3Service
 
 
     // api 도서 목록 조회
@@ -269,7 +272,30 @@ public class BookInfoService {
         return count > 0 ? totalRating / count : 0.0;
     }
 
-    public BookInfoBasicResponseDto updateCustomBookInfo(Long bookInfoId) {
+    public BookInfoBasicResponseDto updateCustomBookInfo(Long bookInfoId, CustomBookUpdateDto dto, MultipartFile newCoverImage) {
+        BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
+                .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
+        User user = userService.getCurrentUser();
 
+        if(bookInfo.getCreatedUserId().equals(user.getUserId())){
+            if (dto.title() != null) {
+                bookInfo.setTitle(dto.title());
+            }
+            if (dto.author() != null) {
+                bookInfo.setAuthor(dto.author());
+            }
+            if (dto.pageCount() != null) {
+                bookInfo.setPageCount(dto.pageCount());
+            }
+            if (dto.publisher() != null) {
+                bookInfo.setPublisher(dto.publisher());
+            }
+
+            if(newCoverImage != null && !newCoverImage.isEmpty()){
+                S3Service
+            }
+        }else{
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.book.controller;
 
+import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "BookInfo", description = "BookInfo 관련 API입니다.")
 @RestController
@@ -62,7 +64,8 @@ public class BookInfoController {
     @Operation(summary = "사용자가 직접 추가한 도서 정보 수정", description = "사용자가 직접 등록한 도서의 정보를 수정합니다.")
     @PatchMapping("/custom/{bookinfoId}")
     public ResponseEntity<BookInfoBasicResponseDto> updateCustomBookInfo(@PathVariable(name = "bookinfoId") final Long bookInfoId,
-                                                                         @RequestBody ){
-        return ResponseEntity.ok(bookInfoService.updateCustomBookInfo(bookInfoId));
+                                                                         @RequestBody final CustomBookUpdateDto dto,
+                                                                         @RequestParam(name = "newCoverImage", required = false) final MultipartFile newCoverImage){
+        return ResponseEntity.ok(bookInfoService.updateCustomBookInfo(bookInfoId, dto, newCoverImage));
     }
 }
