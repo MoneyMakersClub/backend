@@ -21,12 +21,18 @@ import java.util.stream.Collectors;
 public class UserBadgeService {
     private final UserBadgeRepository userBadgeRepository;
     private final UserService userService;
+    private final BadgeService badgeService;
 
     @Transactional(readOnly = true)
     public UserBadgeListResponseDto getUserBadges(Long userId) {
         User user = userService.getUserByUserId(userId);
         List<UserBadge> userBadges = userBadgeRepository.findAllByUser(user);
         List<UserBadge> uniqueUserBadges = deleteDuplicateUserBadges(userBadges);
+
+        int readBadgeTotalCount = badgeService.countBadgesByType(BadgeType.READ);
+        int archiveBadgeTotalCount = badgeService.countBadgesByType(BadgeType.ARCHIVE);
+        int ratingBadgeTotalCount = badgeService.countBadgesByType(BadgeType.RATING);
+        int levelBadgeTotalCount = badgeService.countBadgesByType(BadgeType.LEVEL);
 
         // BadgeType별로 그룹화
         Map<BadgeType, List<UserBadge>> badgesByType = uniqueUserBadges.stream()
@@ -38,7 +44,10 @@ public class UserBadgeService {
         List<UserBadgeUnitDto> ratingBadgeList = convertToDtoList(badgesByType.getOrDefault(BadgeType.RATING, List.of()));
         List<UserBadgeUnitDto> levelBadgeList = convertToDtoList(badgesByType.getOrDefault(BadgeType.LEVEL, List.of()));
 
-        return UserBadgeListResponseDto.from(readBadgeList, archiveBadgeList, ratingBadgeList, levelBadgeList);
+        return new UserBadgeListResponseDto(
+                readBadgeTotalCount, archiveBadgeTotalCount, ratingBadgeTotalCount, levelBadgeTotalCount,
+                readBadgeList, archiveBadgeList, ratingBadgeList, levelBadgeList
+        );
     }
 
     private List<UserBadgeUnitDto> convertToDtoList(List<UserBadge> userBadges) {
