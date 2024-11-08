@@ -48,10 +48,4 @@ public class ArchiveController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @PatchMapping
-    @Operation(summary = "발췌 및 감상평 통합 수정", description = "발췌와 감상평을 수정합니다.")
-    public ResponseEntity<?> updateArchive(@PathVariable("id") final Long archiveId, ArchiveType archiveType) {
-        ArchiveResponseDto responseDto = archiveService.getArchive(archiveId, archiveType);
-        return ResponseEntity.ok(responseDto);
-    }
-    }
+}
