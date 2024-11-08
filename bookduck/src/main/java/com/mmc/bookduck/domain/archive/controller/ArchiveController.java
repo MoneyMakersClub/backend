@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.archive.controller;
 
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.response.ArchiveResponseDto;
+import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.domain.archive.service.ArchiveService;
 import com.mmc.bookduck.domain.archive.service.ExcerptService;
 import com.mmc.bookduck.domain.archive.service.OcrService;
@@ -40,17 +41,17 @@ public class ArchiveController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @GetMapping("/excerpts/{excerptId}")
-    @Operation(summary = "발췌 조회", description = "발췌 내용을 조회하며, 아카이브된 경우 감상평도 함께 조회합니다.")
-    public ResponseEntity<?> getExcerptWithArchive(@PathVariable("excerptId") final Long excerptId) {
-        ArchiveResponseDto responseDto = archiveService.getArchive(excerptId, "excerpt");
+    @GetMapping("/{id}")
+    @Operation(summary = "발췌 및 강상평 통합 조회", description = "발췌와 감상평을 조회합니다.")
+    public ResponseEntity<?> getArchive(@PathVariable("id") final Long id, @RequestParam("type") final ArchiveType archiveType) {
+        ArchiveResponseDto responseDto = archiveService.getArchive(id, archiveType);
         return ResponseEntity.ok(responseDto);
-        }
+    }
 
-    @GetMapping("/reviews/{reviewId}")
-    @Operation(summary = "감상평 조회", description = "감상평 내용을 조회하며, 아카이브된 경우 발췌도 함께 조회합니다.")
-    public ResponseEntity<?> getReviewWithArchive(@PathVariable("reviewId") final Long reviewId) {
-        ArchiveResponseDto responseDto = archiveService.getArchive(reviewId, "review");
+    @PatchMapping
+    @Operation(summary = "발췌 및 감상평 통합 수정", description = "발췌와 감상평을 수정합니다.")
+    public ResponseEntity<?> updateArchive(@PathVariable("id") final Long archiveId, ArchiveType archiveType) {
+        ArchiveResponseDto responseDto = archiveService.getArchive(archiveId, archiveType);
         return ResponseEntity.ok(responseDto);
     }
     }
