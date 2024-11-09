@@ -102,7 +102,14 @@ public class UserItemService {
     @Transactional(readOnly = true)
     public Map<ItemType, Long> getEquippedItemOfUserMap(User user) {
         List<UserItem> equippedItems = getAllUserItemsByUserAndIsEquippedTrue(user);
-        return equippedItems.stream()
+        Map<ItemType, Long> equippedItemMap = equippedItems.stream()
                 .collect(Collectors.toMap(userItem -> userItem.getItem().getItemType(), UserItem::getUserItemId));
+
+        // 기본적으로 ItemType별로 null을 추가
+        for (ItemType itemType : ItemType.values()) {
+            equippedItemMap.putIfAbsent(itemType, null); // 없으면 null을 할당
+        }
+
+        return equippedItemMap;
     }
 }
