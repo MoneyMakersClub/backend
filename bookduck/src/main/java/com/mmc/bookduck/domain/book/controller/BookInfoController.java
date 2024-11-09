@@ -31,14 +31,14 @@ public class BookInfoController {
     }
 
 
-    @Operation(summary = "API 도서 상세-기본 정보 조회", description = "구글 API 도서의 기본 정보를 상세 조회합니다.(책 기본정보 + 현재 사용자의 별점&한줄평)")
+    @Operation(summary = "API 도서 상세-기본 정보 조회", description = "구글 API 도서의 기본 정보를 상세 조회합니다.(책 정보 + 현재 사용자의 별점&한줄평)")
     @GetMapping("/external/{providerId}")
     public ResponseEntity<BookInfoBasicResponseDto> getOneBookBasic(@PathVariable(name = "providerId") final String providerId){
         return ResponseEntity.ok(bookInfoService.getOneBookBasic(providerId));
     }
 
 
-    @Operation(summary = "API 도서 상세-추가 정보 조회", description = "구글 API 도서의 기본 정보를 상세 조회합니다.(현재 책에 대한 다른 사용자들의 별점&한줄평 목록 3개)")
+    @Operation(summary = "API 도서 상세-추가 정보 조회", description = "구글 API 도서의 추가 정보를 상세 조회합니다.(현재 책에 대한 다른 사용자들의 별점&한줄평 목록 3개)")
     @GetMapping("/external/{providerId}/additional")
     public ResponseEntity<BookInfoAdditionalResponseDto> getApiBookAdditional(@PathVariable(name = "providerId") String providerId){
         return ResponseEntity.ok(bookInfoService.getApiBookAdditional(providerId));
@@ -54,7 +54,7 @@ public class BookInfoController {
     }
 
 
-    @Operation(summary = "사용자가 직접 추가한 도서 상세-기본 정보 조회", description = "사용자가 직접 추가한 도서의 기본 정보를 상세 조회합니다.(책 기본정보 + 현재 사용자의 별점&한줄평)")
+    @Operation(summary = "사용자가 직접 추가한 도서 상세-기본 정보 조회", description = "사용자가 직접 추가한 도서의 기본 정보를 상세 조회합니다.(책 정보 + 현재 사용자의 별점&한줄평)")
     @GetMapping("/custom/{bookinfoId}")
     public ResponseEntity<CustomBookResponseDto> getCustomBookBasic(@PathVariable(name = "bookinfoId") final Long bookInfoId){
         return ResponseEntity.ok(bookInfoService.getCustomBookBasic(bookInfoId));
