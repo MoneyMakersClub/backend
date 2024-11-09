@@ -2,7 +2,7 @@ package com.mmc.bookduck.domain.item.service;
 
 import com.mmc.bookduck.domain.item.dto.common.ItemClosetUnitDto;
 import com.mmc.bookduck.domain.item.dto.common.UserItemEquippedDto;
-import com.mmc.bookduck.domain.item.dto.request.UserItemClosetResponseDto;
+import com.mmc.bookduck.domain.item.dto.response.UserItemClosetResponseDto;
 import com.mmc.bookduck.domain.item.dto.request.UserItemUpdateRequestDto;
 import com.mmc.bookduck.domain.item.entity.Item;
 import com.mmc.bookduck.domain.item.entity.ItemType;
@@ -10,6 +10,8 @@ import com.mmc.bookduck.domain.item.entity.UserItem;
 import com.mmc.bookduck.domain.item.repository.UserItemRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
+import com.mmc.bookduck.global.exception.CustomException;
+import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,11 +35,6 @@ public class UserItemService {
         return new UserItemEquippedDto(getEquippedItemOfUserMap(user));
     }
 
-    // user로 장착된 스킨 조회
-    @Transactional(readOnly = true)
-    public UserItemEquippedDto getEquippedItemsOfUser(User user) {
-        return new UserItemEquippedDto(getEquippedItemOfUserMap(user));
-    }
 
     @Transactional(readOnly = true)
     public UserItemClosetResponseDto getUserItemCloset() {
@@ -51,9 +48,7 @@ public class UserItemService {
         List<ItemClosetUnitDto> itemList = allItems.stream()
                 .map(item -> {
                     UserItem userItem = ownedUserItemMap.get(item.getItemId());
-                    Boolean isOwned = (userItem != null);
-                    Boolean isEquipped = (userItem != null && userItem.isEquipped());
-                    return ItemClosetUnitDto.from(item, isOwned, isEquipped);
+                    return ItemClosetUnitDto.from(item, userItem);
                 })
                 .collect(Collectors.toList());
 
@@ -68,12 +63,17 @@ public class UserItemService {
         equippedItems.forEach(item -> item.updateIsEquipped(false));
 
         // 새 아이템 장착
-        Map<ItemType, Long> equippedItemMap = requestDto.equippedItems();
+        Map<ItemType, Long> equippedItemMap = requestDto.userItemEquipped();
         equippedItemMap.forEach((itemType, userItemId) -> {
+            if (userItemId == null) {
+                // userItemId가 null인 경우 DB 조회를 건너뜀
+                return;
+            }
+
             UserItem newItemToEquip = userItemRepository.findById(userItemId)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid userItemId: " + userItemId));
+                    .orElseThrow(() -> new CustomException(ErrorCode.USERITEM_NOT_FOUND));
             if (newItemToEquip.getItem().getItemType() != itemType) {
-                throw new IllegalArgumentException("ItemType mismatch for userItemId: " + userItemId);
+                throw new CustomException(ErrorCode.ITEMTYPE_MISMATCH);
             }
             newItemToEquip.updateIsEquipped(true);
         });
@@ -84,7 +84,7 @@ public class UserItemService {
         // 새 아이템 장착을 저장
         equippedItemMap.values().forEach(userItemId -> {
             UserItem item = userItemRepository.findById(userItemId)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid userItemId: " + userItemId));
+                    .orElseThrow(() -> new CustomException(ErrorCode.USERITEM_NOT_FOUND));
             userItemRepository.save(item);
         });
     }
@@ -107,7 +107,7 @@ public class UserItemService {
 
         // 기본적으로 ItemType별로 null을 추가
         for (ItemType itemType : ItemType.values()) {
-            equippedItemMap.putIfAbsent(itemType, null); // 없으면 null을 할당
+            equippedItemMap.putIfAbsent(itemType, null);
         }
 
         return equippedItemMap;
