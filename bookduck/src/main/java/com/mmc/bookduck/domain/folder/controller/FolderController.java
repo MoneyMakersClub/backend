@@ -6,11 +6,15 @@ import com.mmc.bookduck.domain.folder.dto.response.CandidateFolderBookListRespon
 import com.mmc.bookduck.domain.folder.dto.response.FolderBookListResponseDto;
 import com.mmc.bookduck.domain.folder.dto.response.FolderResponseDto;
 import com.mmc.bookduck.domain.folder.service.FolderService;
+import com.mmc.bookduck.global.exception.CustomException;
+import com.mmc.bookduck.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Folder", description = "Folder 관련 API입니다.")
@@ -22,8 +26,11 @@ public class FolderController {
 
     @Operation(summary = "폴더 생성", description = "폴더를 생성합니다.")
     @PostMapping
-    public ResponseEntity<FolderResponseDto> createFolder(@RequestBody FolderRequestDto dto){
+    public ResponseEntity<FolderResponseDto> createFolder(@Valid @RequestBody FolderRequestDto dto, Errors error){
 
+        if(error.hasErrors()){
+            throw new CustomException(ErrorCode.INVALID_INPUT_LENGTH);
+        }
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(folderService.createFolder(dto));
     }
@@ -31,8 +38,10 @@ public class FolderController {
     @Operation(summary = "폴더 이름 수정", description = "폴더의 이름을 수정합니다.")
     @PatchMapping("/{folderId}")
     public ResponseEntity<FolderResponseDto> updateFolder(@PathVariable final Long folderId,
-                                                          @RequestBody FolderRequestDto dto){
-
+                                                          @Valid @RequestBody FolderRequestDto dto, Errors error){
+        if(error.hasErrors()){
+            throw new CustomException(ErrorCode.INVALID_INPUT_LENGTH);
+        }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(folderService.updateFolder(folderId, dto));
     }

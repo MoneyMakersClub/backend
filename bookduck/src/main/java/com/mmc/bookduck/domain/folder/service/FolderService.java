@@ -143,7 +143,7 @@ public class FolderService {
     @Transactional(readOnly = true)
     public AllFolderListResponseDto getAllFolderList() {
         User user = userService.getCurrentUser();
-        List<Folder> folders = folderRepository.findAllByUser(user);
+        List<Folder> folders = folderRepository.findAllByUserOrderByFolderIdDesc(user);
 
         List<FolderBookCoverListDto> folderList = new ArrayList<>();
 
