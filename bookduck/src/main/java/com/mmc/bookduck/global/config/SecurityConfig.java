@@ -48,14 +48,13 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> web.ignoring()
                 .requestMatchers("/error", "/favicon.ico",
-                        "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs", "/v3/api-docs/**",
-                        "/auth/refresh"
+                        "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs", "/v3/api-docs/**"
                 )
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
     private static final String[] AUTH_WHITELIST = {
-            "/signup", "/login", "/token", // TODO: 추후 변경 필요
+            "/auth/refresh", "/logout" // TODO: 추후 변경 필요
     };
 
     @Bean
@@ -64,7 +63,8 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
-                "https://localhost:3000")); // TODO: 추후 변경 필요
+                "https://localhost:3000",
+                "http://localhost:3001")); // TODO: 추후 변경 필요
 
         configuration.addAllowedMethod("*"); // TODO: 추후 확인 필요
         configuration.addAllowedHeader("*");
@@ -94,7 +94,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                        .anyRequest().permitAll() // 임시로 모두 오픈
+                        .anyRequest() // 임시로 모두 오픈
                 )
                 // X-Frame-Options: SAME ORIGIN으로 설정
                 .headers(header -> header
