@@ -1,10 +1,11 @@
-package com.mmc.bookduck.domain.item.dto.common;
+package com.mmc.bookduck.domain.item.dto.request;
 
 import com.mmc.bookduck.domain.item.entity.ItemType;
 
 import java.util.Map;
 
-public record UserItemEquippedDto(
+public record UserItemUpdateRequestDto(
         Map<ItemType, Long> equippedItems
 ) {
 }
+

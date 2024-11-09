@@ -61,7 +61,7 @@ public class FriendService {
         List<FriendUnitDto> friendList = friendRepository.findAllByUser1UserId(currentUser.getUserId())
                 .stream()
                 .map(friend -> {
-                    UserItemEquippedDto userItemEquippedDto = userItemService.getEquippedItemOrDefault(friend.getUser2().getUserId());
+                    UserItemEquippedDto userItemEquippedDto = userItemService.getEquippedItemsOfUser(friend.getUser2());
                     return FriendUnitDto.from(friend, userItemEquippedDto);
                 })
                 .collect(Collectors.toList());
