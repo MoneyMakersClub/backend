@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.book.controller;
 
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
+import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
@@ -12,16 +13,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "BookInfo", description = "BookInfo 관련 API입니다.")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/bookinfo")
 public class BookInfoController {
-
     private final BookInfoService bookInfoService;
-
 
     @Operation(summary = "API 도서 목록 검색", description = "구글 API에서 특정 키워드에 해당하는 도서 목록을 검색합니다.")
     @GetMapping("/search")
@@ -63,9 +61,8 @@ public class BookInfoController {
 
     @Operation(summary = "사용자가 직접 추가한 도서 정보 수정", description = "사용자가 직접 등록한 도서의 정보를 수정합니다.")
     @PatchMapping("/custom/{bookinfoId}")
-    public ResponseEntity<BookInfoBasicResponseDto> updateCustomBookInfo(@PathVariable(name = "bookinfoId") final Long bookInfoId,
-                                                                         @RequestBody final CustomBookUpdateDto dto,
-                                                                         @RequestParam(name = "newCoverImage", required = false) final MultipartFile newCoverImage){
-        return ResponseEntity.ok(bookInfoService.updateCustomBookInfo(bookInfoId, dto, newCoverImage));
+    public ResponseEntity<CustomBookResponseDto> updateCustomBookInfo(@PathVariable(name = "bookinfoId") final Long bookInfoId,
+                                                                      @ModelAttribute final CustomBookUpdateDto dto){
+        return ResponseEntity.ok(bookInfoService.updateCustomBookInfo(bookInfoId, dto));
     }
 }
