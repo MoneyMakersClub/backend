@@ -9,9 +9,9 @@ public record UserBadgeListResponseDto(
         int archiveBadgeTotalCount,
         int ratingBadgeTotalCount,
         int levelBadgeTotalCount,
-        List<UserBadgeUnitDto> readBadgeOwnedList,
-        List<UserBadgeUnitDto> archiveBadgeOwnedList,
-        List<UserBadgeUnitDto> ratingBadgeOwnedList,
-        List<UserBadgeUnitDto> levelBadgeOwnedList
+        List<UserBadgeUnitDto> readBadgeList,
+        List<UserBadgeUnitDto> archiveBadgeList,
+        List<UserBadgeUnitDto> ratingBadgeList,
+        List<UserBadgeUnitDto> levelBadgeList
 ) {
 }

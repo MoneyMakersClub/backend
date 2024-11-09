@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.badge.service;
 
 import com.mmc.bookduck.domain.badge.dto.common.UserBadgeUnitDto;
 import com.mmc.bookduck.domain.badge.dto.response.UserBadgeListResponseDto;
+import com.mmc.bookduck.domain.badge.entity.Badge;
 import com.mmc.bookduck.domain.badge.entity.BadgeType;
 import com.mmc.bookduck.domain.badge.entity.UserBadge;
 import com.mmc.bookduck.domain.badge.repository.UserBadgeRepository;
@@ -26,33 +27,35 @@ public class UserBadgeService {
     @Transactional(readOnly = true)
     public UserBadgeListResponseDto getUserBadges(Long userId) {
         User user = userService.getUserByUserId(userId);
-        List<UserBadge> userBadges = userBadgeRepository.findAllByUser(user);
-        List<UserBadge> uniqueUserBadges = deleteDuplicateUserBadges(userBadges);
+        List<UserBadge> uniqueUserBadges = deleteDuplicateUserBadges(userBadgeRepository.findAllByUser(user));
 
-        int readBadgeTotalCount = badgeService.countBadgesByType(BadgeType.READ);
-        int archiveBadgeTotalCount = badgeService.countBadgesByType(BadgeType.ARCHIVE);
-        int ratingBadgeTotalCount = badgeService.countBadgesByType(BadgeType.RATING);
-        int levelBadgeTotalCount = badgeService.countBadgesByType(BadgeType.LEVEL);
+        // 전체 뱃지
+        List<Badge> allBadges = badgeService.getAllBadges();
 
-        // BadgeType별로 그룹화
-        Map<BadgeType, List<UserBadge>> badgesByType = uniqueUserBadges.stream()
-                .collect(Collectors.groupingBy(userBadge -> userBadge.getBadge().getBadgeType()));
+        // 사용자가 가진 뱃지를 badgeId로 맵핑
+        Map<Long, UserBadge> userBadgeMap = uniqueUserBadges.stream()
+                .collect(Collectors.toMap(badge -> badge.getBadge().getBadgeId(), badge -> badge));
 
-        // BadgeType에 따라 리스트 생성
-        List<UserBadgeUnitDto> readBadgeList = convertToDtoList(badgesByType.getOrDefault(BadgeType.READ, List.of()));
-        List<UserBadgeUnitDto> archiveBadgeList = convertToDtoList(badgesByType.getOrDefault(BadgeType.ARCHIVE, List.of()));
-        List<UserBadgeUnitDto> ratingBadgeList = convertToDtoList(badgesByType.getOrDefault(BadgeType.RATING, List.of()));
-        List<UserBadgeUnitDto> levelBadgeList = convertToDtoList(badgesByType.getOrDefault(BadgeType.LEVEL, List.of()));
+        // 모든 뱃지와 isOwned를 결합한 리스트 생성
+        List<UserBadgeUnitDto> allBadgesWithOwnership = allBadges.stream()
+                .map(badge -> UserBadgeUnitDto.from(badge, userBadgeMap.get(badge.getBadgeId())))
+                .collect(Collectors.toList());
+
+        // BadgeType별로 뱃지 리스트 나누기
+        List<UserBadgeUnitDto> readBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.READ);
+        List<UserBadgeUnitDto> archiveBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.ARCHIVE);
+        List<UserBadgeUnitDto> ratingBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.RATING);
+        List<UserBadgeUnitDto> levelBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.LEVEL);
 
         return new UserBadgeListResponseDto(
-                readBadgeTotalCount, archiveBadgeTotalCount, ratingBadgeTotalCount, levelBadgeTotalCount,
+                readBadgeList.size(), archiveBadgeList.size(), ratingBadgeList.size(), levelBadgeList.size(),
                 readBadgeList, archiveBadgeList, ratingBadgeList, levelBadgeList
         );
     }
 
-    private List<UserBadgeUnitDto> convertToDtoList(List<UserBadge> userBadges) {
-        return userBadges.stream()
-                .map(UserBadgeUnitDto::from)
+    private List<UserBadgeUnitDto> filterByBadgeType(List<UserBadgeUnitDto> allBadgesWithOwnership, BadgeType badgeType) {
+        return allBadgesWithOwnership.stream()
+                .filter(dto -> dto.badgeType().equals(badgeType))
                 .collect(Collectors.toList());
     }
 
