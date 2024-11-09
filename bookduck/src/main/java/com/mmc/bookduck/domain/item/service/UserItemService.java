@@ -1,7 +1,8 @@
 package com.mmc.bookduck.domain.item.service;
 
 import com.mmc.bookduck.domain.item.dto.common.ItemClosetUnitDto;
-import com.mmc.bookduck.domain.item.dto.common.UserItemEquippedDto;
+import com.mmc.bookduck.domain.item.dto.common.ItemEquippedUnitDto;
+import com.mmc.bookduck.domain.item.dto.response.UserItemEquippedResponseDto;
 import com.mmc.bookduck.domain.item.dto.response.UserItemClosetResponseDto;
 import com.mmc.bookduck.domain.item.dto.request.UserItemUpdateRequestDto;
 import com.mmc.bookduck.domain.item.entity.Item;
@@ -30,11 +31,10 @@ public class UserItemService {
 
     // userId로 장착된 스킨 조회
     @Transactional(readOnly = true)
-    public UserItemEquippedDto getEquippedItemsOfUserByUserId(Long userId) {
+    public UserItemEquippedResponseDto getEquippedItemsOfUserByUserId(Long userId) {
         User user = userService.getUserByUserId(userId);
-        return new UserItemEquippedDto(getEquippedItemOfUserMap(user));
+        return new UserItemEquippedResponseDto(getUserItemEquippedListOfUser(user));
     }
-
 
     @Transactional(readOnly = true)
     public UserItemClosetResponseDto getUserItemCloset() {
@@ -52,40 +52,30 @@ public class UserItemService {
                 })
                 .collect(Collectors.toList());
 
-        return new UserItemClosetResponseDto(getEquippedItemOfUserMap(user), itemList);
+        return new UserItemClosetResponseDto(getUserItemEquippedListOfUser(user), itemList);
     }
 
     public void updateUserItemsEquippedStatus(UserItemUpdateRequestDto requestDto) {
         User user = userService.getCurrentUser();
 
-        // 과거 장착 아이템 해제
+        // 현재 장착된 아이템들을 해제
         List<UserItem> equippedItems = userItemRepository.findAllByUserAndIsEquippedTrue(user);
         equippedItems.forEach(item -> item.updateIsEquipped(false));
-
-        // 새 아이템 장착
-        Map<ItemType, Long> equippedItemMap = requestDto.userItemEquipped();
-        equippedItemMap.forEach((itemType, userItemId) -> {
-            if (userItemId == null) {
-                // userItemId가 null인 경우 DB 조회를 건너뜀
-                return;
-            }
-
-            UserItem newItemToEquip = userItemRepository.findById(userItemId)
-                    .orElseThrow(() -> new CustomException(ErrorCode.USERITEM_NOT_FOUND));
-            if (newItemToEquip.getItem().getItemType() != itemType) {
-                throw new CustomException(ErrorCode.ITEMTYPE_MISMATCH);
-            }
-            newItemToEquip.updateIsEquipped(true);
-        });
-
-        // 과거 장착 아이템 해제를 저장
         userItemRepository.saveAll(equippedItems);
 
-        // 새 아이템 장착을 저장
-        equippedItemMap.values().forEach(userItemId -> {
-            UserItem item = userItemRepository.findById(userItemId)
-                    .orElseThrow(() -> new CustomException(ErrorCode.USERITEM_NOT_FOUND));
-            userItemRepository.save(item);
+        // 새로 장착할 아이템 처리
+        Map<ItemType, Long> equippedItemMap = requestDto.userItemEquipped();
+        equippedItemMap.forEach((itemType, userItemId) -> {
+            if (userItemId != null) { // userItemId가 null인 경우 건너뜀
+                UserItem newItemToEquip = userItemRepository.findById(userItemId)
+                        .orElseThrow(() -> new CustomException(ErrorCode.USERITEM_NOT_FOUND));
+
+                if (newItemToEquip.getItem().getItemType() != itemType) {
+                    throw new CustomException(ErrorCode.ITEMTYPE_MISMATCH);
+                }
+                newItemToEquip.updateIsEquipped(true);
+                userItemRepository.save(newItemToEquip);
+            }
         });
     }
 
@@ -96,20 +86,25 @@ public class UserItemService {
 
     @Transactional(readOnly = true)
     public List<UserItem> getAllUserItemsByUserAndIsEquippedTrue(User user) {
-        return userItemRepository.findAllByUser(user);
+        return userItemRepository.findAllByUserAndIsEquippedTrue(user);
     }
 
     @Transactional(readOnly = true)
-    public Map<ItemType, Long> getEquippedItemOfUserMap(User user) {
+    public List<ItemEquippedUnitDto> getUserItemEquippedListOfUser(User user) {
         List<UserItem> equippedItems = getAllUserItemsByUserAndIsEquippedTrue(user);
-        Map<ItemType, Long> equippedItemMap = equippedItems.stream()
-                .collect(Collectors.toMap(userItem -> userItem.getItem().getItemType(), UserItem::getUserItemId));
 
-        // 기본적으로 ItemType별로 null을 추가
+        // 장착된 아이템을 ItemType을 키로 하는 Map으로 변환
+        Map<ItemType, UserItem> equippedItemMap = equippedItems.stream()
+                .collect(Collectors.toMap(userItem -> userItem.getItem().getItemType(), userItem -> userItem));
+
+        // 모든 ItemType에 대해 기본값을 설정 (없으면 null)
         for (ItemType itemType : ItemType.values()) {
             equippedItemMap.putIfAbsent(itemType, null);
         }
 
-        return equippedItemMap;
+        return equippedItemMap.entrySet().stream()
+                .map(entry -> new ItemEquippedUnitDto(entry.getKey(), entry.getValue() != null ? entry.getValue().getItem().getItemName() : null))
+                .collect(Collectors.toList());
     }
 }
+

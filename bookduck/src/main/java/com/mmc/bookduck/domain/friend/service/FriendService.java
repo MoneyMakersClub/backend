@@ -8,7 +8,6 @@ import com.mmc.bookduck.domain.friend.entity.FriendRequest;
 import com.mmc.bookduck.domain.friend.entity.FriendRequestStatus;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
 import com.mmc.bookduck.domain.friend.repository.FriendRequestRepository;
-import com.mmc.bookduck.domain.item.dto.common.UserItemEquippedDto;
 import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -60,7 +59,7 @@ public class FriendService {
         User currentUser = userService.getCurrentUser();
         List<FriendUnitDto> friendList = friendRepository.findAllByUser1UserId(currentUser.getUserId())
                 .stream()
-                .map(friend -> FriendUnitDto.from(friend, userItemService.getEquippedItemOfUserMap(friend.getUser2())))
+                .map(friend -> FriendUnitDto.from(friend, userItemService.getUserItemEquippedListOfUser(friend.getUser2())))
                 .collect(Collectors.toList());
         return FriendListResponseDto.from(friendList);
     }
