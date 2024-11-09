@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.book.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
@@ -9,13 +10,14 @@ import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.Genre;
+import com.mmc.bookduck.domain.book.entity.GenreName;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.BookInfoRepository;
-import com.mmc.bookduck.domain.book.repository.GenreRepository;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
+import com.mmc.bookduck.global.S3.S3Service;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.google.GoogleBooksApiService;
@@ -35,6 +37,7 @@ public class BookInfoService {
     private final UserBookRepository userBookRepository;
     private final GenreService genreService;
     private final GoogleBooksApiService googleBooksApiService;
+    private final S3Service s3Service;
 
 
     // api 도서 목록 조회
@@ -199,37 +202,23 @@ public class BookInfoService {
         return bookInfoRepository.findByProviderId(providerId);
     }
 
-    // bookInfo 삭제
-    public void deleteBookInfo(Long bookInfoId) {
+    // custom bookInfo 삭제
+    public void deleteCustomBookInfo(Long bookInfoId) {
         BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
                 .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
+        if(bookInfo.getImgPath() != null){
+            s3Service.deleteFile(bookInfo.getImgPath());
+        }
         bookInfoRepository.delete(bookInfo);
     }
 
-    /*
-    // 직접 등록한 책 검색
-    public BookListResponseDto searchCustomBookList(String keyword, Long page, Long size) {
-
-        // 먼저 user 검색
-        User user = userRepository.findById(userId);
-
-        List<BookInfo> bookInfos = bookInfoRepository.searchByCreatedUserIdAndKeyword(user.getUserId(), keyword);
-        if(bookInfos != null){
-
-            List<BookInfoUnitDto> bookList = new ArrayList<>();
-
-            for(BookInfo bookinfo = bookInfos){
-                Long publishedYear = extractYear(bookinfo.getPublishDate());
-                // 저자를 리스트로 변환
-                List<String> authors = Collections.singletonList(bookinfo.getAuthor());
-                bookList.add(new BookInfoUnitDto(bookinfo.getTitle(), authors, bookinfo.getPublisher(), publishedYear, bookinfo.getImgPath(), bookinfo.getProviderId()));
-            }
-            return new BookListResponseDto(bookList);
-        }else{
-            // 검색결과 없는 경우
-            return new BookListResponseDto(null);
+    public BookInfo saveCustomBookInfo (CustomBookRequestDto dto, User user) {
+        String imgPath = null;
+        if(dto.coverImage() != null){
+            imgPath = s3Service.uploadFile(dto.coverImage());
         }
+        Genre genre = genreService.findOrCreateGenreByGenreName(GenreName.valueOf("OTHERS"));
+        BookInfo bookInfo = dto.toEntity(imgPath, genre, user.getUserId());
+        return bookInfoRepository.save(bookInfo);
     }
-    */
-    
 }
