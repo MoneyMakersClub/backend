@@ -2,7 +2,7 @@ package com.mmc.bookduck.domain.book.controller;
 
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.CustomBookUnitResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.CustomBookUnitDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
@@ -47,14 +47,14 @@ public class BookInfoController {
 
     @Operation(summary = "사용자가 직접 추가한 도서 목록 검색", description = "현재 사용자가 직접 추가한 도서 중에서 특정 키워드에 해당하는 도서 목록을 검색합니다.")
     @GetMapping("/search/custom")
-    public ResponseEntity<BookListResponseDto<CustomBookUnitResponseDto>> searchCustomBookList(@RequestParam(name = "keyword") final String keyword, @RequestParam final Long page,
-                                                                                               @RequestParam final Long size){
+    public ResponseEntity<BookListResponseDto<CustomBookUnitDto>> searchCustomBookList(@RequestParam(name = "keyword") final String keyword, @RequestParam final Long page,
+                                                                                       @RequestParam final Long size){
         return ResponseEntity.ok(bookInfoService.searchCustomBookList(keyword, page, size));
     }
 
 
     @Operation(summary = "사용자가 직접 추가한 도서 상세-기본 정보 조회", description = "사용자가 직접 추가한 도서의 기본 정보를 상세 조회합니다.(책 기본정보 + 현재 사용자의 별점&한줄평)")
-    @GetMapping("/custom/{bookinfoId}/additional")
+    @GetMapping("/custom/{bookinfoId}")
     public ResponseEntity<BookInfoBasicResponseDto> getCustomBookBasic(@PathVariable(name = "bookinfoId") final Long bookInfoId){
         return ResponseEntity.ok(bookInfoService.getCustomBookBasic(bookInfoId));
     }

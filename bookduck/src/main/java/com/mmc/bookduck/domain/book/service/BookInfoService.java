@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookUnitParseDto;
-import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineDto;
+import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineReadStatusDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
@@ -14,7 +14,7 @@ import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.CustomBookUnitResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.CustomBookUnitDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.Genre;
 import com.mmc.bookduck.domain.book.entity.GenreName;
@@ -62,7 +62,7 @@ public class BookInfoService {
                     .orElse(null);
 
             if(bookInfo != null){
-                MyRatingOneLineDto myRatingOneLine = getMyRatingOneLine(bookInfo, user);
+                MyRatingOneLineReadStatusDto myRatingOneLine = getMyRatingOneLineReadStatus(bookInfo, user);
                 BookUnitResponseDto responseDto = BookUnitResponseDto.from(bookUnit, myRatingOneLine);
                 bookResponseList.add(responseDto);
             }
@@ -133,21 +133,12 @@ public class BookInfoService {
         String responseBody = googleBooksApiService.searchOneBook(providerId);
         BookInfoDetailDto additional = parseBookDetail(responseBody);
 
+        User user = userService.getCurrentUser();
         Optional<BookInfo> bookInfo = bookInfoRepository.findByProviderId(providerId);
+
         if(bookInfo.isPresent()){
-            Optional<UserBook> userBook = userBookRepository.findByUserAndBookInfo(userService.getCurrentUser(), bookInfo.get());
-            if(userBook.isPresent()){
-                Optional<OneLineRating> oneLineRating = oneLineRatingRepository.findByUserBook(userBook.get());
-                if(oneLineRating.isPresent()){
-                    return new BookInfoBasicResponseDto(getRatingAverage(bookInfo.get()), oneLineRating.get().getOneLineContent(),
-                            oneLineRating.get().getRating(), userBook.get().getReadStatus(), additional);
-                }else{
-                    return new BookInfoBasicResponseDto(getRatingAverage(bookInfo.get()), null, null,
-                            userBook.get().getReadStatus(), additional);
-                }
-            }else{
-                return new BookInfoBasicResponseDto(getRatingAverage(bookInfo.get()), null, null, null, additional);
-            }
+            MyRatingOneLineReadStatusDto my = getMyRatingOneLineReadStatus(bookInfo.get(), user);
+            return new BookInfoBasicResponseDto(getRatingAverage(bookInfo.get()), my.myOneLine(),my.myRating(), my.readStatus(), additional);
         }
         else{
             return new BookInfoBasicResponseDto(null, null, null, null, additional);
@@ -230,14 +221,15 @@ public class BookInfoService {
 
     // custom book 목록 검색
     @Transactional(readOnly = true)
-    public BookListResponseDto<CustomBookUnitResponseDto> searchCustomBookList(String keyword, Long page, Long size) {
+    public BookListResponseDto<CustomBookUnitDto> searchCustomBookList(String keyword, Long page, Long size) {
 
         User user = userService.getCurrentUser();
         List<BookInfo> bookInfoList = bookInfoRepository.searchByCreatedUserIdAndKeyword(user.getUserId(), keyword);
 
-        List<CustomBookUnitResponseDto> dtos = new ArrayList<>();
+        List<CustomBookUnitDto> dtos = new ArrayList<>();
         for(BookInfo bookInfo : bookInfoList){
-            dtos.add(CustomBookUnitResponseDto.from(bookInfo));
+            MyRatingOneLineReadStatusDto dto = getMyRatingOneLineReadStatus(bookInfo, user);
+            dtos.add(CustomBookUnitDto.from(bookInfo, dto));
         }
         return new BookListResponseDto<>(dtos);
     }
@@ -267,24 +259,17 @@ public class BookInfoService {
     @Transactional(readOnly = true)
     public BookInfoBasicResponseDto getCustomBookBasic(Long bookInfoId) {
         User user = userService.getCurrentUser();
+
         BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
                 .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
-
         UserBook userBook = userBookRepository.findByUserAndBookInfo(user, bookInfo)
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
 
         String koreanGenreName = genreService.genreNameToKorean(userBook.getBookInfo().getGenre());
         BookInfoDetailDto detailDto = BookInfoDetailDto.from(userBook.getBookInfo(), koreanGenreName);
 
-        OneLineRating oneLineRating = oneLineRatingRepository.findByUserBook(userBook)
-                .orElse(null);
-
-        return new BookInfoBasicResponseDto(
-                null,
-                oneLineRating!=null ? oneLineRating.getOneLineContent() : null,
-                oneLineRating!=null ? oneLineRating.getRating() : null,
-                userBook.getReadStatus(),
-                detailDto);
+        MyRatingOneLineReadStatusDto my = getMyRatingOneLineReadStatus(bookInfo, user);
+        return new BookInfoBasicResponseDto(getRatingAverage(bookInfo), my.myOneLine(), my.myRating(), my.readStatus(), detailDto);
     }
 
     @Transactional(readOnly = true)
@@ -305,9 +290,15 @@ public class BookInfoService {
                 count++;
             }
         }
-        return count > 0 ? totalRating / count : 0.0;
+
+        if(count > 0){
+            return (totalRating / count);
+        }else{
+            return null;
+        }
     }
 
+    @Transactional
     public CustomBookResponseDto updateCustomBookInfo(Long bookInfoId, CustomBookUpdateDto dto) {
         BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
                 .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
@@ -338,27 +329,27 @@ public class BookInfoService {
         UserBook userBook = userBookRepository.findByUserAndBookInfo(user, bookInfo)
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
 
-        MyRatingOneLineDto myRatingOneLine = getMyRatingOneLine(bookInfo,user);
-        return CustomBookResponseDto.from(userBook, myRatingOneLine.myRating(), myRatingOneLine.myOneLine());
+        MyRatingOneLineReadStatusDto ratingDto = getMyRatingOneLineReadStatus(bookInfo, user);
+        return CustomBookResponseDto.from(userBook, ratingDto.myRating(), ratingDto.myOneLine());
     }
 
 
     @Transactional(readOnly = true)
-    public MyRatingOneLineDto getMyRatingOneLine(BookInfo bookInfo, User user){
+    public MyRatingOneLineReadStatusDto getMyRatingOneLineReadStatus(BookInfo bookInfo, User user){
         UserBook userBook = userBookRepository.findByUserAndBookInfo(user,bookInfo)
                 .orElse(null);
         
         if(userBook == null){
-            return new MyRatingOneLineDto(null,null);
+            return new MyRatingOneLineReadStatusDto(null,null, null);
         }
         else{
             OneLineRating oneLineRating = oneLineRatingRepository.findByUserBook(userBook)
                     .orElse(null);
 
             if(oneLineRating == null){
-                return new MyRatingOneLineDto(null,null);
+                return new MyRatingOneLineReadStatusDto(null, null, userBook.getReadStatus());
             }else{
-                return new MyRatingOneLineDto(oneLineRating.getRating(),oneLineRating.getOneLineContent());
+                return new MyRatingOneLineReadStatusDto(oneLineRating.getRating(), oneLineRating.getOneLineContent(), userBook.getReadStatus());
             }
         }
     }

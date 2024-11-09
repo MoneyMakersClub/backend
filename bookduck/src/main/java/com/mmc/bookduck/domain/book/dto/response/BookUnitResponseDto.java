@@ -1,26 +1,26 @@
 package com.mmc.bookduck.domain.book.dto.response;
 
 import com.mmc.bookduck.domain.book.dto.common.BookUnitParseDto;
-import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineDto;
+import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineReadStatusDto;
+import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import lombok.Setter;
 
 public record BookUnitResponseDto(
         @NotNull String title,
         List<String> author,
         String imgPath,
         Double myRating,
-        String myOneLine,
+        ReadStatus readStatus,
         String providerId
 ) {
-    public static BookUnitResponseDto from(BookUnitParseDto infoDto, MyRatingOneLineDto ratingDto){
+    public static BookUnitResponseDto from(BookUnitParseDto infoDto, MyRatingOneLineReadStatusDto ratingDto){
         return new BookUnitResponseDto(
                 infoDto.title(),
                 infoDto.author(),
                 infoDto.imgPath(),
                 ratingDto.myRating(),
-                ratingDto.myOneLine(),
+                ratingDto.readStatus(),
                 infoDto.providerId()
         );
     }
