@@ -257,7 +257,7 @@ public class BookInfoService {
 
     // custom 기본 정보
     @Transactional(readOnly = true)
-    public BookInfoBasicResponseDto getCustomBookBasic(Long bookInfoId) {
+    public CustomBookResponseDto getCustomBookBasic(Long bookInfoId) {
         User user = userService.getCurrentUser();
 
         BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
@@ -265,11 +265,8 @@ public class BookInfoService {
         UserBook userBook = userBookRepository.findByUserAndBookInfo(user, bookInfo)
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
 
-        String koreanGenreName = genreService.genreNameToKorean(userBook.getBookInfo().getGenre());
-        BookInfoDetailDto detailDto = BookInfoDetailDto.from(userBook.getBookInfo(), koreanGenreName);
-
-        MyRatingOneLineReadStatusDto my = getMyRatingOneLineReadStatus(bookInfo, user);
-        return new BookInfoBasicResponseDto(getRatingAverage(bookInfo), my.myOneLine(), my.myRating(), my.readStatus(), detailDto);
+        MyRatingOneLineReadStatusDto myRatingOneLine = getMyRatingOneLineReadStatus(bookInfo, user);
+        return CustomBookResponseDto.from(userBook, myRatingOneLine.myRating(), myRatingOneLine.myOneLine());
     }
 
     @Transactional(readOnly = true)
