@@ -3,22 +3,26 @@ package com.mmc.bookduck.domain.book.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
+import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
-import com.mmc.bookduck.domain.book.dto.response.CustomBookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.CustomBookUnitResponseDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.Genre;
+import com.mmc.bookduck.domain.book.entity.GenreName;
+import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.BookInfoRepository;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
 import com.mmc.bookduck.domain.onelinerating.entity.OneLineRating;
 import com.mmc.bookduck.domain.onelinerating.repository.OneLineRatingRepository;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.global.S3.S3Service;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -185,11 +189,24 @@ public class BookInfoService {
         return bookInfoRepository.findByProviderId(providerId);
     }
 
-    // bookInfo 삭제
-    public void deleteBookInfo(Long bookInfoId) {
+    // custom bookInfo 삭제
+    public void deleteCustomBookInfo(Long bookInfoId) {
         BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
                 .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
+        if(bookInfo.getImgPath() != null){
+            s3Service.deleteFile(bookInfo.getImgPath());
+        }
         bookInfoRepository.delete(bookInfo);
+    }
+
+    public BookInfo saveCustomBookInfo (CustomBookRequestDto dto, User user) {
+        String imgPath = null;
+        if(dto.coverImage() != null){
+            imgPath = s3Service.uploadFile(dto.coverImage());
+        }
+        Genre genre = genreService.findOrCreateGenreByGenreName(GenreName.valueOf("OTHERS"));
+        BookInfo bookInfo = dto.toEntity(imgPath, genre, user.getUserId());
+        return bookInfoRepository.save(bookInfo);
     }
 
     // custom book 목록 검색
@@ -298,4 +315,5 @@ public class BookInfoService {
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
     }
+
 }

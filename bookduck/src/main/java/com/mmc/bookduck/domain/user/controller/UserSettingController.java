@@ -30,7 +30,7 @@ public class UserSettingController {
     }
 
     @Operation(summary = "닉네임 사용 가능 여부 확인", description = "닉네임 사용 가능 여부를 확인합니다.")
-    @GetMapping("/nickname/check")
+    @PostMapping("/nickname/check")
     public ResponseEntity<?> checkUserNicknameAvailability(@RequestBody @Valid UserNicknameRequestDto requestDto) {
         return ResponseEntity.ok().body(userSettingService.checkNicknameAvailability(requestDto));
     }

@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.book.dto.common;
 
 import com.mmc.bookduck.domain.book.entity.BookInfo;
+import com.mmc.bookduck.domain.book.entity.UserBook;
 
 import java.util.List;
 

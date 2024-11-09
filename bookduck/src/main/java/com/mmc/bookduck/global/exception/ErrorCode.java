@@ -46,6 +46,7 @@ public enum ErrorCode {
     // 각 리소스를 찾지 못함
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
     USERSETTING_NOT_FOUND(404, "사용자 설정을 찾을 수 없습니다."),
+    USERGROWTH_NOT_FOUND(404, "사용자 성장상태를 찾을 수 없습니다."),
     FRIEND_REQUEST_NOT_FOUND(404, "친구 요청을 찾을 수 없습니다."),
     FRIEND_NOT_FOUND(404, "친구를 찾을 수 없습니다."),
     BOOKINFO_NOT_FOUND(404, "책 정보를 찾을 수 없습니다."),
@@ -86,6 +87,7 @@ public enum ErrorCode {
     REDIS_CONNECTION_ERROR(500, "서버에서 Redis 연결 중 문제가 발생했습니다."),
     EXTERNAL_API_ERROR(500, "외부 API 사용 중 문제가 발생했습니다."),
     UPLOAD_FAIL_TO_GOOGLE(500, "Google Storage에 업로드하지 못했습니다."),
+    UPLOAD_FAIL_TO_S3(500, "S3에 업로드하지 못했습니다."),
     EMPTY_IMAGE_FILE(500, "첨부 파일이 없습니다."),
     //JSON
     JSON_PARSING_ERROR(500, "API JSON에서 정보를 파싱하는 중 문제가 발생했습니다."),

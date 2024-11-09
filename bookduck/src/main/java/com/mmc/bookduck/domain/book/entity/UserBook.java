@@ -5,6 +5,7 @@ import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -21,6 +22,15 @@ public class UserBook extends BaseTimeEntity {
     @NotNull
     private ReadStatus readStatus;
 
+    @ColumnDefault("false")
+    private boolean isFinishedExpGiven;
+
+    @ColumnDefault("false")
+    private boolean isArchiveExpGiven;
+
+    @ColumnDefault("false")
+    private boolean isRatingExpGiven;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", updatable = false)
     @NotNull
@@ -33,15 +43,32 @@ public class UserBook extends BaseTimeEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private BookInfo bookInfo;
 
-
     @Builder
     public UserBook(ReadStatus readStatus, User user, BookInfo bookInfo) {
         this.readStatus = readStatus;
         this.user = user;
         this.bookInfo = bookInfo;
+        this.isFinishedExpGiven = false;
+        this.isArchiveExpGiven = false;
+        this.isRatingExpGiven = false;
     }
 
     public void changeReadStatus(ReadStatus readStatus) {
         this.readStatus = readStatus;
+    }
+
+    // 완독 경험치 획득 표시
+    public void markFinishedExpGiven() {
+        this.isFinishedExpGiven = true;
+    }
+
+    // 독서기록 경험치 획득 표시
+    public void markArchiveExpGiven() {
+        this.isArchiveExpGiven = true;
+    }
+
+    // 한줄평 경험치 획득 표시
+    public void markRatingExpGiven() {
+        this.isRatingExpGiven = true;
     }
 }
