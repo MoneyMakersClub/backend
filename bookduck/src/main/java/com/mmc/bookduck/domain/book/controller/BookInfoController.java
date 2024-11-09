@@ -2,7 +2,7 @@ package com.mmc.bookduck.domain.book.controller;
 
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.CustomBookUnitDto;
+import com.mmc.bookduck.domain.book.dto.common.CustomBookUnitDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;

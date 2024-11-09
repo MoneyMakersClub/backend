@@ -14,7 +14,7 @@ import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.CustomBookUnitDto;
+import com.mmc.bookduck.domain.book.dto.common.CustomBookUnitDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.Genre;
 import com.mmc.bookduck.domain.book.entity.GenreName;
