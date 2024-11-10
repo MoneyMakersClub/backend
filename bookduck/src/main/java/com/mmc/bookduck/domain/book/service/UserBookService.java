@@ -1,5 +1,10 @@
 package com.mmc.bookduck.domain.book.service;
 
+import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.request.ExcerptCreateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.request.ReviewCreateRequestDto;
+import com.mmc.bookduck.domain.archive.entity.Excerpt;
+import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
@@ -40,16 +45,33 @@ public class UserBookService {
     private final UserService userService;
     private final OneLineRatingRepository oneLineRatingRepository;
 
+    //customBook 추가
+    public UserBook createCustomBookEntity(CustomBookRequestDto requestDto) {
+        User user = userService.getCurrentUser();
+        BookInfo bookInfo = bookInfoService.saveCustomBookInfo(requestDto, user);
+        UserBook userBook = new UserBook(ReadStatus.NOT_STARTED, user, bookInfo);
+        return userBookRepository.save(userBook);
+    }
+
+    public CustomBookResponseDto createCustomBook(CustomBookRequestDto requestDto) {
+        UserBook userBook = createCustomBookEntity(requestDto);
+        return CustomBookResponseDto.from(userBook, null, null);
+    }
 
     // 서재에 책 추가
-    public UserBookResponseDto addUserBook(UserBookRequestDto dto) {
+    public UserBookResponseDto addUserBook(UserBookRequestDto requestDto) {
+        UserBook savedUserBook = addUserBookEntity(requestDto);
+        return UserBookResponseDto.from(savedUserBook);
+    }
+
+    public UserBook addUserBookEntity(UserBookRequestDto requestDto) {
         try {
-            ReadStatus.valueOf(dto.readStatus());
+            ReadStatus.valueOf(requestDto.readStatus());
         } catch (IllegalArgumentException e) {
             throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
         }
 
-        Optional<BookInfo> bookInfo = bookInfoService.findBookInfoByProviderId(dto.providerId());
+        Optional<BookInfo> bookInfo = bookInfoService.findBookInfoByProviderId(requestDto.providerId());
 
         if(bookInfo.isPresent()){
             Optional<UserBook> userBook = userBookRepository.findByUserAndBookInfo(userService.getCurrentUser(), bookInfo.get());
@@ -57,17 +79,42 @@ public class UserBookService {
             if(userBook.isPresent()){
                 throw new CustomException(ErrorCode.USERBOOK_ALREADY_EXISTS);
             }
-            UserBook newUserBook = dto.toEntity(userService.getCurrentUser(), bookInfo.get(), ReadStatus.valueOf(dto.readStatus()));
-            UserBook savedUserBook = userBookRepository.save(newUserBook);
-            return UserBookResponseDto.from(savedUserBook);
+            UserBook newUserBook = requestDto.toEntity(userService.getCurrentUser(), bookInfo.get(), ReadStatus.valueOf(requestDto.readStatus()));
+            return userBookRepository.save(newUserBook);
         }
         else{
             // bookInfo 없으면 먼저 bookInfo 저장
-            BookInfo newBookInfo = bookInfoService.saveApiBookInfo(dto);
+            BookInfo newBookInfo = bookInfoService.saveApiBookInfo(requestDto);
+            UserBook newUserBook = requestDto.toEntity(userService.getCurrentUser(),newBookInfo, ReadStatus.valueOf(requestDto.readStatus()));
+            return userBookRepository.save(newUserBook);
+        }
+    }
 
-            UserBook newUserBook = dto.toEntity(userService.getCurrentUser(),newBookInfo, ReadStatus.valueOf(dto.readStatus()));
-            UserBook savedUserBook = userBookRepository.save(newUserBook);
-            return UserBookResponseDto.from(savedUserBook);
+    // UserBook 정보 불러오거나 없으면 생성하기 (Archive에서 활용)
+    @Transactional(readOnly = true)
+    public UserBook getUserBookFromExcerptOrReview(Excerpt excerpt, Review review) {
+        if (excerpt != null) {
+            return excerpt.getUserBook();
+        } else if (review != null) {
+            return findUserBookById(review.getUserBook().getUserBookId());
+        } else {
+            throw new CustomException(ErrorCode.USERBOOK_NOT_FOUND);
+        }
+    }
+
+    public UserBook getUserBookOrAdd(Excerpt excerpt, Review review, ArchiveCreateRequestDto requestDto) {
+        // Excerpt와 Review에서 UserBook을 가져오려 시도
+        try {
+            return getUserBookFromExcerptOrReview(excerpt, review);
+        } catch (CustomException e) {
+            // CustomException이 발생하면 UserBook 새로 생성
+            if (requestDto.getUserBook() != null) {
+                return addUserBookEntity(requestDto.getUserBook());
+            } else if (requestDto.getCustomBook() != null) {
+                return createCustomBookEntity(requestDto.getCustomBook());
+            } else {
+                throw new CustomException(ErrorCode.USERBOOK_NOT_FOUND);
+            }
         }
     }
 
@@ -251,14 +298,5 @@ public class UserBookService {
         return userBookRepository.findAllByUser(user);
     }
 
-    //customBook 추가
-    public CustomBookResponseDto createCustomBook(CustomBookRequestDto requestDto) {
-        User user = userService.getCurrentUser();
-        BookInfo bookInfo = bookInfoService.saveCustomBookInfo(requestDto, user);
 
-        UserBook userBook = new UserBook(ReadStatus.NOT_STARTED, user, bookInfo);
-        UserBook savedUserBook = userBookRepository.save(userBook);
-
-        return CustomBookResponseDto.from(savedUserBook, null, null);
-    }
 }

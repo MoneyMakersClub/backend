@@ -9,7 +9,11 @@ import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ArchiveRepository;
+import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.entity.UserBook;
+import com.mmc.bookduck.domain.book.service.UserBookService;
+import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -26,18 +30,30 @@ import java.util.Optional;
 public class ArchiveService {
     private final ExcerptService excerptService;
     private final ReviewService reviewService;
+    private final UserService userService;
+    private final UserBookService userBookService;
     private final ArchiveRepository archiveRepository;
 
     public ArchiveResponseDto createArchive(ArchiveCreateRequestDto requestDto) {
-        Excerpt excerpt = Optional.ofNullable(requestDto.excerpt())
-                .map(excerptService::createExcerpt)
+        // UserBook 결정(createExcerpt,Review의 findById때문에)
+        UserBook userBook = userBookService.getUserBookOrAdd(null, null, requestDto);
+        // Excerpt 생성 시 결정된 UserBook 사용
+        Excerpt excerpt = Optional.ofNullable(requestDto.getExcerpt())
+                .map(dto -> {
+                    dto.setUserBookId(userBook.getUserBookId());
+                    return excerptService.createExcerpt(dto);
+                })
                 .orElse(null);
-        Review review = Optional.ofNullable(requestDto.review())
-                .map(reviewService::createReview)
+        // Review 생성 시 결정된 UserBook 사용
+        Review review = Optional.ofNullable(requestDto.getReview())
+                .map(dto -> {
+                    dto.setUserBookId(userBook.getUserBookId());
+                    return reviewService.createReview(dto);
+                })
                 .orElse(null);
         Archive archive = requestDto.toEntity(excerpt, review);
         archiveRepository.save(archive);
-        return createArchiveResponseDto(archive, excerpt, review);
+        return createArchiveResponseDto(archive, excerpt, review, userBook);
     }
 
     @Transactional(readOnly = true)
@@ -52,16 +68,11 @@ public class ArchiveService {
         } else {
             throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
         }
-        return createArchiveResponseDto(archive, archive.getExcerpt(), archive.getReview());
+        UserBook userBook = userBookService.getUserBookFromExcerptOrReview(archive.getExcerpt(), archive.getReview());
+        return createArchiveResponseDto(archive, archive.getExcerpt(), archive.getReview(), userBook);
     }
 
-    public ArchiveResponseDto createArchiveResponseDto(Archive archive, Excerpt excerpt, Review review) {
-        UserBook userBook;
-        if (excerpt != null) {
-            userBook = excerpt.getUserBook();
-        } else if (review != null) {
-            userBook = review.getUserBook();
-        } else throw new CustomException(ErrorCode.USERBOOK_NOT_FOUND);
+    public ArchiveResponseDto createArchiveResponseDto(Archive archive, Excerpt excerpt, Review review, UserBook userBook) {
         String title = userBook.getBookInfo().getTitle();
         String author = userBook.getBookInfo().getAuthor();
         return ArchiveResponseDto.from(
@@ -72,5 +83,6 @@ public class ArchiveService {
                 author
         );
     }
+
 
 }
