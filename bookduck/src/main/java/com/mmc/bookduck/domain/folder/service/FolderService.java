@@ -49,6 +49,9 @@ public class FolderService {
     // 폴더명 수정
     public FolderResponseDto updateFolder(Long folderId, FolderRequestDto dto) {
         User user = userService.getCurrentUser();
+        if(folderRepository.existsByFolderNameAndUser(dto.folderName(), user)){
+            throw new CustomException(ErrorCode.FOLDERNAME_ALREADY_EXISTS);
+        }
         Folder folder = findFolderById(folderId);
 
         folder.updateFolderName(dto.folderName());
