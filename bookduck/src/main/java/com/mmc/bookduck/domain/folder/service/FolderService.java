@@ -196,16 +196,17 @@ public class FolderService {
 
         List<CandidateFolderBookDto> dtoList = new ArrayList<>();
 
+        List<UserBook> candidateList = new ArrayList<>(userBooks);
         for(UserBook userBook: userBooks){
             for(FolderBook folderBook: folderBooks){
                 if(userBook.equals(folderBook.getUserBook())){
-                    userBooks.remove(userBook);
+                    candidateList.remove(userBook);
                     break;
                 }
             }
         }
 
-        for(UserBook userBook: userBooks){
+        for(UserBook userBook: candidateList){
             dtoList.add(CandidateFolderBookDto.from(userBook));
         }
         return new CandidateFolderBookListResponseDto(dtoList);
