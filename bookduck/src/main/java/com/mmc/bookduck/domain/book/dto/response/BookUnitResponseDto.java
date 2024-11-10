@@ -30,7 +30,7 @@ public record BookUnitResponseDto(
                 infoDto.title(),
                 infoDto.author(),
                 infoDto.imgPath(),
-                null,
+                0.0,
                 null
         );
     }

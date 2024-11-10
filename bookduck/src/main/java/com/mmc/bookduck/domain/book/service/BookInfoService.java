@@ -21,8 +21,8 @@ import com.mmc.bookduck.domain.book.entity.GenreName;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.BookInfoRepository;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
-import com.mmc.bookduck.domain.onelinerating.entity.OneLineRating;
-import com.mmc.bookduck.domain.onelinerating.repository.OneLineRatingRepository;
+import com.mmc.bookduck.domain.oneline.entity.OneLine;
+import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.S3.S3Service;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -46,7 +46,7 @@ public class BookInfoService {
     private final GenreService genreService;
     private final GoogleBooksApiService googleBooksApiService;
     private final UserService userService;
-    private final OneLineRatingRepository oneLineRatingRepository;
+    private final OneLineRepository oneLineRepository;
     private final S3Service s3Service;
 
 
@@ -141,7 +141,7 @@ public class BookInfoService {
             return new BookInfoBasicResponseDto(getRatingAverage(bookInfo.get()), my.myOneLine(),my.myRating(), my.readStatus(), additional);
         }
         else{
-            return new BookInfoBasicResponseDto(null, null, null, null, additional);
+            return new BookInfoBasicResponseDto(null, null, 0.0, null, additional);
         }
     }
 
@@ -240,15 +240,24 @@ public class BookInfoService {
     public BookInfoAdditionalResponseDto getApiBookAdditional(String providerId) {
         User user = userService.getCurrentUser();
         BookInfo bookInfo = bookInfoRepository.findByProviderId(providerId)
-                .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
-        List<UserBook> sameBookInfo_userBookList = userBookRepository.findAllByBookInfo(bookInfo);
+                .orElse(null);
+        if(bookInfo == null){
+            return new BookInfoAdditionalResponseDto(new ArrayList<>());
+        }
+        List<UserBook> sameBookInfo_userBookList = userBookRepository.findAllByBookInfoOrderByRatingDesc(bookInfo);
 
         List<BookRatingUnitDto> oneLineList = new ArrayList<>();
         if (!sameBookInfo_userBookList.isEmpty()) {
             for (UserBook book : sameBookInfo_userBookList) {
+                //내 userBook 제외
                 if (!book.getUser().equals(user)) {
-                    oneLineRatingRepository.findByUserBook(book).ifPresent(oneLineRating -> oneLineList.add(
-                            BookRatingUnitDto.from(oneLineRating)));
+                    Optional<OneLine> oneLine =  oneLineRepository.findByUserBook(book);
+                    if(oneLine.isPresent()){
+                        oneLineList.add(BookRatingUnitDto.from(oneLine.get(), book));
+                    }
+                    if(oneLineList.size() == 3){
+                        break;
+                    }
                 }
             }
         }
@@ -276,14 +285,12 @@ public class BookInfoService {
 
         List<UserBook> userBookList = userBookRepository.findAllByBookInfo(bookInfo);
         if(userBookList.isEmpty()){
-            // 별점 아예 없는 경우에는 NULL
             return null;
         }
 
         for(UserBook book : userBookList){
-            Optional<OneLineRating> oneLineRating = oneLineRatingRepository.findByUserBook(book);
-            if (oneLineRating.isPresent()) {
-                totalRating += oneLineRating.get().getRating();
+            if (book.getRating() != 0.0) {
+                totalRating += book.getRating();
                 count++;
             }
         }
@@ -301,26 +308,30 @@ public class BookInfoService {
                 .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
         User user = userService.getCurrentUser();
 
-        if(bookInfo.getCreatedUserId().equals(user.getUserId())){
-            if (dto.title() != null) {
-                bookInfo.setTitle(dto.title());
-            }
-            if (dto.author() != null) {
-                bookInfo.setAuthor(dto.author());
-            }
-            if (dto.pageCount() != null) {
-                bookInfo.setPageCount(dto.pageCount());
-            }
-            if (dto.publisher() != null) {
-                bookInfo.setPublisher(dto.publisher());
-            }
-            if(dto.coverImage() != null){
-                String newImgPath = s3Service.uploadFile(dto.coverImage());
-                s3Service.deleteFile(bookInfo.getImgPath());
-                bookInfo.setImgPath(newImgPath);
+        if(bookInfo.getCreatedUserId() != null){
+            if(bookInfo.getCreatedUserId().equals(user.getUserId())){
+                if (dto.title() != null) {
+                    bookInfo.setTitle(dto.title());
+                }
+                if (dto.author() != null) {
+                    bookInfo.setAuthor(dto.author());
+                }
+                if (dto.pageCount() != null) {
+                    bookInfo.setPageCount(dto.pageCount());
+                }
+                if (dto.publisher() != null) {
+                    bookInfo.setPublisher(dto.publisher());
+                }
+                if(dto.coverImage() != null){
+                    String newImgPath = s3Service.uploadFile(dto.coverImage());
+                    s3Service.deleteFile(bookInfo.getImgPath());
+                    bookInfo.setImgPath(newImgPath);
+                }
+            }else{
+                throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
             }
         }else{
-            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+            throw new CustomException(ErrorCode.CUSTOM_BOOKINFO_NOT_FOUND);
         }
 
         UserBook userBook = userBookRepository.findByUserAndBookInfo(user, bookInfo)
@@ -330,25 +341,20 @@ public class BookInfoService {
         return CustomBookResponseDto.from(userBook, ratingDto.myRating(), ratingDto.myOneLine());
     }
 
-
     @Transactional(readOnly = true)
-    public MyRatingOneLineReadStatusDto getMyRatingOneLineReadStatus(BookInfo bookInfo, User user){
-        UserBook userBook = userBookRepository.findByUserAndBookInfo(user,bookInfo)
+    public MyRatingOneLineReadStatusDto getMyRatingOneLineReadStatus(BookInfo bookInfo, User user) {
+        UserBook userBook = userBookRepository.findByUserAndBookInfo(user, bookInfo)
                 .orElse(null);
-        
-        if(userBook == null){
-            return new MyRatingOneLineReadStatusDto(null,null, null);
-        }
-        else{
-            OneLineRating oneLineRating = oneLineRatingRepository.findByUserBook(userBook)
+        if (userBook == null) {
+            return new MyRatingOneLineReadStatusDto(null, null, null);
+        } else {
+            OneLine oneLineRating = oneLineRepository.findByUserBook(userBook)
                     .orElse(null);
-
-            if(oneLineRating == null){
-                return new MyRatingOneLineReadStatusDto(null, null, userBook.getReadStatus());
-            }else{
-                return new MyRatingOneLineReadStatusDto(oneLineRating.getRating(), oneLineRating.getOneLineContent(), userBook.getReadStatus());
+            if (oneLineRating == null) {
+                return new MyRatingOneLineReadStatusDto(userBook.getRating(), null, userBook.getReadStatus());
+            } else {
+                return new MyRatingOneLineReadStatusDto(userBook.getRating(), oneLineRating.getOneLineContent(), userBook.getReadStatus());
             }
         }
     }
-
 }

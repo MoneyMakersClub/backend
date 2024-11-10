@@ -213,25 +213,6 @@ public class UserBookService {
 
 
     // 서재책 상세보기 - 기본정보
-    @Transactional(readOnly = true)
-    public BookInfoBasicResponseDto getUserBookInfoBasic(Long userBookId) {
-        UserBook userBook = findUserBookById(userBookId);
-
-        String koreanGenreName = genreService.genreNameToKorean(userBook.getBookInfo().getGenre());
-        BookInfoDetailDto detailDto = BookInfoDetailDto.from(userBook.getBookInfo(), koreanGenreName);
-
-        OneLineRating oneLineRating = oneLineRatingRepository.findByUserBook(userBook)
-                .orElse(null);
-
-        Double ratingAverage = bookInfoService.getRatingAverage(userBook.getBookInfo());
-
-        return new BookInfoBasicResponseDto(
-                ratingAverage,
-                oneLineRating!=null ? oneLineRating.getOneLineContent() : null,
-                oneLineRating!=null ? oneLineRating.getRating() : null,
-                userBook.getReadStatus(),
-                detailDto);
-    }
     // 수정필요
 //    @Transactional(readOnly = true)
 //    public BookInfoBasicResponseDto getUserBookInfoBasic(Long userBookId) {
@@ -253,6 +234,7 @@ public class UserBookService {
 //                detailDto);
 //    }
 
+    /*
     // 서재 책 상세보기 - 추가정보
     @Transactional(readOnly = true)
     public BookInfoAdditionalResponseDto getUserBookInfoAdditional(Long userBookId) {
@@ -270,6 +252,8 @@ public class UserBookService {
         }
         return new BookInfoAdditionalResponseDto(oneLineList);
     }
+
+     */
 
 
     // 수정 필요
