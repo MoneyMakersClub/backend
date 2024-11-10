@@ -2,14 +2,17 @@ package com.mmc.bookduck.domain.archive.controller;
 
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.response.ArchiveResponseDto;
+import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.domain.archive.service.ArchiveService;
 import com.mmc.bookduck.domain.archive.service.ExcerptService;
 import com.mmc.bookduck.domain.archive.service.OcrService;
 import com.mmc.bookduck.domain.archive.service.ReviewService;
+import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,10 +26,8 @@ import java.io.IOException;
 public class ArchiveController {
     private final OcrService ocrService;
     private final ArchiveService archiveService;
-    private final ExcerptService excerptService;
-    private final ReviewService reviewService;
 
-    @PostMapping("/excerpts/ocr")
+    @PostMapping(value = "/excerpts/ocr", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "OCR을 통한 텍스트 추출", description = "이미지를 업로드하여 텍스트를 OCR로 추출합니다.")
     public ResponseEntity<?> uploadAndExtractText(@RequestParam("image") final MultipartFile image) throws IOException {
         String extractedText = ocrService.processOcr(image);
@@ -40,17 +41,18 @@ public class ArchiveController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @GetMapping("/excerpts/{excerptId}")
-    @Operation(summary = "발췌 조회", description = "발췌 내용을 조회하며, 아카이브된 경우 감상평도 함께 조회합니다.")
-    public ResponseEntity<?> getExcerptWithArchive(@PathVariable("excerptId") final Long excerptId) {
-        ArchiveResponseDto responseDto = archiveService.getArchive(excerptId, "excerpt");
+    @GetMapping("/{id}")
+    @Operation(summary = "발췌 및 감상평 통합 조회", description = "발췌와 감상평을 조회합니다.")
+    public ResponseEntity<?> getArchive(@PathVariable("id") final Long id, @RequestParam("type") final ArchiveType archiveType) {
+        ArchiveResponseDto responseDto = archiveService.getArchive(id, archiveType);
         return ResponseEntity.ok(responseDto);
-        }
+    }
 
-    @GetMapping("/reviews/{reviewId}")
-    @Operation(summary = "감상평 조회", description = "감상평 내용을 조회하며, 아카이브된 경우 발췌도 함께 조회합니다.")
-    public ResponseEntity<?> getReviewWithArchive(@PathVariable("reviewId") final Long reviewId) {
-        ArchiveResponseDto responseDto = archiveService.getArchive(reviewId, "review");
-        return ResponseEntity.ok(responseDto);
-    }
-    }
+//    @PatchMapping("/{id}")
+//    @Operation(summary = "발췌 및 감상평 통합 수정", description = "발췌와 감상평을 수정합니다.")
+//    public ResponseEntity<?> updateArchive(PathVariable("id") final Long id, @RequestParam("type") final ArchiveType archiveType) {
+//        ArchiveResponseDto responseDto = archiveService.updateArchive(id, archiveType);
+//        return ResponseEntity.ok(responseDto);
+//    }
+
+}

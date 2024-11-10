@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 
@@ -31,6 +32,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorDto> handleOAuth2AuthenticationException(OAuth2AuthenticationException e, HttpServletRequest request) {
         ErrorCode errorCode = ErrorCode.OAUTH2_LOGIN_FAILED;
 
+        ErrorDto errorDto = new ErrorDto(
+                LocalDateTime.now().toString(),
+                errorCode.getStatus(),
+                errorCode.name(),
+                errorCode.getMessage(),
+                request.getRequestURI()
+        );
+        return new ResponseEntity<>(errorDto, HttpStatusCode.valueOf(errorCode.getStatus()));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorDto> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e, HttpServletRequest request) {
+        ErrorCode errorCode = ErrorCode.INVALID_ENUM_VALUE;
         ErrorDto errorDto = new ErrorDto(
                 LocalDateTime.now().toString(),
                 errorCode.getStatus(),

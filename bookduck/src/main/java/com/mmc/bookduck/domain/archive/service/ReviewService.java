@@ -24,9 +24,9 @@ public class ReviewService {
 
     public Review createReview(ReviewCreateRequestDto requestDto){
         User user = userService.getCurrentUser();
-        UserBook userBook = userBookService.findUserBookById(requestDto.userBookId());
-        String color = requestDto.color() != null ? requestDto.color() : "#FFFFFF";
-        Visibility visibility = requestDto.visibility() != null ? requestDto.visibility() : Visibility.PUBLIC;
+        UserBook userBook = userBookService.findUserBookById(requestDto.getUserBookId());
+        String color = requestDto.getColor() != null ? requestDto.getColor() : "#FFFFFF";
+        Visibility visibility = requestDto.getVisibility() != null ? requestDto.getVisibility() : Visibility.PUBLIC;
         Review review = requestDto.toEntity(user, userBook, color, visibility);
         return reviewRepository.save(review);
     }

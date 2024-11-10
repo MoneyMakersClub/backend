@@ -5,13 +5,19 @@ import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.user.entity.User;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 
-public record ExcerptCreateRequestDto(
-        @NotNull String excerptContent,
-        Visibility visibility,
-        @NotNull Long pageNumber,
-        @NotNull Long userBookId
-) {
+@Getter
+public class ExcerptCreateRequestDto {
+    @NotNull private String excerptContent;
+    @NotNull private Long pageNumber;
+    private Visibility visibility;
+    private Long userBookId;
+
+    public void setUserBookId(Long userBookId) {
+        this.userBookId = userBookId;
+    }
+
     public Excerpt toEntity(User user, UserBook userBook, boolean isMain, Visibility visibility) {
         return Excerpt.builder()
                 .excerptContent(excerptContent)

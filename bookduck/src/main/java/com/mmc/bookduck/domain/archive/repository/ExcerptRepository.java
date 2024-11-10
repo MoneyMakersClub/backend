@@ -6,11 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
 public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
-    Optional<Excerpt> findByUserUserIdAndCreatedTime(Long userId, LocalDateTime createdTime);
 
     long countByUser(User user);
 
