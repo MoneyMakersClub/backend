@@ -51,13 +51,13 @@ public class UserBadgeService {
 
         // 모든 뱃지와 isOwned를 결합한 리스트 생성
         List<UserBadgeUnitDto> allBadgesWithOwnership = allBadges.stream()
-                .map(badge -> UserBadgeUnitDto.from(badge, userBadgeMap.get(badge.getBadgeId())))
+                .map(badge -> UserBadgeUnitDto.from(badge, userBadgeMap.get(badge.getBadgeId()), getBadgeUnlockValue(badge)))
                 .collect(Collectors.toList());
 
         // BadgeType별로 뱃지 리스트 나누기
         List<UserBadgeUnitDto> readBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.READ);
         List<UserBadgeUnitDto> archiveBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.ARCHIVE);
-        List<UserBadgeUnitDto> oneLineBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.ONELNE);
+        List<UserBadgeUnitDto> oneLineBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.ONELINE);
         List<UserBadgeUnitDto> levelBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.LEVEL);
 
         // 각 분야별 사용자 상태 가져오기
@@ -76,6 +76,14 @@ public class UserBadgeService {
                 oneLineBadgeList,
                 levelBadgeList
         );
+    }
+
+    private int getBadgeUnlockValue(Badge badge) {
+        try {
+            return Integer.parseInt(badge.getUnlockCondition());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     private List<UserBadgeUnitDto> filterByBadgeType(List<UserBadgeUnitDto> allBadgesWithOwnership, BadgeType badgeType) {
