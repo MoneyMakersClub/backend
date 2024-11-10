@@ -11,9 +11,11 @@ import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -23,10 +25,13 @@ public class ExcerptService {
     private final UserBookService userBookService;
 
     public Excerpt createExcerpt(ExcerptCreateRequestDto requestDto){
+        log.debug("createExcerpt 접근 시도 : ", requestDto);
         User user = userService.getCurrentUser();
-        UserBook userBook = userBookService.findUserBookById(requestDto.userBookId());
-        Visibility visibility = requestDto.visibility() != null ? requestDto.visibility() : Visibility.PUBLIC;
+        UserBook userBook = userBookService.findUserBookById(requestDto.getUserBookId());
+        log.debug("userBookId : ", userBook);
+        Visibility visibility = requestDto.getVisibility() != null ? requestDto.getVisibility() : Visibility.PUBLIC;
         Excerpt excerpt = requestDto.toEntity(user, userBook, false, visibility);
+        log.debug("excerpt : ", excerpt);
         return excerptRepository.save(excerpt);
     }
 

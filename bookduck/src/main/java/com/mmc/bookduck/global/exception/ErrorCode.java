@@ -21,6 +21,8 @@ public enum ErrorCode {
     INVALID_UNLOCK_CONDITION(400, "해제 조건이 잘못되었습니다."),
     // enum 값이 잘못됨
     INVALID_ENUM_VALUE(400, "enum 값이 잘못되었습니다."),
+    ITEMTYPE_MISMATCH(400,"ItemType이 맞지 않습니다."),
+    USERITEM_BAD_REQUEST(400, "유저의 소유가 아닌 userItemId입니다."),
 
 
     // 401 Unauthorized
@@ -51,18 +53,18 @@ public enum ErrorCode {
     FRIEND_NOT_FOUND(404, "친구를 찾을 수 없습니다."),
     BOOKINFO_NOT_FOUND(404, "책 정보를 찾을 수 없습니다."),
     USERBOOK_NOT_FOUND(404, "사용자의 책을 찾을 수 없습니다."),
+    ARCHIVE_NOT_FOUND(404, "독서 기록을 찾을 수 없습니다."),
     REVIEW_NOT_FOUND(404, "감상평을 찾을 수 없습니다."),
-    REVIEW_HEART_NOT_FOUND(404, "리뷰의 좋아요를 찾을 수 없습니다."),
     EXCERPT_NOT_FOUND(404, "발췌를 찾을 수 없습니다."),
-    EXCERPT_HEART_NOT_FOUND(404, "발췌의 좋아요를 찾을 수 없습니다."),
+    ONELINERATING_NOT_FOUND(404, "한줄평점을 찾을 수 없습니다."),
+    ONELINERATINGLIKE_NOT_FOUND(404, "한줄평점 좋아요를 찾을 수 없습니다."),
     ALARM_NOT_FOUND(404, "알림을 찾을 수 없습니다."),
     FOLDER_NOT_FOUND(404, "폴더를 찾을 수 없습니다."),
     FOLDERBOOK_NOT_FOUND(404, "폴더내의 책을 찾을 수 없습니다."),
     BADGE_NOT_FOUND(404, "뱃지를 찾을 수 없습니다."),
     ITEM_NOT_FOUND(404, "아이템을 찾을 수 없습니다."),
+    USERITEM_NOT_FOUND(404, "유저의 아이템을 찾을 수 없습니다."),
     GENRE_NOT_FOUND(404, "장르를 찾을 수 없습니다."),
-
-
 
     // 409 Conflict
     // 중복 리소스 생성 시도
@@ -75,6 +77,7 @@ public enum ErrorCode {
     USERBOOK_ALREADY_EXISTS(409, "이미 사용자의 책이 등록되어 있습니다."),
     REVIEW_ALREADY_EXISTS(409, "이미 존재하는 감상평입니다."),
     EXCERPT_ALREADY_EXISTS(409, "이미 존재하는 발췌입니다."),
+    ONELINERATINGLIKE_ALREADY_EXISTS(409, "이미 존재하는 한줄평점입니다."),
     ALARM_ALREADY_EXISTS(409, "이미 존재하는 알림입니다."),
     FOLDERNAME_ALREADY_EXISTS(409, "이미 존재하는 폴더 이름입니다."),
     FOLDERBOOK_ALREADY_EXISTS(409, "이미 폴더 내에 존재하는 책입니다."),
@@ -94,7 +97,8 @@ public enum ErrorCode {
     // Oauth2, JWT
     ILLEGAL_REGISTRATION_ID(500, "잘못된 registrationId입니다."),
     DATABASE_ERROR(500, "데이터베이스 오류가 발생했습니다."),
-    INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다.")
+    INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다."),
+
     ;
 
     private final int status;

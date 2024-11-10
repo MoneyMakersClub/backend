@@ -26,7 +26,6 @@ public class Badge {
     @NotNull
     private String unlockCondition; // 추후 수정 필요할 수 있음
 
-
     @Builder
     public Badge(String badgeName, BadgeType badgeType, String description, String unlockCondition) {
         this.badgeName = badgeName;

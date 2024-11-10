@@ -6,13 +6,20 @@ import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.user.entity.User;
 import jakarta.validation.constraints.NotNull;
 
-public record ReviewCreateRequestDto(
-        @NotNull String reviewTitle,
-        @NotNull String reviewContent,
-        String color,
-        Visibility visibility,
-        @NotNull Long userBookId
-) {
+import lombok.Getter;
+
+@Getter
+public class ReviewCreateRequestDto {
+    @NotNull private String reviewTitle;
+    @NotNull private String reviewContent;
+    private String color;
+    private Visibility visibility;
+    private Long userBookId;
+
+    public void setUserBookId(Long userBookId) {
+        this.userBookId = userBookId;
+    }
+
     public Review toEntity(User user, UserBook userBook, String color, Visibility visibility) {
         return Review.builder()
                 .reviewTitle(reviewTitle)
@@ -24,3 +31,4 @@ public record ReviewCreateRequestDto(
                 .build();
     }
 }
+

@@ -70,8 +70,8 @@ public class UserGrowthService {
         gainExpForUser(userBook, 30, "Archive");
     }
 
-    public void gainRatingExp(UserBook userBook) {
-        gainExpForUser(userBook, 50, "Rating");
+    public void gainOneLineExp(UserBook userBook) {
+        gainExpForUser(userBook, 50, "OneLine");
     }
 
     private void gainExpForUser(UserBook userBook, int expToAdd, String experienceType) {
@@ -87,7 +87,7 @@ public class UserGrowthService {
         switch (experienceType) {
             case "Finished" -> userBook.markFinishedExpGiven();
             case "Archive" -> userBook.markArchiveExpGiven();
-            case "Rating" -> userBook.markRatingExpGiven();
+            case "OneLine" -> userBook.markOneLineExpGiven();
             default -> throw new IllegalArgumentException("Unsupported experience type: " + experienceType);
         }
     }

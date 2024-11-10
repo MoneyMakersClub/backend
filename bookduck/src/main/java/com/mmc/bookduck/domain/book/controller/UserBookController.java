@@ -51,32 +51,34 @@ public class UserBookController {
     }
 
 
-    @Operation(summary = "서재 책 목록 조회", description = "사용자의 서재 책 전체 목록을 조회합니다.")
-    @GetMapping("/list")
-    public ResponseEntity<UserBookListResponseDto> getAllUserBook(@RequestParam(name = "sort") final String sort){
+    // 수정 필요
+//    @Operation(summary = "서재 책 목록 조회", description = "사용자의 서재 책 전체 목록을 조회합니다.")
+//    @GetMapping("/list")
+//    public ResponseEntity<UserBookListResponseDto> getAllUserBook(@RequestParam(name = "sort") final String sort){
+//
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(userBookService.getAllUserBook(sort));
+//    }
+//
+//
+//    @Operation(summary = "상태별 서재 책 목록 조회", description = "사용자의 서재 책 목록을 상태별로 조회합니다.")
+//    @GetMapping("/filter")
+//    public ResponseEntity<UserBookListResponseDto> getStatusUserBook(@RequestParam(name = "status") final List<String> statusList,
+//                                                                     @RequestParam(name = "sort") final String sort){
+//
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(userBookService.getStatusUserBook(statusList, sort));
+//    }
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(userBookService.getAllUserBook(sort));
-    }
 
-
-    @Operation(summary = "상태별 서재 책 목록 조회", description = "사용자의 서재 책 목록을 상태별로 조회합니다.")
-    @GetMapping("/filter")
-    public ResponseEntity<UserBookListResponseDto> getStatusUserBook(@RequestParam(name = "status") final List<String> statusList,
-                                                                     @RequestParam(name = "sort") final String sort){
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(userBookService.getStatusUserBook(statusList, sort));
-    }
-
-
-    @Operation(summary = "서재 책 상세-기본 정보 조회", description = "사용자의 서재 책의 기본 정보를 상세 조회합니다.(책 기본정보 + 현재 사용자의 별점&한줄평)")
-    @GetMapping("/{userbookId}")
-    public ResponseEntity<BookInfoBasicResponseDto> getUserBookInfoBasic(@PathVariable(name = "userbookId") final Long userbookId){
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(userBookService.getUserBookInfoBasic(userbookId));
-    }
+    // 수정 필요
+//    @Operation(summary = "서재 책 상세-기본 정보 조회", description = "사용자의 서재 책의 기본 정보를 상세 조회합니다.(책 기본정보 + 현재 사용자의 별점&한줄평)")
+//    @GetMapping("/{userbookId}")
+//    public ResponseEntity<BookInfoBasicResponseDto> getUserBookInfoBasic(@PathVariable(name = "userbookId") final Long userbookId){
+//
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .body(userBookService.getUserBookInfoBasic(userbookId));
+//    }
 
 
     @Operation(summary = "서재 책 상세-추가 정보 조회", description = "사용자의 서재 책의 추가 정보를 상세 조회합니다.(현재 책에 대한 다른 사용자들의 별점&한줄평 목록 3개)")
