@@ -22,6 +22,9 @@ public class UserBook extends BaseTimeEntity {
     @NotNull
     private ReadStatus readStatus;
 
+    @NotNull
+    private double rating;
+
     @ColumnDefault("false")
     private boolean isFinishedExpGiven;
 
