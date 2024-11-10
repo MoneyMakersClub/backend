@@ -22,14 +22,14 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
 
     List<UserBook> findByUserAndReadStatus(User user, ReadStatus readStatus);
 
+    long countByUserAndReadStatus(User user, ReadStatus readStatus);
+
     // userbook 테이블과 bookinfo 테이블 조인해서 userbook의 user에 해당하는 bookinfo 정보 검색
     @Query("SELECT ub FROM UserBook ub JOIN ub.bookInfo b WHERE ub.user = :userId AND (" +
             "b.title LIKE %:keyword% OR b.author LIKE %:keyword% OR b.description LIKE %:keyword%)")
     List<UserBook> searchByUserIdAndKeyword(@Param("userId") User user, @Param("keyword") String keyword);
 
     Optional<UserBook> findByUserAndBookInfo(User user, BookInfo bookInfo);
-
-    List<UserBook> findByBookInfo(BookInfo bookInfo);
 
     //최신순
     List<UserBook> findAllByUserOrderByCreatedTimeDesc(User user);

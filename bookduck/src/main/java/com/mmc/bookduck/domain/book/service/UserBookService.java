@@ -1,19 +1,13 @@
 package com.mmc.bookduck.domain.book.service;
 
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
-import com.mmc.bookduck.domain.archive.dto.request.ExcerptCreateRequestDto;
-import com.mmc.bookduck.domain.archive.dto.request.ReviewCreateRequestDto;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
-import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.UserBookListResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.*;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
@@ -24,15 +18,13 @@ import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
-import java.io.IOException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -298,5 +290,8 @@ public class UserBookService {
         return userBookRepository.findAllByUser(user);
     }
 
-
+    @Transactional(readOnly = true)
+    public long countFinishedUserBooksByUser(User user) {
+        return userBookRepository.countByUserAndReadStatus(user, ReadStatus.FINISHED);
+    }
 }

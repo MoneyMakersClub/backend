@@ -18,7 +18,7 @@ public record UserSettingInfoResponseDto(
                 user.getNickname(),
                 user.getLoginType(),
                 user.getEmail(),
-                userSetting.isFriendRequestEnabled(),
+                userSetting.isPushAlarmEnabled(),
                 userSetting.isFriendRequestEnabled(),
                 userSetting.getRecordFont()
         );

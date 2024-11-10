@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.user.controller;
 
+import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserReadingReportService;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final UserGrowthService userGrowthService;
+    private final UserItemService userItemService;
     private final UserReadingReportService userReadingReportService;
 
     @Operation(summary = "유저 검색", description = "유저를 검색합니다.")
@@ -39,6 +41,13 @@ public class UserController {
         return ResponseEntity.ok().body(userGrowthService.getUserLevelInfo(userId));
     }
 
+    @Operation(summary = "유저 캐릭터가 착용한 아이템 조회", description = "유저 캐릭터가 착용한 아이템을 조회합니다.")
+    @GetMapping("/{userId}/character")
+    public ResponseEntity<?> getUserCharacterEquippedItems(@PathVariable final Long userId) {
+        return ResponseEntity.ok().body(userItemService.getEquippedItemsOfUserByUserId(userId));
+    }
+
+
     @Operation(summary = "유저 독서 리포트 조회 - 통계", description = "유저의 독서 리포트 중 통계를 조회합니다.")
     @GetMapping("/{userId}/statistics")
     public ResponseEntity<?> getUserStatistics(@PathVariable final Long userId) {
@@ -50,4 +59,5 @@ public class UserController {
 //    public ResponseEntity<?> getUserKeywordAnalysis(@PathVariable final Long userId) {
 //        return ResponseEntity.ok().body(userGrowthService.getUserKeywordAnalysis(userId));
 //    }
+
 }

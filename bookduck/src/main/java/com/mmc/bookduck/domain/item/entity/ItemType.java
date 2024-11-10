@@ -1,6 +1,9 @@
 package com.mmc.bookduck.domain.item.entity;
 
 public enum ItemType {
-    NORMAL,
-    BADGE_REWARD
+    PROP,
+    HAT,
+    FACE,
+    CLOTHES,
+    BAG
 }
