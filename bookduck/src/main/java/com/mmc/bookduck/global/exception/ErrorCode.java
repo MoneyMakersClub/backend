@@ -21,6 +21,8 @@ public enum ErrorCode {
     INVALID_UNLOCK_CONDITION(400, "해제 조건이 잘못되었습니다."),
     // enum 값이 잘못됨
     INVALID_ENUM_VALUE(400, "enum 값이 잘못되었습니다."),
+    ITEMTYPE_MISMATCH(400,"ItemType이 맞지 않습니다."),
+    USERITEM_BAD_REQUEST(400, "유저의 소유가 아닌 userItemId입니다."),
 
 
     // 401 Unauthorized
@@ -60,9 +62,8 @@ public enum ErrorCode {
     FOLDERBOOK_NOT_FOUND(404, "폴더내의 책을 찾을 수 없습니다."),
     BADGE_NOT_FOUND(404, "뱃지를 찾을 수 없습니다."),
     ITEM_NOT_FOUND(404, "아이템을 찾을 수 없습니다."),
+    USERITEM_NOT_FOUND(404, "유저의 아이템을 찾을 수 없습니다."),
     GENRE_NOT_FOUND(404, "장르를 찾을 수 없습니다."),
-
-
 
     // 409 Conflict
     // 중복 리소스 생성 시도
@@ -94,7 +95,8 @@ public enum ErrorCode {
     // Oauth2, JWT
     ILLEGAL_REGISTRATION_ID(500, "잘못된 registrationId입니다."),
     DATABASE_ERROR(500, "데이터베이스 오류가 발생했습니다."),
-    INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다.")
+    INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다."),
+
     ;
 
     private final int status;
