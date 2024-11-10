@@ -50,6 +50,7 @@ public class UserBook extends BaseTimeEntity {
         this.readStatus = readStatus;
         this.user = user;
         this.bookInfo = bookInfo;
+        this.rating = 0.0;
         this.isFinishedExpGiven = false;
         this.isArchiveExpGiven = false;
         this.isOneLineExpGiven = false;

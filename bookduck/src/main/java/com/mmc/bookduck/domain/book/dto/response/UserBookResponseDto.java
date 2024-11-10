@@ -9,16 +9,24 @@ public record UserBookResponseDto(
         String author,
         String imgPath,
         ReadStatus readStatus,
-        Long bookInfoId
+        double rating,
+        Long bookInfoId,
+        boolean isCustomBook
 ) {
     public static UserBookResponseDto from(UserBook userBook) {
+        boolean isCustom = false;
+        if(userBook.getBookInfo().getCreatedUserId() != null){
+            isCustom = true;
+        }
         return new UserBookResponseDto(
                 userBook.getUserBookId(),
                 userBook.getBookInfo().getTitle(),
                 userBook.getBookInfo().getAuthor(),
                 userBook.getBookInfo().getImgPath(),
                 userBook.getReadStatus(),
-                userBook.getBookInfo().getBookInfoId()
+                userBook.getRating(),
+                userBook.getBookInfo().getBookInfoId(),
+                isCustom
         );
     }
 }

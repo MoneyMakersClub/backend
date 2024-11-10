@@ -10,6 +10,7 @@ import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class UserBookController {
 
     @Operation(summary = "서재에 책 추가", description = "사용자의 서재에 책을 추가합니다.")
     @PostMapping
-    public ResponseEntity<UserBookResponseDto> addUserBook(@RequestBody UserBookRequestDto dto){
+    public ResponseEntity<UserBookResponseDto> addUserBook(@Valid @RequestBody UserBookRequestDto dto){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userBookService.addUserBook(dto));
     }
@@ -51,36 +52,33 @@ public class UserBookController {
     }
 
 
-    // 수정 필요
-//    @Operation(summary = "서재 책 목록 조회", description = "사용자의 서재 책 전체 목록을 조회합니다.")
-//    @GetMapping("/list")
-//    public ResponseEntity<UserBookListResponseDto> getAllUserBook(@RequestParam(name = "sort") final String sort){
-//
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(userBookService.getAllUserBook(sort));
-//    }
-//
-//
-//    @Operation(summary = "상태별 서재 책 목록 조회", description = "사용자의 서재 책 목록을 상태별로 조회합니다.")
-//    @GetMapping("/filter")
-//    public ResponseEntity<UserBookListResponseDto> getStatusUserBook(@RequestParam(name = "status") final List<String> statusList,
-//                                                                     @RequestParam(name = "sort") final String sort){
-//
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(userBookService.getStatusUserBook(statusList, sort));
-//    }
+    @Operation(summary = "서재 책 목록 조회", description = "사용자의 서재 책 전체 목록을 조회합니다.")
+    @GetMapping("/list")
+    public ResponseEntity<UserBookListResponseDto> getAllUserBook(@RequestParam(name = "sort") final String sort){
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.getAllUserBook(sort));
+    }
+
+    @Operation(summary = "상태별 서재 책 목록 조회", description = "사용자의 서재 책 목록을 상태별로 조회합니다.")
+    @GetMapping("/filter")
+    public ResponseEntity<UserBookListResponseDto> getStatusUserBook(@RequestParam(name = "status") final List<String> statusList,
+                                                                     @RequestParam(name = "sort") final String sort){
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.getStatusUserBook(statusList, sort));
+    }
 
 
-    // 수정 필요
-//    @Operation(summary = "서재 책 상세-기본 정보 조회", description = "사용자의 서재 책의 기본 정보를 상세 조회합니다.(책 기본정보 + 현재 사용자의 별점&한줄평)")
-//    @GetMapping("/{userbookId}")
-//    public ResponseEntity<BookInfoBasicResponseDto> getUserBookInfoBasic(@PathVariable(name = "userbookId") final Long userbookId){
-//
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .body(userBookService.getUserBookInfoBasic(userbookId));
-//    }
+    @Operation(summary = "서재 책 상세-기본 정보 조회", description = "사용자의 서재 책의 기본 정보를 상세 조회합니다.(책 기본정보 + 현재 사용자의 별점&한줄평)")
+    @GetMapping("/{userbookId}")
+    public ResponseEntity<BookInfoBasicResponseDto> getUserBookInfoBasic(@PathVariable(name = "userbookId") final Long userbookId){
 
-/*
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.getUserBookInfoBasic(userbookId));
+    }
+
+
     @Operation(summary = "서재 책 상세-추가 정보 조회", description = "사용자의 서재 책의 추가 정보를 상세 조회합니다.(현재 책에 대한 다른 사용자들의 별점&한줄평 목록 3개)")
     @GetMapping("/{userbookId}/additional")
     public ResponseEntity<BookInfoAdditionalResponseDto> getUserBookInfoAdditional(@PathVariable(name = "userbookId") final Long userbookId){
@@ -89,11 +87,10 @@ public class UserBookController {
                 .body(userBookService.getUserBookInfoAdditional(userbookId));
     }
 
- */
 
     @Operation(summary = "책 직접 등록", description = "사용자가 책을 직접 등록합니다.")
     @PostMapping(value = "/custom", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<CustomBookResponseDto> createCustomBook(@ModelAttribute final CustomBookRequestDto requestDto) {
+    public ResponseEntity<CustomBookResponseDto> createCustomBook(@Valid @ModelAttribute final CustomBookRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body((userBookService.createCustomBook(requestDto)));
     }

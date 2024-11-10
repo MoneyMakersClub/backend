@@ -38,10 +38,11 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
     @Query("SELECT ub FROM UserBook ub JOIN ub.bookInfo b WHERE ub.user = :user ORDER BY b.title ASC")
     List<UserBook> findAllByUserOrderByTitle(User user);
 
-    //별점순
-    // 수정 필요
-//    @Query("SELECT ub From UserBook ub LEFT JOIN OneLineRating r ON r.userBook = ub WHERE ub.user = :user ORDER BY r.rating DESC")
-//    List<UserBook> findByUserOrderByRating(User user);
+    //별점 높은 순
+    List<UserBook> findByUserOrderByRatingDesc(User user);
+
+    // 별점 낮은 순
+    List<UserBook> findByUserOrderByRatingAsc(User user);
 
     List<UserBook> findAllByBookInfo(BookInfo bookInfo);
 
