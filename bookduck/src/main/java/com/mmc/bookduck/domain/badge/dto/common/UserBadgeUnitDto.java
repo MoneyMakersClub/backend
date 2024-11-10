@@ -10,17 +10,21 @@ public record UserBadgeUnitDto(
         BadgeType badgeType,
         String badgeName,
         String description,
+        int unlockValue,
         LocalDate createdDate,
         Boolean isOwned
 ) {
     public static UserBadgeUnitDto from(Badge badge, UserBadge userBadge) {
         LocalDate localDate = userBadge != null ? userBadge.getCreatedTime().toLocalDate() : null;
         Boolean isOwned = userBadge != null;
+        String unlockValueString = badge.getUnlockCondition().split("#")[1];
+        Integer unlockValue = Integer.valueOf(unlockValueString);
 
         return new UserBadgeUnitDto(
                 badge.getBadgeType(),
                 badge.getBadgeName(),
                 badge.getDescription(),
+                unlockValue,
                 localDate,
                 isOwned
         );

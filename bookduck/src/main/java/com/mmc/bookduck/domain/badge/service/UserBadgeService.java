@@ -1,12 +1,20 @@
 package com.mmc.bookduck.domain.badge.service;
 
+import com.mmc.bookduck.domain.archive.repository.ArchiveRepository;
+import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
+import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
+import com.mmc.bookduck.domain.archive.service.ArchiveService;
 import com.mmc.bookduck.domain.badge.dto.common.UserBadgeUnitDto;
 import com.mmc.bookduck.domain.badge.dto.response.UserBadgeListResponseDto;
 import com.mmc.bookduck.domain.badge.entity.Badge;
 import com.mmc.bookduck.domain.badge.entity.BadgeType;
 import com.mmc.bookduck.domain.badge.entity.UserBadge;
 import com.mmc.bookduck.domain.badge.repository.UserBadgeRepository;
+import com.mmc.bookduck.domain.book.service.UserBookService;
+import com.mmc.bookduck.domain.onelinerating.entity.OneLineRating;
+import com.mmc.bookduck.domain.onelinerating.repository.OneLineRatingRepository;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,8 +29,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserBadgeService {
     private final UserBadgeRepository userBadgeRepository;
+    private final OneLineRatingRepository oneLineRatingRepository;
+    private final ReviewRepository reviewRepository;
+    private final ExcerptRepository excerptRepository;
     private final UserService userService;
     private final BadgeService badgeService;
+    private final UserBookService userBookService;
+    private final UserGrowthService userGrowthService;
 
     @Transactional(readOnly = true)
     public UserBadgeListResponseDto getUserBadges(Long userId) {
@@ -44,12 +57,24 @@ public class UserBadgeService {
         // BadgeType별로 뱃지 리스트 나누기
         List<UserBadgeUnitDto> readBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.READ);
         List<UserBadgeUnitDto> archiveBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.ARCHIVE);
-        List<UserBadgeUnitDto> ratingBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.RATING);
+        List<UserBadgeUnitDto> oneLineBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.ONELNE);
         List<UserBadgeUnitDto> levelBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.LEVEL);
 
+        // 각 분야별 사용자 상태 가져오기
+        long currentReadCount = userBookService.countFinishedUserBooksByUser(user);
+        long currentArchiveCount = reviewRepository.countByUser(user) + excerptRepository.countByUser(user);
+        long currentOneLineCount = oneLineRatingRepository.countAllByUser(user);
+        long currentLevel = userGrowthService.getUserGrowthByUserId(user.getUserId()).getLevel();
+
         return new UserBadgeListResponseDto(
-                readBadgeList.size(), archiveBadgeList.size(), ratingBadgeList.size(), levelBadgeList.size(),
-                readBadgeList, archiveBadgeList, ratingBadgeList, levelBadgeList
+                currentReadCount,
+                currentArchiveCount,
+                currentOneLineCount,
+                currentLevel,
+                readBadgeList,
+                archiveBadgeList,
+                oneLineBadgeList,
+                levelBadgeList
         );
     }
 
