@@ -39,8 +39,9 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
     List<UserBook> findAllByUserOrderByTitle(User user);
 
     //별점순
-    @Query("SELECT ub From UserBook ub LEFT JOIN OneLineRating r ON r.userBook = ub WHERE ub.user = :user ORDER BY r.rating DESC")
-    List<UserBook> findByUserOrderByRating(User user);
+    // 수정 필요
+//    @Query("SELECT ub From UserBook ub LEFT JOIN OneLineRating r ON r.userBook = ub WHERE ub.user = :user ORDER BY r.rating DESC")
+//    List<UserBook> findByUserOrderByRating(User user);
 
     List<UserBook> findAllByBookInfo(BookInfo bookInfo);
 
