@@ -12,8 +12,8 @@ import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
-import com.mmc.bookduck.domain.onelinerating.entity.OneLineRating;
-import com.mmc.bookduck.domain.onelinerating.repository.OneLineRatingRepository;
+import com.mmc.bookduck.domain.oneline.entity.OneLine;
+import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -35,7 +35,7 @@ public class UserBookService {
     private final UserBookRepository userBookRepository;
     private final GenreService genreService;
     private final UserService userService;
-    private final OneLineRatingRepository oneLineRatingRepository;
+    private final OneLineRepository oneLineRepository;
 
     //customBook 추가
     public UserBook createCustomBookEntity(CustomBookRequestDto requestDto) {
@@ -162,74 +162,77 @@ public class UserBookService {
     }
 
     // 서재 책 전체 조회
-    public UserBookListResponseDto getAllUserBook(String sort){
-
-        User user = userService.getCurrentUser();
-        List<UserBook> userBookList = sortUserBook(user, sort);
-
-        List<UserBookResponseDto> dtos = new ArrayList<>();
-        for(UserBook book : userBookList){
-                dtos.add(UserBookResponseDto.from(book));
-        }
-        return new UserBookListResponseDto(dtos);
-    }
+    // 수정 필요
+//    public UserBookListResponseDto getAllUserBook(String sort){
+//
+//        User user = userService.getCurrentUser();
+//        List<UserBook> userBookList = sortUserBook(user, sort);
+//
+//        List<UserBookResponseDto> dtos = new ArrayList<>();
+//        for(UserBook book : userBookList){
+//                dtos.add(UserBookResponseDto.from(book));
+//        }
+//        return new UserBookListResponseDto(dtos);
+//    }
 
     // 서재 책 상태별 조회
-    public UserBookListResponseDto getStatusUserBook(List<String> statusList, String sort){
-
-        if(statusList.isEmpty()){
-            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
-        }
-
-        List<ReadStatus> readStatusList = new ArrayList<>();
-        try {
-            for(String status : statusList){
-                readStatusList.add(ReadStatus.valueOf(status));
-            }
-        } catch (IllegalArgumentException e) {
-            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
-        }
-
-        User user = userService.getCurrentUser();
-        List<UserBook> sorteduserBookList = sortUserBook(user, sort);
-
-        List<UserBook> userBookList = new ArrayList<>();
-        for(UserBook userBook : sorteduserBookList){
-            for(ReadStatus status : readStatusList){
-                if(userBook.getReadStatus().equals(status)){
-                    userBookList.add(userBook);
-                }
-            }
-        }
-
-        List<UserBookResponseDto> dtos = new ArrayList<>();
-        for(UserBook book : userBookList){
-            dtos.add(UserBookResponseDto.from(book));
-        }
-        return new UserBookListResponseDto(dtos);
-    }
+    // 수정 필요
+//    public UserBookListResponseDto getStatusUserBook(List<String> statusList, String sort){
+//
+//        if(statusList.isEmpty()){
+//            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
+//        }
+//
+//        List<ReadStatus> readStatusList = new ArrayList<>();
+//        try {
+//            for(String status : statusList){
+//                readStatusList.add(ReadStatus.valueOf(status));
+//            }
+//        } catch (IllegalArgumentException e) {
+//            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
+//        }
+//
+//        User user = userService.getCurrentUser();
+//        List<UserBook> sorteduserBookList = sortUserBook(user, sort);
+//
+//        List<UserBook> userBookList = new ArrayList<>();
+//        for(UserBook userBook : sorteduserBookList){
+//            for(ReadStatus status : readStatusList){
+//                if(userBook.getReadStatus().equals(status)){
+//                    userBookList.add(userBook);
+//                }
+//            }
+//        }
+//
+//        List<UserBookResponseDto> dtos = new ArrayList<>();
+//        for(UserBook book : userBookList){
+//            dtos.add(UserBookResponseDto.from(book));
+//        }
+//        return new UserBookListResponseDto(dtos);
+//    }
 
 
     // 서재책 상세보기 - 기본정보
-    @Transactional(readOnly = true)
-    public BookInfoBasicResponseDto getUserBookInfoBasic(Long userBookId) {
-        UserBook userBook = findUserBookById(userBookId);
-
-        String koreanGenreName = genreService.genreNameToKorean(userBook.getBookInfo().getGenre());
-        BookInfoDetailDto detailDto = BookInfoDetailDto.from(userBook.getBookInfo(), koreanGenreName);
-
-        OneLineRating oneLineRating = oneLineRatingRepository.findByUserBook(userBook)
-                .orElse(null);
-
-        double ratingAverage = getRatingAverage(findAllUserBookByBookInfo(userBook.getBookInfo()));
-
-        return new BookInfoBasicResponseDto(
-                ratingAverage,
-                oneLineRating!=null ? oneLineRating.getOneLineContent() : null,
-                oneLineRating!=null ? oneLineRating.getRating() : null,
-                userBook.getReadStatus(),
-                detailDto);
-    }
+    // 수정필요
+//    @Transactional(readOnly = true)
+//    public BookInfoBasicResponseDto getUserBookInfoBasic(Long userBookId) {
+//        UserBook userBook = findUserBookById(userBookId);
+//
+//        String koreanGenreName = genreService.genreNameToKorean(userBook.getBookInfo().getGenre());
+//        BookInfoDetailDto detailDto = BookInfoDetailDto.from(userBook.getBookInfo(), koreanGenreName);
+//
+//        OneLine oneLine = oneLineRepository.findByUserBook(userBook)
+//                .orElse(null);
+//
+//        double ratingAverage = getRatingAverage(findAllUserBookByBookInfo(userBook.getBookInfo()));
+//
+//        return new BookInfoBasicResponseDto(
+//                ratingAverage,
+//                oneLine !=null ? oneLine.getOneLineContent() : null,
+//                oneLine !=null ? oneLine.getRating() : null,
+//                userBook.getReadStatus(),
+//                detailDto);
+//    }
 
     // 서재 책 상세보기 - 추가정보
     @Transactional(readOnly = true)
@@ -241,7 +244,7 @@ public class UserBookService {
         if (!sameBookInfo_userBookList.isEmpty()) {
             for (UserBook book : sameBookInfo_userBookList) {
                 if (!book.equals(userBook)) {
-                    oneLineRatingRepository.findByUserBook(book).ifPresent(oneLineRating -> oneLineList.add(
+                    oneLineRepository.findByUserBook(book).ifPresent(oneLineRating -> oneLineList.add(
                             BookRatingUnitDto.from(oneLineRating)));
                 }
             }
@@ -250,40 +253,42 @@ public class UserBookService {
     }
 
 
-    @Transactional(readOnly = true)
-    public List<UserBook> sortUserBook(User user, String sort){
-
-        if(sort.equals("latest")){
-            return userBookRepository.findAllByUserOrderByCreatedTimeDesc(user);
-        }else if(sort.equals("rating")){
-            return userBookRepository.findByUserOrderByRating(user);
-        }else if(sort.equals("title")){
-            return userBookRepository.findAllByUserOrderByTitle(user);
-        }else{
-            throw new CustomException(ErrorCode.ERROR);
-        }
-    }
+    // 수정 필요
+//    @Transactional(readOnly = true)
+//    public List<UserBook> sortUserBook(User user, String sort){
+//
+//        if(sort.equals("latest")){
+//            return userBookRepository.findAllByUserOrderByCreatedTimeDesc(user);
+//        }else if(sort.equals("rating")){
+//            return userBookRepository.findByUserOrderByRating(user);
+//        }else if(sort.equals("title")){
+//            return userBookRepository.findAllByUserOrderByTitle(user);
+//        }else{
+//            throw new CustomException(ErrorCode.ERROR);
+//        }
+//    }
 
     @Transactional(readOnly = true)
     public List<UserBook> findAllUserBookByBookInfo(BookInfo bookInfo){
         return userBookRepository.findAllByBookInfo(bookInfo);
     }
 
-    @Transactional(readOnly = true)
-    public double getRatingAverage(List<UserBook> userBookList) {
-
-        double totalRating = 0.0;
-        int count = 0;
-
-        for(UserBook book : userBookList){
-            Optional<OneLineRating> oneLineRating = oneLineRatingRepository.findByUserBook(book);
-            if (oneLineRating.isPresent()) {
-                totalRating += oneLineRating.get().getRating();
-                count++;
-            }
-        }
-        return count > 0 ? totalRating / count : 0.0;
-    }
+    // 수정 필요
+//    @Transactional(readOnly = true)
+//    public double getRatingAverage(List<UserBook> userBookList) {
+//
+//        double totalRating = 0.0;
+//        int count = 0;
+//
+//        for(UserBook book : userBookList){
+//            Optional<OneLine> oneLineRating = oneLineRepository.findByUserBook(book);
+//            if (oneLineRating.isPresent()) {
+//                totalRating += oneLineRating.get().getRating();
+//                count++;
+//            }
+//        }
+//        return count > 0 ? totalRating / count : 0.0;
+//    }
 
     @Transactional(readOnly = true)
     public List<UserBook> findAllByUser(User user) {
