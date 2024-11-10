@@ -31,7 +31,9 @@ jobs:
         shell: bash
         
       - name: Verify JSON File Location
-        run: ls -l ./bookduck/src/main/resources
+        run: |
+          ls -l ./bookduck/src/main/resources
+          cat ./bookduck/src/main/resources/mmc
 
       - name: Gradle Caching
         uses: actions/cache@v3
