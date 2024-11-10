@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.book.dto.common;
 
+import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 
 import java.util.List;
@@ -15,16 +16,16 @@ public record BookInfoDetailDto(
         String language
 ) {
 
-    public static BookInfoDetailDto from(UserBook userBook, String koreanGenreName) {
+    public static BookInfoDetailDto from(BookInfo bookInfo, String koreanGenreName) {
         return new BookInfoDetailDto(
-                userBook.getBookInfo().getPublisher(),
-                userBook.getBookInfo().getPublishDate(),
-                userBook.getBookInfo().getDescription(),
-                userBook.getBookInfo().getPageCount(),
+                bookInfo.getPublisher(),
+                bookInfo.getPublishDate(),
+                bookInfo.getDescription(),
+                bookInfo.getPageCount(),
                 null,
-                userBook.getBookInfo().getGenre().getGenreId(),
+                bookInfo.getGenre().getGenreId(),
                 koreanGenreName,
-                userBook.getBookInfo().getLanguage()
+                bookInfo.getLanguage()
         );
     }
 }
