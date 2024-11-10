@@ -29,7 +29,7 @@ public class UserBook extends BaseTimeEntity {
     private boolean isArchiveExpGiven;
 
     @ColumnDefault("false")
-    private boolean isRatingExpGiven;
+    private boolean isOneLineExpGiven;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", updatable = false)
@@ -50,7 +50,7 @@ public class UserBook extends BaseTimeEntity {
         this.bookInfo = bookInfo;
         this.isFinishedExpGiven = false;
         this.isArchiveExpGiven = false;
-        this.isRatingExpGiven = false;
+        this.isOneLineExpGiven = false;
     }
 
     public void changeReadStatus(ReadStatus readStatus) {
@@ -68,7 +68,7 @@ public class UserBook extends BaseTimeEntity {
     }
 
     // 한줄평 경험치 획득 표시
-    public void markRatingExpGiven() {
-        this.isRatingExpGiven = true;
+    public void markOneLineExpGiven() {
+        this.isOneLineExpGiven = true;
     }
 }

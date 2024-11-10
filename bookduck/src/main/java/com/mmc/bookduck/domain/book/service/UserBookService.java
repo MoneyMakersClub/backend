@@ -261,4 +261,9 @@ public class UserBookService {
 
         return CustomBookResponseDto.from(savedUserBook, null, null);
     }
+
+    @Transactional(readOnly = true)
+    public long countFinishedUserBooksByUser(User user) {
+        return userBookRepository.countByUserAndReadStatus(user, ReadStatus.FINISHED);
+    }
 }
