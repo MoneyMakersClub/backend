@@ -29,6 +29,9 @@ jobs:
           cd ./bookduck/src/main/resources
           echo "${{ secrets.GCP_ACCESS_KEY_BASE64 }}" | base64 --decode > mmc-bookduck-ocr.json
         shell: bash
+        
+      - name: Verify JSON File Location
+        run: ls -l ./bookduck/src/main/resources
 
       - name: Gradle Caching
         uses: actions/cache@v3
