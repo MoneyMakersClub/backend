@@ -1,5 +1,8 @@
 package com.mmc.bookduck.domain.book.dto.response;
 
-public record UserBookReviewArchiveResponseDto(Long userbookId,
-                                               ) {
+import com.mmc.bookduck.domain.book.dto.common.ReviewExcerptUnitDto;
+import java.util.List;
+
+public record UserBookReviewExcerptResponseDto(Long userbookId,
+                                               List<ReviewExcerptUnitDto> archiveList) {
 }

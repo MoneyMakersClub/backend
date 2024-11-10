@@ -9,6 +9,7 @@ import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.RatingResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.UserBookReviewExcerptResponseDto;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Books", description = "Books 관련 API입니다.")
 @RestController
@@ -99,16 +99,12 @@ public class UserBookController {
 
 
     //userBook의 기록과 발췌 통합 조회
-    /*
-    @Operation(summary = "서재 책 상세-기본 정보 조회", description = "사용자의 서재 책의 기본 정보를 상세 조회합니다.(책 기본정보 + 현재 사용자의 별점&한줄평)")
-    @GetMapping("/{userbookId}")
-    public ResponseEntity<BookInfoBasicResponseDto> getUserBookInfoBasic(@PathVariable(name = "userbookId") final Long userbookId){
-
+    @Operation(summary = "서재책/Custom책 전체 기록 조회", description = "사용자의 서재책/Custom책의 전체 기록을 조회합니다.(감상평+발췌)")
+    @GetMapping("/{userbookId}/reviewexcerpt")
+    public ResponseEntity<UserBookReviewExcerptResponseDto> getAllUserBookReviewExcerpt(@PathVariable(name = "userbookId") final Long userbookId){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(userBookService.getUserBookInfoBasic(userbookId));
+                .body(userBookService.getAllUserBookReviewExcerpt(userbookId));
     }
-
-     */
 
 
     //별점 등록
