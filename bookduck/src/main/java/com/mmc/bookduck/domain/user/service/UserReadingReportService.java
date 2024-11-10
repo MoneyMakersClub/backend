@@ -44,8 +44,7 @@ public class UserReadingReportService {
         // 2. 발췌 수, 감상평 수, 완독한 책 수
         long excerptCount = excerptRepository.countByUser(user);
         long reviewCount = reviewRepository.countByUser(user);
-        List<UserBook> userBooks = userBookRepository.findByUserAndReadStatus(user, ReadStatus.FINISHED);
-        long finishedBookCount = userBooks.size();
+        long finishedBookCount = userBookRepository.countByUserAndReadStatus(user, ReadStatus.FINISHED);
 
 
         // 3. 올해 현재 분기(상반기/하반기) 월별 독서 수
