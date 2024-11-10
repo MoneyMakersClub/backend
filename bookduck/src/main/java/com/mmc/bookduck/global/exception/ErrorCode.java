@@ -22,6 +22,7 @@ public enum ErrorCode {
     // enum 값이 잘못됨
     INVALID_ENUM_VALUE(400, "enum 값이 잘못되었습니다."),
     ITEMTYPE_MISMATCH(400,"ItemType이 맞지 않습니다."),
+    USERITEM_BAD_REQUEST(400, "유저의 소유가 아닌 userItemId입니다."),
 
 
     // 401 Unauthorized

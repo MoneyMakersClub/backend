@@ -52,7 +52,7 @@ public class UserItemService {
                 })
                 .collect(Collectors.toList());
 
-        return new UserItemClosetResponseDto(getUserItemEquippedListOfUser(user), itemList);
+        return new UserItemClosetResponseDto(itemList);
     }
 
     public void updateUserItemsEquippedStatus(UserItemUpdateRequestDto requestDto) {
@@ -64,12 +64,14 @@ public class UserItemService {
         userItemRepository.saveAll(equippedItems);
 
         // 새로 장착할 아이템 처리
-        Map<ItemType, Long> equippedItemMap = requestDto.userItemEquipped();
+        Map<ItemType, Long> equippedItemMap = requestDto.equippedUserItemIdList();
         equippedItemMap.forEach((itemType, userItemId) -> {
             if (userItemId != null) { // userItemId가 null인 경우 건너뜀
                 UserItem newItemToEquip = userItemRepository.findById(userItemId)
                         .orElseThrow(() -> new CustomException(ErrorCode.USERITEM_NOT_FOUND));
-
+                if (!newItemToEquip.getUser().equals(user)) {
+                    throw new CustomException(ErrorCode.USERITEM_BAD_REQUEST);
+                }
                 if (newItemToEquip.getItem().getItemType() != itemType) {
                     throw new CustomException(ErrorCode.ITEMTYPE_MISMATCH);
                 }

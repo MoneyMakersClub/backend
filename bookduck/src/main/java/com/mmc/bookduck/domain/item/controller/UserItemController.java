@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserItemController {
     private final UserItemService userItemService;
 
-    @Operation(summary = "캐릭터 아이템 옷장 조회", description = "캐릭터 아이템 옷장을 조회합니다.")
+    @Operation(summary = "캐릭터 꾸미기 아이템 조회", description = "캐릭터 꾸미기 아이템을 조회합니다.")
     @GetMapping
     public ResponseEntity<?> getUserItemCloset() {
         return ResponseEntity.ok(userItemService.getUserItemCloset());
