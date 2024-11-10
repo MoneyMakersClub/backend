@@ -25,7 +25,7 @@ public class GoogleCloudUploadService {
     @Value("${cloud.gcp.storage.bucket.name}")
     private String bucketName;
 
-    private Storage storage;
+    private final Storage storage;
 
     public String upload(MultipartFile file) {
         try {
