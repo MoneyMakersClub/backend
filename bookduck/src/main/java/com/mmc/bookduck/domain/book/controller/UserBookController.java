@@ -1,10 +1,12 @@
 package com.mmc.bookduck.domain.book.controller;
 
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
+import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.RatingResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
 import com.mmc.bookduck.domain.book.service.UserBookService;
@@ -93,5 +95,36 @@ public class UserBookController {
     public ResponseEntity<CustomBookResponseDto> createCustomBook(@Valid @ModelAttribute final CustomBookRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body((userBookService.createCustomBook(requestDto)));
+    }
+
+
+    //userBook의 기록과 발췌 통합 조회
+    /*
+    @Operation(summary = "서재 책 상세-기본 정보 조회", description = "사용자의 서재 책의 기본 정보를 상세 조회합니다.(책 기본정보 + 현재 사용자의 별점&한줄평)")
+    @GetMapping("/{userbookId}")
+    public ResponseEntity<BookInfoBasicResponseDto> getUserBookInfoBasic(@PathVariable(name = "userbookId") final Long userbookId){
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.getUserBookInfoBasic(userbookId));
+    }
+
+     */
+
+
+    //별점 등록
+    @Operation(summary = "별점 등록(수정)", description = "서재 책의 별점을 등록(수정)합니다.")
+    @PatchMapping("/{userbookId}/rating")
+    public ResponseEntity<RatingResponseDto> ratingUserBook(@PathVariable(name = "userbookId") final Long userbookId,
+                                                            @Valid @RequestBody final RatingRequestDto dto){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.ratingUserBook(userbookId, dto));
+    }
+
+    //별점 삭제
+    @Operation(summary = "별점 삭제", description = "서재 책의 별점을 삭제합니다.")
+    @DeleteMapping("/{userbookId}/rating")
+    public ResponseEntity<RatingResponseDto> deleteRating(@PathVariable(name = "userbookId") final Long userbookId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.deleteRating(userbookId));
     }
 }

@@ -6,6 +6,7 @@ import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
+import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.response.*;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
@@ -286,5 +287,24 @@ public class UserBookService {
     @Transactional(readOnly = true)
     public long countFinishedUserBooksByUser(User user) {
         return userBookRepository.countByUserAndReadStatus(user, ReadStatus.FINISHED);
+    }
+
+    @Transactional
+    public RatingResponseDto ratingUserBook(Long userbookId, RatingRequestDto dto) {
+        if(dto.rating() == 0.0 || dto.rating() < 0.0){
+            throw new CustomException(ErrorCode.INVALID_INPUT_FORMAT);
+        }
+        UserBook userBook = findUserBookById(userbookId);
+        userBook.changeRating(dto.rating());
+
+        return RatingResponseDto.from(userBook);
+    }
+
+    @Transactional
+    public RatingResponseDto deleteRating(Long userbookId) {
+        UserBook userBook = findUserBookById(userbookId);
+        userBook.changeRating(0.0);
+
+        return RatingResponseDto.from(userBook);
     }
 }

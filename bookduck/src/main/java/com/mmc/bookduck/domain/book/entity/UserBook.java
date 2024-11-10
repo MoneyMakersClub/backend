@@ -59,6 +59,9 @@ public class UserBook extends BaseTimeEntity {
     public void changeReadStatus(ReadStatus readStatus) {
         this.readStatus = readStatus;
     }
+    public void changeRating(double rating) {
+        this.rating = rating;
+    }
 
     // 완독 경험치 획득 표시
     public void markFinishedExpGiven() {
