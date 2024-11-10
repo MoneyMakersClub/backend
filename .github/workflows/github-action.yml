@@ -65,5 +65,8 @@ jobs:
           script: |
             sudo docker rm -f $(sudo docker ps -qa)
             sudo docker pull ${{ secrets.DOCKER_REPO }}:latest
-            sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_REPO }}:latest
+            sudo docker run -d -p 8080:8080 \
+              -e GOOGLE_APPLICATION_CREDENTIALS="/home/ubuntu/mmc-bookduck-ocr.json" \
+              ${{ secrets.DOCKER_REPO }}:latest
             sudo docker image prune -f
+
