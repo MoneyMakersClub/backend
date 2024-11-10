@@ -63,8 +63,8 @@ jobs:
           key: ${{ secrets.KEY }}
           envs: GITHUB_SHA
           script: |
-            export GOOGLE_APPLICATION_CREDENTIALS=/home/ubuntu/mmc-bookduck-ocr.json # 환경 변수 설정
             sudo docker-compose -f /home/ubuntu/docker-compose.yml down # 이전 컨테이너들 제거
             sudo docker pull ${{ secrets.DOCKER_REPO }}:latest # 최신 Docker 이미지 가져오기
             sudo docker-compose -f /home/ubuntu/docker-compose.yml up -d # docker-compose로 컨테이너 실행
             sudo docker image prune -f # 불필요한 이미지를 정리
+
