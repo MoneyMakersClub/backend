@@ -33,7 +33,7 @@ jobs:
       - name: Verify JSON File Location
         run: |
           ls -l ./bookduck/src/main/resources
-          cat ./bookduck/src/main/resources/mmc
+          cat './bookduck/src/main/resources/mmc-bookduck-ocr.json'
 
       - name: Gradle Caching
         uses: actions/cache@v3
