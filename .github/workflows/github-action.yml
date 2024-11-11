@@ -19,17 +19,16 @@ jobs:
 
       - name: Make application.yml
         run: |
-          sudo mkdir -p ./bookduck/src/main/resources # 디렉토리가 없으면 생성
+          mkdir -p ./bookduck/src/main/resources # 디렉토리가 없으면 생성
           cd ./bookduck/src/main/resources
           touch ./application.yml
           echo "${{ secrets.APPLICATION }}" > ./application.yml
 
       - name: Make GCP Service Account Key
         run: |
-          mkdir -p /home/ubuntu/bookduck/src/main/resources
-          cd /home/ubuntu/bookduck/src/main/resources
-          echo "${{ secrets.GCP_ACCESS_KEY_BASE64 }}" | base64 --decode > mmc-bookduck-ocr.json
-        shell: bash
+          sudo mkdir -p ./bookduck/src/main/resources
+          sudo touch ./bookduck/src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION }}" | sudo tee ./bookduck/src/main/resources/application.yml
 
       - name: Gradle Caching
         uses: actions/cache@v3
