@@ -10,7 +10,9 @@ import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +44,11 @@ public class UserSearchService {
 
     @Transactional(readOnly = true)
     public Page<User> getSearchedUserPage(String keyword, Pageable pageable) {
-        return userRepository.searchAllByNicknameContaining(keyword, pageable);
+        Pageable sortedByNickname = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by("nickname").ascending()
+        );
+        return userRepository.searchAllByNicknameStartingWith(keyword, sortedByNickname);
     }
 }
