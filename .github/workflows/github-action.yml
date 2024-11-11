@@ -26,14 +26,10 @@ jobs:
 
       - name: Make GCP Service Account Key
         run: |
-          cd ./bookduck/src/main/resources
+          mkdir -p /home/ubuntu/bookduck/src/main/resources
+          cd /home/ubuntu/bookduck/src/main/resources
           echo "${{ secrets.GCP_ACCESS_KEY_BASE64 }}" | base64 --decode > mmc-bookduck-ocr.json
         shell: bash
-        
-      - name: Verify JSON File Location
-        run: |
-          ls -l ./bookduck/src/main/resources
-          cat './bookduck/src/main/resources/mmc-bookduck-ocr.json'
 
       - name: Gradle Caching
         uses: actions/cache@v3
