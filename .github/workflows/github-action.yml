@@ -17,13 +17,12 @@ jobs:
           java-version: 21
           distribution: 'zulu'
 
-      - name: Make application.yml and GCP Key
+      - name: Make application.yml
         run: |
           mkdir -p ./bookduck/src/main/resources # 디렉토리가 없으면 생성
           cd ./bookduck/src/main/resources
           touch ./application.yml
           echo "${{ secrets.APPLICATION }}" > ./application.yml
-          echo "${{ secrets.GCP_ACCESS_KEY_BASE64 }}" | openssl base64 -d -A > mmc-bookduck-ocr.json
 
       - name: Gradle Caching
         uses: actions/cache@v3
@@ -67,13 +66,4 @@ jobs:
             sudo docker-compose -f /home/ubuntu/docker-compose.yml down # 이전 컨테이너들 제거
             sudo docker pull ${{ secrets.DOCKER_REPO }}:latest # 최신 Docker 이미지 가져오기
             sudo docker-compose -f /home/ubuntu/docker-compose.yml up -d # docker-compose로 컨테이너 실행
-            sleep 10
-            container_id=$(sudo docker ps -q -f "ancestor=${{ secrets.DOCKER_REPO }}:latest") # 애플리케이션 컨테이너 ID 가져오기
-            if [ -n "$container_id" ]; then
-              sudo docker cp /home/ubuntu/bookduck/src/main/resources/mmc-bookduck-ocr.json $container_id:/home/ubuntu/bookduck/src/main/resources/ # 파일 복사
-            else
-              echo "Application container not found"
-              exit 1
-            fi
             sudo docker image prune -f # 불필요한 이미지를 정리
-
