@@ -127,7 +127,7 @@ public class UserBookController {
     }
 
     @Operation(summary = "검색페이지-최근 기록한책 목록 조회", description = "검색페이지 - 최근 기록한 책 3개를 조회합니다.")
-    @DeleteMapping("/recent")
+    @GetMapping("/recent")
     public ResponseEntity<BookListResponseDto<BookCoverImageUnitDto>> getRecentRecordBooks(){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userBookService.getRecentRecordBooks());

@@ -28,9 +28,6 @@ import com.mmc.bookduck.global.common.BaseTimeEntity;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -369,8 +366,11 @@ public class UserBookService {
     @Transactional(readOnly = true)
     public BookListResponseDto<BookCoverImageUnitDto> getRecentRecordBooks() {
         User user = userService.getCurrentUser();
-        List<Excerpt> excerpts = excerptRepository.findAllByUser(user);
-        List<Review> reviews = reviewRepository.findAllByUser(user);
+        LocalDateTime monthsAgo = LocalDateTime.now().minusMonths(3);
+
+        // 세 달 이내
+        List<Excerpt> excerpts = excerptRepository.findAllByUserAndCreatedTimeAfter(user, monthsAgo);
+        List<Review> reviews = reviewRepository.findAllByUserAndCreatedTimeAfter(user, monthsAgo);
 
         List<BaseTimeEntity> allItems = new ArrayList<>();
         allItems.addAll(excerpts);

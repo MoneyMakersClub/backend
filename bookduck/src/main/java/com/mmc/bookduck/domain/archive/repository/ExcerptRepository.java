@@ -3,6 +3,7 @@ package com.mmc.bookduck.domain.archive.repository;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.entity.User;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,5 +18,5 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
 
     List<Excerpt> findExcerptByUserBookOrderByCreatedTimeDesc(UserBook userBook);
 
-    List<Excerpt> findAllByUser(User user);
+    List<Excerpt> findAllByUserAndCreatedTimeAfter(User user, LocalDateTime monthsAgo);
 }

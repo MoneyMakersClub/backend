@@ -3,6 +3,7 @@ package com.mmc.bookduck.domain.archive.repository;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.entity.User;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,5 +18,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     List<Review> findReviewByUserBookOrderByCreatedTimeDesc(UserBook userBook);
 
-    List<Review> findAllByUser(User user);
+    List<Review> findAllByUserAndCreatedTimeAfter(User user, LocalDateTime monthsAgo);
 }
