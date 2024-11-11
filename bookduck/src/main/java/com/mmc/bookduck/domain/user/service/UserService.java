@@ -43,18 +43,12 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User getActiveUserByUserId(Long userId) throws CustomException {
-        User user = getUserByUserId(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         validateActiveUserStatus(user);
         return user;
     }
-
-    @Transactional(readOnly = true)
-    public User getUserByUserId(Long userId) throws CustomException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        return user;
-    }
-
+    
     // 사용자가 활성 상태임을 검증
     private void validateActiveUserStatus(User user) throws CustomException {
         if (!user.getUserStatus().equals(UserStatus.ACTIVE)) {
