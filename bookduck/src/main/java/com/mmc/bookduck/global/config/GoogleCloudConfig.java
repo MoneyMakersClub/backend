@@ -3,7 +3,6 @@ package com.mmc.bookduck.global.config;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,11 +18,6 @@ public class GoogleCloudConfig {
 
     @Value("${cloud.gcp.storage.project-id}")
     private String projectId;
-
-    @PostConstruct
-    public void init() {
-        System.out.println("gcpAccountKeyPath: " + gcpAccountKeyPath);
-    }
 
     @Bean
     public Storage storage() throws IOException {
