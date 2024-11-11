@@ -1,10 +1,12 @@
 package com.mmc.bookduck.domain.book.controller;
 
+import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.RatingResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookListResponseDto;
@@ -122,5 +124,12 @@ public class UserBookController {
     public ResponseEntity<RatingResponseDto> deleteRating(@PathVariable(name = "userbookId") final Long userbookId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userBookService.deleteRating(userbookId));
+    }
+
+    @Operation(summary = "검색페이지-최근 기록한책 목록 조회", description = "검색페이지 - 최근 기록한 책 3개를 조회합니다.")
+    @DeleteMapping("/recent")
+    public ResponseEntity<BookListResponseDto<BookCoverImageUnitDto>> getRecentRecordBooks(){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.getRecentRecordBooks());
     }
 }

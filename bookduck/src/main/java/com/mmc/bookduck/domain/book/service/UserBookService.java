@@ -8,6 +8,7 @@ import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
+import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.ReviewExcerptUnitDto;
@@ -23,9 +24,13 @@ import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
+import com.mmc.bookduck.global.common.BaseTimeEntity;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -359,5 +364,41 @@ public class UserBookService {
         else{
             return unit.review().createdTime();
         }
+    }
+
+    @Transactional(readOnly = true)
+    public BookListResponseDto<BookCoverImageUnitDto> getRecentRecordBooks() {
+        User user = userService.getCurrentUser();
+        List<Excerpt> excerpts = excerptRepository.findAllByUser(user);
+        List<Review> reviews = reviewRepository.findAllByUser(user);
+
+        List<BaseTimeEntity> allItems = new ArrayList<>();
+        allItems.addAll(excerpts);
+        allItems.addAll(reviews);
+
+        allItems.sort((item1, item2) -> item2.getCreatedTime().compareTo(item1.getCreatedTime()));
+
+        List<UserBook> userBookList = new ArrayList<>();
+        for (Object item : allItems) {
+            if (userBookList.size() > 3 || userBookList.size() == 3) break;
+
+            if (item instanceof Excerpt excerpt) {
+                UserBook userBook = excerpt.getUserBook();
+                if (!userBookList.contains(userBook)) {
+                    userBookList.add(userBook);
+                }
+            }
+            else if (item instanceof Review review) {
+                UserBook userBook = review.getUserBook();
+                if (!userBookList.contains(userBook)) {
+                    userBookList.add(userBook);
+                }
+            }
+        }
+        List<BookCoverImageUnitDto> coverList = new ArrayList<>();
+        for(UserBook userBook : userBookList){
+            coverList.add(BookCoverImageUnitDto.from(userBook));
+        }
+        return new BookListResponseDto<>(coverList);
     }
 }

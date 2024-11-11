@@ -16,4 +16,6 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
     long countByUserAndCreatedTimeThisYear(@Param("user") User user, @Param("currentYear") int currentYear);
 
     List<Excerpt> findExcerptByUserBookOrderByCreatedTimeDesc(UserBook userBook);
+
+    List<Excerpt> findAllByUser(User user);
 }

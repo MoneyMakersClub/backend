@@ -16,4 +16,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     long countByUserAndCreatedTimeThisYear(@Param("user") User user, @Param("currentYear") int currentYear);
 
     List<Review> findReviewByUserBookOrderByCreatedTimeDesc(UserBook userBook);
+
+    List<Review> findAllByUser(User user);
 }
