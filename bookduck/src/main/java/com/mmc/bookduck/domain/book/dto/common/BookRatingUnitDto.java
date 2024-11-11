@@ -1,16 +1,17 @@
 package com.mmc.bookduck.domain.book.dto.common;
 
+import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 
 public record BookRatingUnitDto(
         String nickname,
-//        double rating,
+        double rating,
         String oneLine
 ) {
-    public static BookRatingUnitDto from(OneLine oneLine) {
+    public static BookRatingUnitDto from(OneLine oneLine, UserBook userBook) {
         return new BookRatingUnitDto(
                 oneLine.getUser().getNickname(),
-//                oneLine.getRating(),
+                userBook.getRating(),
                 oneLine.getOneLineContent()
         );
     }

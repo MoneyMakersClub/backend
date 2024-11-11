@@ -80,7 +80,7 @@ public class UserBookController {
 //                .body(userBookService.getUserBookInfoBasic(userbookId));
 //    }
 
-
+/*
     @Operation(summary = "서재 책 상세-추가 정보 조회", description = "사용자의 서재 책의 추가 정보를 상세 조회합니다.(현재 책에 대한 다른 사용자들의 별점&한줄평 목록 3개)")
     @GetMapping("/{userbookId}/additional")
     public ResponseEntity<BookInfoAdditionalResponseDto> getUserBookInfoAdditional(@PathVariable(name = "userbookId") final Long userbookId){
@@ -89,6 +89,7 @@ public class UserBookController {
                 .body(userBookService.getUserBookInfoAdditional(userbookId));
     }
 
+ */
 
     @Operation(summary = "책 직접 등록", description = "사용자가 책을 직접 등록합니다.")
     @PostMapping(value = "/custom", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})

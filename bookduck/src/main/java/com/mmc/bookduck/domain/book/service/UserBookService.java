@@ -234,6 +234,7 @@ public class UserBookService {
 //                detailDto);
 //    }
 
+    /*
     // 서재 책 상세보기 - 추가정보
     @Transactional(readOnly = true)
     public BookInfoAdditionalResponseDto getUserBookInfoAdditional(Long userBookId) {
@@ -251,6 +252,8 @@ public class UserBookService {
         }
         return new BookInfoAdditionalResponseDto(oneLineList);
     }
+
+     */
 
 
     // 수정 필요
