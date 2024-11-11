@@ -24,6 +24,12 @@ jobs:
           touch ./application.yml
           echo "${{ secrets.APPLICATION }}" > ./application.yml
 
+      - name: Make GCP Service Account Key
+        run: |
+          cd ./bookduck/src/main/resources
+          echo "${{ secrets.GCP_ACCESS_KEY_BASE64 }}" | openssl base64 -d -A > mmc-bookduck-ocr.json
+        shell: bash
+
       - name: Gradle Caching
         uses: actions/cache@v3
         with:
