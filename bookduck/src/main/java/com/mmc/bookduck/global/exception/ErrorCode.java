@@ -52,6 +52,7 @@ public enum ErrorCode {
     FRIEND_REQUEST_NOT_FOUND(404, "친구 요청을 찾을 수 없습니다."),
     FRIEND_NOT_FOUND(404, "친구를 찾을 수 없습니다."),
     BOOKINFO_NOT_FOUND(404, "책 정보를 찾을 수 없습니다."),
+    CUSTOM_BOOKINFO_NOT_FOUND(404, "직접 등록한 책 정보를 찾을 수 없습니다."),
     USERBOOK_NOT_FOUND(404, "사용자의 책을 찾을 수 없습니다."),
     ARCHIVE_NOT_FOUND(404, "독서 기록을 찾을 수 없습니다."),
     REVIEW_NOT_FOUND(404, "감상평을 찾을 수 없습니다."),

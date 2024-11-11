@@ -74,4 +74,6 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
     List<UserBook> findAllByUserAndCreatedInHalfWithReadStatus(@Param("user") User user,
                                                                @Param("isFirstHalf") boolean isFirstHalf,
                                                                @Param("readStatus") ReadStatus readStatus);
+
+    List<UserBook> findAllByBookInfoOrderByRatingDesc(BookInfo bookInfo);
 }
