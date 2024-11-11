@@ -20,9 +20,7 @@ jobs:
       - name: Make application.yml
         run: |
           mkdir -p ./bookduck/src/main/resources # 디렉토리가 없으면 생성
-          cd ./bookduck/src/main/resources
-          touch ./application.yml
-          echo "${{ secrets.APPLICATION }}" > ./application.yml
+          echo "${{ secrets.APPLICATION }}" > ./bookduck/src/main/resources/application.yml
 
       - name: Gradle Caching
         uses: actions/cache@v3
