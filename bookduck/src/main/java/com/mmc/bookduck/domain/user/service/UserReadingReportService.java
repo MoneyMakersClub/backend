@@ -30,7 +30,7 @@ public class UserReadingReportService {
     private final UserService userService;
 
     public UserStatisticsResponseDto getUserStatistics(Long userId) {
-        User user = userService.getUserByUserId(userId);
+        User user = userService.getActiveUserByUserId(userId);
 
         // 1. 가장 많이 읽은 카테고리, Top3 카테고리 // TODO: 카테고리? GenreName?
         List<Object[]> topCategoryResults = userBookRepository.findTopCategoriesByUser(user, Pageable.ofSize(3));
