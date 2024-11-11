@@ -24,11 +24,10 @@ jobs:
           touch ./application.yml
           echo "${{ secrets.APPLICATION }}" > ./application.yml
 
-      - name: Make GCP Service Account Key
+      - name: Copy GCP Service Account Key to Docker Container
         run: |
-          sudo mkdir -p ./bookduck/src/main/resources
-          sudo touch ./bookduck/src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION }}" | sudo tee ./bookduck/src/main/resources/application.yml
+          container_id=$(docker ps -q -f "name=my_container_name")
+          docker cp ./src/main/resources/mmc-bookduck-ocr.json $container_id:/home/ubuntu/bookduck/src/main/resources/mmc-bookduck-ocr.json
 
       - name: Gradle Caching
         uses: actions/cache@v3
