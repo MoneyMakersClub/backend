@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.validation.Errors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +36,11 @@ public class FolderService {
 
 
     // 폴더 생성
-    public FolderResponseDto createFolder(FolderRequestDto dto) {
+    public FolderResponseDto createFolder(FolderRequestDto dto, Errors error) {
+        if(error.hasErrors()){
+            throw new CustomException(ErrorCode.INVALID_INPUT_LENGTH);
+        }
+
         User user = userService.getCurrentUser();
         if(folderRepository.existsByFolderNameAndUser(dto.folderName(), user)){
             throw new CustomException(ErrorCode.FOLDERNAME_ALREADY_EXISTS);
@@ -47,8 +52,15 @@ public class FolderService {
     }
 
     // 폴더명 수정
-    public FolderResponseDto updateFolder(Long folderId, FolderRequestDto dto) {
+    public FolderResponseDto updateFolder(Long folderId, FolderRequestDto dto, Errors error) {
+        if(error.hasErrors()){
+            throw new CustomException(ErrorCode.INVALID_INPUT_LENGTH);
+        }
+
         User user = userService.getCurrentUser();
+        if(folderRepository.existsByFolderNameAndUser(dto.folderName(), user)){
+            throw new CustomException(ErrorCode.FOLDERNAME_ALREADY_EXISTS);
+        }
         Folder folder = findFolderById(folderId);
 
         folder.updateFolderName(dto.folderName());
@@ -196,16 +208,17 @@ public class FolderService {
 
         List<CandidateFolderBookDto> dtoList = new ArrayList<>();
 
+        List<UserBook> candidateList = new ArrayList<>(userBooks);
         for(UserBook userBook: userBooks){
             for(FolderBook folderBook: folderBooks){
                 if(userBook.equals(folderBook.getUserBook())){
-                    userBooks.remove(userBook);
+                    candidateList.remove(userBook);
                     break;
                 }
             }
         }
 
-        for(UserBook userBook: userBooks){
+        for(UserBook userBook: candidateList){
             dtoList.add(CandidateFolderBookDto.from(userBook));
         }
         return new CandidateFolderBookListResponseDto(dtoList);

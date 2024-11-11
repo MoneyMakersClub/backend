@@ -28,22 +28,16 @@ public class FolderController {
     @PostMapping
     public ResponseEntity<FolderResponseDto> createFolder(@Valid @RequestBody FolderRequestDto dto, Errors error){
 
-        if(error.hasErrors()){
-            throw new CustomException(ErrorCode.INVALID_INPUT_LENGTH);
-        }
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(folderService.createFolder(dto));
+                .body(folderService.createFolder(dto, error));
     }
 
     @Operation(summary = "폴더 이름 수정", description = "폴더의 이름을 수정합니다.")
     @PatchMapping("/{folderId}")
     public ResponseEntity<FolderResponseDto> updateFolder(@PathVariable final Long folderId,
                                                           @Valid @RequestBody FolderRequestDto dto, Errors error){
-        if(error.hasErrors()){
-            throw new CustomException(ErrorCode.INVALID_INPUT_LENGTH);
-        }
         return ResponseEntity.status(HttpStatus.OK)
-                .body(folderService.updateFolder(folderId, dto));
+                .body(folderService.updateFolder(folderId, dto, error));
     }
 
     @Operation(summary = "폴더 삭제", description = "폴더를 삭제합니다.")
