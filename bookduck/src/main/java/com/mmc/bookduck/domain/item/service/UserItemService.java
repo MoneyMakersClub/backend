@@ -29,10 +29,10 @@ public class UserItemService {
     private final UserService userService;
     private final ItemService itemService;
 
-    // userId로 장착된 스킨 조회
+    // userId로 장착된 아이템 조회
     @Transactional(readOnly = true)
     public UserItemEquippedResponseDto getEquippedItemsOfUserByUserId(Long userId) {
-        User user = userService.getUserByUserId(userId);
+        User user = userService.getActiveUserByUserId(userId);
         return new UserItemEquippedResponseDto(getUserItemEquippedListOfUser(user));
     }
 

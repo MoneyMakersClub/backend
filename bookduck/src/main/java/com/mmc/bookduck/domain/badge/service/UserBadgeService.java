@@ -36,7 +36,7 @@ public class UserBadgeService {
 
     @Transactional(readOnly = true)
     public UserBadgeListResponseDto getUserBadges(Long userId) {
-        User user = userService.getUserByUserId(userId);
+        User user = userService.getActiveUserByUserId(userId);
         List<UserBadge> uniqueUserBadges = deleteDuplicateUserBadges(userBadgeRepository.findAllByUser(user));
 
         // 전체 뱃지
