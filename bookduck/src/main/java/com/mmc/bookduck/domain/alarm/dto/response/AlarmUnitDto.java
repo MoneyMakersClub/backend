@@ -2,21 +2,31 @@ package com.mmc.bookduck.domain.alarm.dto.response;
 
 
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
+import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 
 import java.time.LocalDateTime;
 
 public record AlarmUnitDto(
         Boolean isRead,
-        String message,
+        AlarmType alarmType,
         LocalDateTime createdTime,
-        String nickname
+        String boldText,
+        String resourceName,
+        Long resourceId
 ) {
-    public static AlarmUnitDto from(Alarm alarm, String message) {
+    public static AlarmUnitDto from(Alarm alarm) {
+        String boldText = null;
+        if (alarm.getSender() != null)
+            boldText = alarm.getSender().getNickname();
+        else if (alarm.getResourceValue() != null)
+            boldText = alarm.getResourceValue();
         return new AlarmUnitDto(
                 alarm.isRead(),
-                message,
+                alarm.getAlarmType(),
                 alarm.getCreatedTime(),
-                alarm.getSender().getNickname()
+                boldText,
+                alarm.getResourceName(),
+                alarm.getResourceId()
         );
     }
 }

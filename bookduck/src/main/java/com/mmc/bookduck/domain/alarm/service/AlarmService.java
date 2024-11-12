@@ -53,17 +53,16 @@ public class AlarmService {
     }
 
     private List<AlarmUnitDto> getAndReadAlarms(Pageable pageable) {
-        List<AlarmUnitDto> alarmList = new ArrayList<>();
+        List<AlarmUnitDto> alarmUnitDtoList = new ArrayList<>();
         User currentUser = userService.getCurrentUser();
         Slice<Alarm> alarmSlice = alarmRepository.findByReceiverOrderByCreatedTimeDesc(currentUser, pageable);
         if (alarmSlice != null && alarmSlice.hasContent()) {
             for (Alarm alarm : alarmSlice) {
-                String message = alarm.getMessage();
-                alarmList.add(AlarmUnitDto.from(alarm, message));
+                alarmUnitDtoList.add(AlarmUnitDto.from(alarm));
                 alarm.readAlarm();
             }
             alarmRepository.saveAll(alarmSlice);
         }
-        return alarmList;
+        return alarmUnitDtoList;
     }
 }
