@@ -7,22 +7,24 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.entity.User;
 import jakarta.validation.constraints.NotBlank;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 
 public record UserBookRequestDto(
-        @NotBlank String title,
-        @NotBlank List<String> authors,
-        @NotBlank String readStatus,
+        @NotBlank(message = "title은 필수입니다. title은 공백일 수 없습니다.") String title,
+        @NotEmpty(message = "authors은 필수입니다. authors은 최소 한 개 이상의 요소를 포함해야 합니다.") List<String> authors,
+        @NotBlank(message = "readStatus는 필수입니다.") String readStatus,
         String publisher,
         String publishDate,
         String description,
         List<String> category,
-        @NotBlank Long genreId,
+        @NotNull(message = "genreId는 필수입니다.") Long genreId,
         Long pageCount,
         String imgPath,
         String language,
-        @NotBlank String providerId
+        @NotNull(message = "providerId는 필수입니다.") String providerId
 ) {
 
     public UserBook toEntity(User user, BookInfo bookInfo, ReadStatus readStatus) {
