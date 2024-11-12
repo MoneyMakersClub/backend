@@ -1,6 +1,8 @@
 package com.mmc.bookduck.domain.archive.service;
 
 import com.mmc.bookduck.domain.archive.dto.request.ExcerptCreateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.request.ExcerptUpdateRequestDto;
+import com.mmc.bookduck.domain.archive.entity.Archive;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
@@ -22,12 +24,28 @@ public class ExcerptService {
     private final UserService userService;
     private final UserBookService userBookService;
 
+    // 생성
     public Excerpt createExcerpt(ExcerptCreateRequestDto requestDto){
         User user = userService.getCurrentUser();
-        UserBook userBook = userBookService.findUserBookById(requestDto.userBookId());
-        Visibility visibility = requestDto.visibility() != null ? requestDto.visibility() : Visibility.PUBLIC;
+        UserBook userBook = userBookService.getUserBookById(requestDto.getUserBookId());
+        Visibility visibility = requestDto.getVisibility() != null ? requestDto.getVisibility() : Visibility.PUBLIC;
         Excerpt excerpt = requestDto.toEntity(user, userBook, false, visibility);
         return excerptRepository.save(excerpt);
+    }
+
+    // 수정
+    public Excerpt updateExcerpt(Long excerptId, ExcerptUpdateRequestDto requestDto) {
+        // 생성자 검증 archiveService.updateArchive에서 하고 있으므로 생략
+        Excerpt excerpt = getExcerptById(excerptId);
+        excerpt.updateExcerpt(requestDto.excerptContent(), requestDto.pageNumber(), requestDto.excerptVisibility());
+        return excerpt;
+    }
+
+    // 삭제
+    public void deleteExcerpt(Long excerptId) {
+        // 생성자 검증 archiveService.deleteArchive에서 하고 있으므로 생략
+        Excerpt excerpt = getExcerptById(excerptId);
+        excerptRepository.delete(excerpt);
     }
 
     @Transactional(readOnly = true)
@@ -35,5 +53,8 @@ public class ExcerptService {
         return excerptRepository.findById(excerptId)
                 .orElseThrow(() -> new CustomException(ErrorCode.EXCERPT_NOT_FOUND));
     }
+
+
+
 
 }

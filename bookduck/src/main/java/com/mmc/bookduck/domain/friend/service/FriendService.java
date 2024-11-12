@@ -88,4 +88,10 @@ public class FriendService {
 
         friendRepository.delete(friend);
     }
+
+    @Transactional(readOnly = true)
+    public boolean isFriendWithCurrentUser(User otherUser) {
+        User currentUser = userService.getCurrentUser();
+        return friendRepository.findFriendBetweenUsers(currentUser.getUserId(), otherUser.getUserId()).isPresent();
+    }
 }

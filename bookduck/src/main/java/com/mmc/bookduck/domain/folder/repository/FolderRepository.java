@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface FolderRepository extends JpaRepository<Folder, Long> {
     Optional<Folder> findById(Long folderId);
 
-    List<Folder> findAllByUser(User user);
+    List<Folder> findAllByUserOrderByFolderIdDesc(User user);
 
     boolean existsByFolderNameAndUser(String folderName, User user);
 }

@@ -1,24 +1,31 @@
 package com.mmc.bookduck.global.google;
 
+import autovalue.shaded.com.google.common.collect.Lists;
+import com.google.auth.oauth2.GoogleCredentials;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.google.cloud.storage.*;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.UUID;
 
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 
-@Component
+
+@Service
 @RequiredArgsConstructor
 public class GoogleCloudUploadService {
 
     @Value("${cloud.gcp.storage.bucket.name}")
     private String bucketName;
 
-    private static Storage storage = StorageOptions.getDefaultInstance().getService();
+    private final Storage storage;
 
     public String upload(MultipartFile file) {
         try {
