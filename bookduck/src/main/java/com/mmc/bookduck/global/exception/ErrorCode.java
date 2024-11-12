@@ -93,12 +93,14 @@ public enum ErrorCode {
     UPLOAD_FAIL_TO_GOOGLE(500, "Google Storage에 업로드하지 못했습니다."),
     UPLOAD_FAIL_TO_S3(500, "S3에 업로드하지 못했습니다."),
     EMPTY_IMAGE_FILE(500, "첨부 파일이 없습니다."),
-    //JSON
+    // JSON
     JSON_PARSING_ERROR(500, "API JSON에서 정보를 파싱하는 중 문제가 발생했습니다."),
     // Oauth2, JWT
     ILLEGAL_REGISTRATION_ID(500, "잘못된 registrationId입니다."),
     DATABASE_ERROR(500, "데이터베이스 오류가 발생했습니다."),
     INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다."),
+    // FCM
+    FIREBASE_SDK_ERROR(500, "Firebase Admin SDK 비공개 키를 찾을 수 없습니다."),
 
     ;
 
