@@ -5,9 +5,12 @@ import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.user.entity.User;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExcerptCreateRequestDto {
     @NotNull private String excerptContent;
     @NotNull private Long pageNumber;
