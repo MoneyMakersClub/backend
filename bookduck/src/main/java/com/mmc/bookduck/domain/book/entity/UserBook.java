@@ -22,6 +22,8 @@ public class UserBook extends BaseTimeEntity {
     @NotNull
     private ReadStatus readStatus;
 
+    private double rating;
+
     @ColumnDefault("false")
     private boolean isFinishedExpGiven;
 
@@ -48,6 +50,7 @@ public class UserBook extends BaseTimeEntity {
         this.readStatus = readStatus;
         this.user = user;
         this.bookInfo = bookInfo;
+        this.rating = 0.0;
         this.isFinishedExpGiven = false;
         this.isArchiveExpGiven = false;
         this.isOneLineExpGiven = false;
@@ -55,6 +58,9 @@ public class UserBook extends BaseTimeEntity {
 
     public void changeReadStatus(ReadStatus readStatus) {
         this.readStatus = readStatus;
+    }
+    public void changeRating(double rating) {
+        this.rating = rating;
     }
 
     // 완독 경험치 획득 표시

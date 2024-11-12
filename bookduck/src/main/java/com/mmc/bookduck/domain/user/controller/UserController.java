@@ -3,6 +3,7 @@ package com.mmc.bookduck.domain.user.controller;
 import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserReadingReportService;
+import com.mmc.bookduck.domain.user.service.UserSearchService;
 import com.mmc.bookduck.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,16 +18,16 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final UserService userService;
     private final UserGrowthService userGrowthService;
     private final UserItemService userItemService;
     private final UserReadingReportService userReadingReportService;
+    private final UserSearchService userSearchService;
 
     @Operation(summary = "유저 검색", description = "유저를 검색합니다.")
     @GetMapping("/search")
     public ResponseEntity<?> searchUsers(@RequestParam("keyword") final String keyword,
                                          @PageableDefault(size = 20) final Pageable pageable) {
-        return ResponseEntity.ok().body(userService.searchUsers(keyword, pageable));
+        return ResponseEntity.ok().body(userSearchService.searchUsers(keyword, pageable));
     }
 
     @Operation(summary = "유저 정보 조회", description = "유저의 닉네임과 기록 수를 조회합니다.")

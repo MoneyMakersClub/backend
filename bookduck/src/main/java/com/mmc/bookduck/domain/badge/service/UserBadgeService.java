@@ -1,9 +1,7 @@
 package com.mmc.bookduck.domain.badge.service;
 
-import com.mmc.bookduck.domain.archive.repository.ArchiveRepository;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
-import com.mmc.bookduck.domain.archive.service.ArchiveService;
 import com.mmc.bookduck.domain.badge.dto.common.UserBadgeUnitDto;
 import com.mmc.bookduck.domain.badge.dto.response.UserBadgeListResponseDto;
 import com.mmc.bookduck.domain.badge.entity.Badge;
@@ -11,8 +9,7 @@ import com.mmc.bookduck.domain.badge.entity.BadgeType;
 import com.mmc.bookduck.domain.badge.entity.UserBadge;
 import com.mmc.bookduck.domain.badge.repository.UserBadgeRepository;
 import com.mmc.bookduck.domain.book.service.UserBookService;
-import com.mmc.bookduck.domain.onelinerating.entity.OneLineRating;
-import com.mmc.bookduck.domain.onelinerating.repository.OneLineRatingRepository;
+import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -29,7 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserBadgeService {
     private final UserBadgeRepository userBadgeRepository;
-    private final OneLineRatingRepository oneLineRatingRepository;
+    private final OneLineRepository oneLineRepository;
     private final ReviewRepository reviewRepository;
     private final ExcerptRepository excerptRepository;
     private final UserService userService;
@@ -39,7 +36,7 @@ public class UserBadgeService {
 
     @Transactional(readOnly = true)
     public UserBadgeListResponseDto getUserBadges(Long userId) {
-        User user = userService.getUserByUserId(userId);
+        User user = userService.getActiveUserByUserId(userId);
         List<UserBadge> uniqueUserBadges = deleteDuplicateUserBadges(userBadgeRepository.findAllByUser(user));
 
         // 전체 뱃지
@@ -63,7 +60,7 @@ public class UserBadgeService {
         // 각 분야별 사용자 상태 가져오기
         long currentReadCount = userBookService.countFinishedUserBooksByUser(user);
         long currentArchiveCount = reviewRepository.countByUser(user) + excerptRepository.countByUser(user);
-        long currentOneLineCount = oneLineRatingRepository.countAllByUser(user);
+        long currentOneLineCount = oneLineRepository.countAllByUser(user);
         long currentLevel = userGrowthService.getUserGrowthByUserId(user.getUserId()).getLevel();
 
         return new UserBadgeListResponseDto(

@@ -1,6 +1,9 @@
 package com.mmc.bookduck.domain.archive.service;
 
+import com.mmc.bookduck.domain.archive.dto.request.ExcerptUpdateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.request.ReviewCreateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.request.ReviewUpdateRequestDto;
+import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
@@ -24,11 +27,24 @@ public class ReviewService {
 
     public Review createReview(ReviewCreateRequestDto requestDto){
         User user = userService.getCurrentUser();
-        UserBook userBook = userBookService.findUserBookById(requestDto.userBookId());
-        String color = requestDto.color() != null ? requestDto.color() : "#FFFFFF";
-        Visibility visibility = requestDto.visibility() != null ? requestDto.visibility() : Visibility.PUBLIC;
+        UserBook userBook = userBookService.getUserBookById(requestDto.getUserBookId());
+        String color = requestDto.getColor() != null ? requestDto.getColor() : "#FFFFFF";
+        Visibility visibility = requestDto.getVisibility() != null ? requestDto.getVisibility() : Visibility.PUBLIC;
         Review review = requestDto.toEntity(user, userBook, color, visibility);
         return reviewRepository.save(review);
+    }
+
+    public Review updateReview(Long reviewId, ReviewUpdateRequestDto requestDto) {
+        // 생성자 검증 archiveService.updateArchive에서 하고 있으므로 생략
+        Review review = getReviewById(reviewId);
+        review.updateReview(requestDto.reviewTitle(), requestDto.reviewContent(), requestDto.color(), requestDto.reviewVisibility());
+        return review;
+    }
+
+    public void deleteReview(Long reviewId) {
+        // 생성자 검증 archiveService.deleteArchive에서 하고 있으므로 생략
+        Review review = getReviewById(reviewId);
+        reviewRepository.delete(review);
     }
 
     @Transactional(readOnly = true)

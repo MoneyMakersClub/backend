@@ -1,22 +1,27 @@
 package com.mmc.bookduck.domain.book.controller;
 
+import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
+import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.RatingResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.UserBookReviewExcerptResponseDto;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Books", description = "Books 관련 API입니다.")
 @RestController
@@ -28,7 +33,7 @@ public class UserBookController {
 
     @Operation(summary = "서재에 책 추가", description = "사용자의 서재에 책을 추가합니다.")
     @PostMapping
-    public ResponseEntity<UserBookResponseDto> addUserBook(@RequestBody UserBookRequestDto dto){
+    public ResponseEntity<UserBookResponseDto> addUserBook(@Valid @RequestBody UserBookRequestDto dto){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(userBookService.addUserBook(dto));
     }
@@ -58,7 +63,6 @@ public class UserBookController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userBookService.getAllUserBook(sort));
     }
-
 
     @Operation(summary = "상태별 서재 책 목록 조회", description = "사용자의 서재 책 목록을 상태별로 조회합니다.")
     @GetMapping("/filter")
@@ -90,8 +94,42 @@ public class UserBookController {
 
     @Operation(summary = "책 직접 등록", description = "사용자가 책을 직접 등록합니다.")
     @PostMapping(value = "/custom", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<CustomBookResponseDto> createCustomBook(@ModelAttribute final CustomBookRequestDto requestDto) {
+    public ResponseEntity<CustomBookResponseDto> createCustomBook(@Valid @ModelAttribute final CustomBookRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body((userBookService.createCustomBook(requestDto)));
+    }
+
+
+    //userBook의 기록과 발췌 통합 조회
+    @Operation(summary = "서재책/Custom책 전체 기록 조회", description = "사용자의 서재책/Custom책의 전체 기록을 조회합니다.(감상평+발췌)")
+    @GetMapping("/{userbookId}/reviewexcerpt")
+    public ResponseEntity<UserBookReviewExcerptResponseDto> getAllUserBookReviewExcerpt(@PathVariable(name = "userbookId") final Long userbookId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.getAllUserBookReviewExcerpt(userbookId));
+    }
+
+
+    //별점 등록
+    @Operation(summary = "별점 등록(수정)", description = "서재 책의 별점을 등록(수정)합니다.")
+    @PatchMapping("/{userbookId}/rating")
+    public ResponseEntity<RatingResponseDto> ratingUserBook(@PathVariable(name = "userbookId") final Long userbookId,
+                                                            @Valid @RequestBody final RatingRequestDto dto){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.ratingUserBook(userbookId, dto));
+    }
+
+    //별점 삭제
+    @Operation(summary = "별점 삭제", description = "서재 책의 별점을 삭제합니다.")
+    @DeleteMapping("/{userbookId}/rating")
+    public ResponseEntity<RatingResponseDto> deleteRating(@PathVariable(name = "userbookId") final Long userbookId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.deleteRating(userbookId));
+    }
+
+    @Operation(summary = "검색페이지-최근 기록한책 목록 조회", description = "검색페이지 - 최근 기록한 책 3개를 조회합니다.")
+    @GetMapping("/recent")
+    public ResponseEntity<BookListResponseDto<BookCoverImageUnitDto>> getRecentRecordBooks(){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userBookService.getRecentRecordBooks());
     }
 }
