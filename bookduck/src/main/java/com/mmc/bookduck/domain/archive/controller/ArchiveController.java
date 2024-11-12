@@ -49,7 +49,7 @@ public class ArchiveController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     @Operation(summary = "발췌 및 감상평 통합 수정", description = "발췌와 감상평을 수정합니다.(없던 종류의 독서기록을 남기는 것 역시 가능함)")
     public ResponseEntity<?> updateArchive(@PathVariable("id") final Long id, @RequestParam("type") final ArchiveType archiveType,
                                            @Valid @RequestBody ArchiveUpdateRequestDto requestDto) {
