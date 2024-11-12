@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.archive.controller;
 
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.request.ArchiveUpdateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.response.ArchiveResponseDto;
 import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.domain.archive.service.ArchiveService;
@@ -48,11 +49,21 @@ public class ArchiveController {
         return ResponseEntity.ok(responseDto);
     }
 
-//    @PatchMapping("/{id}")
-//    @Operation(summary = "발췌 및 감상평 통합 수정", description = "발췌와 감상평을 수정합니다.")
-//    public ResponseEntity<?> updateArchive(PathVariable("id") final Long id, @RequestParam("type") final ArchiveType archiveType) {
-//        ArchiveResponseDto responseDto = archiveService.updateArchive(id, archiveType);
-//        return ResponseEntity.ok(responseDto);
-//    }
+    @PatchMapping("/{id}")
+    @Operation(summary = "발췌 및 감상평 통합 수정", description = "발췌와 감상평을 수정합니다.(없던 종류의 독서기록을 남기는 것 역시 가능함)")
+    public ResponseEntity<?> updateArchive(@PathVariable("id") final Long id, @RequestParam("type") final ArchiveType archiveType,
+                                           @Valid @RequestBody ArchiveUpdateRequestDto requestDto) {
+        ArchiveResponseDto responseDto = archiveService.updateArchive(id, archiveType, requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @DeleteMapping("/{archiveId}")
+    @Operation(summary = "발췌 및 감상평 통합 삭제", description = "발췌와 감상평을 동시에 또는 선택적으로 삭제합니다.")
+    public ResponseEntity<?> deleteArchive(@PathVariable("archiveId") final Long archiveId,
+                                           @RequestHeader(value = "Review-Id", required = false) Long reviewId,
+                                           @RequestHeader(value = "Excerpt-Id", required = false) Long excerptId){
+        archiveService.deleteArchive(archiveId, reviewId, excerptId);
+        return ResponseEntity.ok().build();
+    }
 
 }

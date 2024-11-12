@@ -3,16 +3,14 @@ package com.mmc.bookduck.domain.book.service;
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
-import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
-import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
-import com.mmc.bookduck.domain.book.dto.response.*;
+import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
-import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -22,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,7 +85,7 @@ public class UserBookService {
         if (excerpt != null) {
             return excerpt.getUserBook();
         } else if (review != null) {
-            return findUserBookById(review.getUserBook().getUserBookId());
+            return getUserBookById(review.getUserBook().getUserBookId());
         } else {
             throw new CustomException(ErrorCode.USERBOOK_NOT_FOUND);
         }
@@ -112,7 +109,7 @@ public class UserBookService {
 
     // 서재에서 책 삭제
     public String deleteUserBook(Long userBookId) {
-        UserBook userBook = findUserBookById(userBookId);
+        UserBook userBook = getUserBookById(userBookId);
         User user = userService.getCurrentUser();
 
         // 권한체크
@@ -140,7 +137,7 @@ public class UserBookService {
             throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
         }
 
-        UserBook userBook = findUserBookById(userBookId);
+        UserBook userBook = getUserBookById(userBookId);
 
         User user = userService.getCurrentUser();
 
@@ -155,7 +152,7 @@ public class UserBookService {
     }
 
     @Transactional(readOnly = true)
-    public UserBook findUserBookById(Long userBookId){
+    public UserBook getUserBookById(Long userBookId){
         UserBook userBook = userBookRepository.findById(userBookId)
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
         return userBook;
@@ -301,5 +298,14 @@ public class UserBookService {
     @Transactional(readOnly = true)
     public long countFinishedUserBooksByUser(User user) {
         return userBookRepository.countByUserAndReadStatus(user, ReadStatus.FINISHED);
+    }
+
+    @Transactional(readOnly = true)
+    public void validateUserBookOwner(Long userBookId) {
+        UserBook userBook = getUserBookById(userBookId);
+        User currentUser = userService.getCurrentUser();
+        if(!userBook.getUser().getUserId().equals(currentUser.getUserId())){
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+        }
     }
 }
