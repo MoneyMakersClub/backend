@@ -28,14 +28,14 @@ public class UserGrowthService {
     @Transactional(readOnly = true)
     public UserGrowth getUserGrowthByUserId(Long userId)
     {
-        User user = userService.getUserByUserId(userId);
+        User user = userService.getActiveUserByUserId(userId);
         return userGrowthRepository.findByUser(user)
                 .orElseThrow(()-> new CustomException(ErrorCode.USERGROWTH_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)
     public UserInfoResponseDto getUserInfo(Long userId) {
-        User user = userService.getUserByUserId(userId);
+        User user = userService.getActiveUserByUserId(userId);
         int currentYear = Year.now().getValue();
         long reviewCount = reviewRepository.countByUserAndCreatedTimeThisYear(user, currentYear);
         long excerptCount = excerptRepository.countByUserAndCreatedTimeThisYear(user, currentYear);

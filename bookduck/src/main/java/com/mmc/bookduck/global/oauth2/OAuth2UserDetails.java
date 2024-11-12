@@ -14,7 +14,8 @@ public record OAuth2UserDetails(
         String attributeKey,
         String email,
         Boolean isNewUser, // 신규 회원 여부
-        String role // 권한
+        String role, // 권한
+        Long userId // userId
 ) implements OAuth2User, UserDetails {
 
     @Override

@@ -30,7 +30,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             // 액세스 토큰 유효 시간
             int expiresIn = jwtUtil.getAccessTokenMaxAge();
 
-             // 새로운 리프레시 토큰 발급
+            // 새로운 리프레시 토큰 발급
             String refreshToken = jwtUtil.generateRefreshToken(authentication);
             // 리프레시 토큰을 HttpOnly 쿠키에 저장
             cookieUtil.addCookie(response, "refreshToken", refreshToken, jwtUtil.getRefreshTokenMaxAge());
@@ -38,6 +38,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             // OAuth2UserDetails를 통해 신규 유저 여부 확인
             OAuth2UserDetails userDetails = (OAuth2UserDetails) authentication.getPrincipal();
             boolean isNewUser = userDetails.isNewUser();
+
+            // userId를 건넴
+            Long userId = userDetails.userId();
 
             // 로그 출력용
             if (isNewUser) {
@@ -51,6 +54,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .queryParam("accessToken", accessToken)
                     .queryParam("expiresIn", expiresIn)
                     .queryParam("isNewUser", isNewUser)
+                    .queryParam("userId", userId)
                     .build()
                     .toUriString();
             response.sendRedirect(redirectUrl);
