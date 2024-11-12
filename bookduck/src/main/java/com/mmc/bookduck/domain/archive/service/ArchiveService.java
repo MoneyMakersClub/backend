@@ -118,12 +118,17 @@ public class ArchiveService {
         UserBook userBook = getUserBookFromExcerptOrReview(reviewId, excerptId);
         // 생성자 검증
         userBookService.validateUserBookOwner(userBook.getUserBookId());
-        if (excerptId != null && archive.getExcerpt() != null && archive.getExcerpt().getExcerptId().equals(excerptId)) {
+        if (excerptId != null && archive.getExcerpt() != null) {
+            if (!archive.getExcerpt().getExcerptId().equals(excerptId)) {
+                throw new CustomException(ErrorCode.ARCHIVE_DOES_NOT_MATCH);
+            }
             excerptService.deleteExcerpt(excerptId);
             archive.updateExcerpt(null);
         }
-        if (reviewId != null && archive.getReview() != null &&
-                archive.getReview().getReviewId().equals(reviewId)) {
+        if (reviewId != null && archive.getReview() != null) {
+            if (!archive.getReview().getReviewId().equals(reviewId)) {
+                throw new CustomException(ErrorCode.ARCHIVE_DOES_NOT_MATCH);
+            }
             reviewService.deleteReview(reviewId);
             archive.updateReview(null);
         }

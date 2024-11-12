@@ -19,6 +19,7 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(400, "입력값이 잘못되었습니다."),
     MISSING_PARAMETER(400, "필수 파라미터가 누락되었습니다."),
     INVALID_UNLOCK_CONDITION(400, "해제 조건이 잘못되었습니다."),
+    ARCHIVE_DOES_NOT_MATCH(404, "발췌/리뷰Id와 archive에 등록된 Id가 일치하지않습니다."),
     // enum 값이 잘못됨
     INVALID_ENUM_VALUE(400, "enum 값이 잘못되었습니다."),
     ITEMTYPE_MISMATCH(400,"ItemType이 맞지 않습니다."),
