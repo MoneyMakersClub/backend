@@ -303,8 +303,8 @@ public class UserBookService {
 
     @Transactional
     public RatingResponseDto ratingUserBook(Long userbookId, RatingRequestDto dto) {
-        if(dto.rating() == 0.0 || dto.rating() < 0.0){
-            throw new CustomException(ErrorCode.INVALID_INPUT_FORMAT);
+        if ((dto.rating() % 0.5) != 0.0){
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
         }
         UserBook userBook = findUserBookById(userbookId);
         userBook.changeRating(dto.rating());
