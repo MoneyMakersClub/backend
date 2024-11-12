@@ -18,5 +18,5 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
 
     List<Excerpt> findExcerptByUserBookOrderByCreatedTimeDesc(UserBook userBook);
 
-    List<Excerpt> findAllByUserAndCreatedTimeAfter(User user, LocalDateTime monthsAgo);
+    List<Excerpt> findAllByUserAndCreatedTimeAfter(User user, LocalDateTime createdTime);
 }
