@@ -138,10 +138,15 @@ public class BookInfoService {
 
         if(bookInfo.isPresent()){
             MyRatingOneLineReadStatusDto my = getMyRatingOneLineReadStatus(bookInfo.get(), user);
-            return new BookInfoBasicResponseDto(getRatingAverage(bookInfo.get()), my.myOneLine(),my.myRating(), my.readStatus(), additional);
+            Optional<UserBook> userBook = userBookRepository.findByUserAndBookInfo(user, bookInfo.get());
+            if(userBook.isPresent()){
+                return BookInfoBasicResponseDto.from(userBook.get(), getRatingAverage(bookInfo.get()), my.myOneLine(), additional);
+            }else{
+                return new BookInfoBasicResponseDto(bookInfo.get().getBookInfoId(), null, getRatingAverage(bookInfo.get()), null, 0.0, null, additional);
+            }
         }
         else{
-            return new BookInfoBasicResponseDto(null, null, 0.0, null, additional);
+            return new BookInfoBasicResponseDto(null, null, null, null, 0.0, null, additional);
         }
     }
 

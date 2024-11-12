@@ -236,12 +236,12 @@ public class UserBookService {
                 .orElse(null);
         Double ratingAverage = bookInfoService.getRatingAverage(userBook.getBookInfo());
 
-        return new BookInfoBasicResponseDto(
-                ratingAverage,
-                oneLine !=null ? oneLine.getOneLineContent() : null,
-                userBook.getRating(),
-                userBook.getReadStatus(),
-                detailDto);
+        if(oneLine != null){
+            return BookInfoBasicResponseDto.from(userBook, ratingAverage, oneLine.getOneLineContent(), detailDto);
+        }
+        else{
+            return BookInfoBasicResponseDto.from(userBook, ratingAverage, null, detailDto);
+        }
     }
 
 
