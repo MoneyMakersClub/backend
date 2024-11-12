@@ -60,8 +60,7 @@ public class ArchiveController {
     @DeleteMapping("/{archiveId}")
     @Operation(summary = "발췌 및 감상평 통합 삭제", description = "발췌와 감상평을 동시에 또는 선택적으로 삭제합니다.")
     public ResponseEntity<?> deleteArchive(@PathVariable("archiveId") final Long archiveId,
-                                           @RequestParam(required = false) Long reviewId,
-                                           @RequestParam(required = false) Long excerptId){
+                                           @RequestParam(name = "excerptId", required = false) Long excerptId, @RequestParam(name = "reviewId", required = false) Long reviewId){
         archiveService.deleteArchive(archiveId, reviewId, excerptId);
         return ResponseEntity.ok().build();
     }
