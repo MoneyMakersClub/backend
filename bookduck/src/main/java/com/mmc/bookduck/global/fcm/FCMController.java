@@ -1,5 +1,6 @@
 package com.mmc.bookduck.global.fcm;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +15,11 @@ import org.springframework.web.bind.annotation.*;
 public class FCMController {
     private final FCMService fcmService;
 
+    @Operation(summary = "FCM 토큰 저장", description = "유저의 FCM 토큰을 저장합니다.")
     @PostMapping("/{userId}/token")
-    public ResponseEntity<String> getFcmToken(@PathVariable Long userId,
-                                             @Valid @RequestBody PostTokenReq postTokenReq) {
-        return ResponseEntity.ok().body(fcmService.getFcmToken(userId, postTokenReq.getFcmToken()));
+    public ResponseEntity<String> setFcmToken(@PathVariable Long userId,
+                                             @RequestBody @Valid FCMTokenRequestDto requestDto) {
+        fcmService.setFcmToken(userId, requestDto.getFcmToken());
+        return ResponseEntity.ok().build();
     }
 }

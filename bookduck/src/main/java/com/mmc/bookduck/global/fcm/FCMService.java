@@ -26,11 +26,11 @@ public class FCMService {
     private final UserService userService;
 
     @Transactional
-    public String getFcmToken(Long userId, String fcmToken) {
+    public void setFcmToken(Long userId, String fcmToken) {
         // 해당 아이디 가진 유저가 존재하는지 검사
         User user = userService.getActiveUserByUserId(userId);
         user.setFcmToken(fcmToken);
-        return "토큰이 성공적으로 저장되었습니다";
+        log.info("User " + userId + "의 FCM 토큰이 성공적으로 저장되었습니다");
     }
 
     // 토큰 기반 전송
