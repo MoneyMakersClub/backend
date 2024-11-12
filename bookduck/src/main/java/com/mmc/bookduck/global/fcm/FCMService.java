@@ -2,10 +2,17 @@ package com.mmc.bookduck.global.fcm;
 
 
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.repository.UserRepository;
+import com.mmc.bookduck.domain.user.service.UserService;
+import com.mmc.bookduck.global.security.RedisService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -13,46 +20,31 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class FCMService {
+    private final UserService userService;
 
-    /**
-     * 토큰 기반 전송 -> 특정 사용자의 디바이스에 개별적인 알림을 전송(특정 한명에게 전송)
-     * @param fcmToken
-     * @param scheduleNotificationDto
-     */
-    public void sendNotificationToToken(String fcmToken,
-                                        ScheduleNotificationDto scheduleNotificationDto) {
+    @Transactional
+    public String getFcmToken(Long userId, String fcmToken) {
+        // 해당 아이디 가진 유저가 존재하는지 검사
+        User user = userService.getActiveUserByUserId(userId);
+        user.setFcmToken(fcmToken);
+        return "토큰이 성공적으로 저장되었습니다";
+    }
 
-        Message message = Message.builder()
-                .setNotification(getnotification())
-                .setToken(fcmToken)
-                .putAllData(getData(scheduleNotificationDto))
+    // 토큰 기반 전송
+    public void sendPushMessage(String token, String title, String body) {
+        Message message = Message.builder().setNotification(Notification.builder()
+                        .setTitle(title)
+                        .setBody(body)
+                        .build())
+                .setToken(token)  // 대상 디바이스의 등록 토큰
                 .build();
-
         try {
             String response = FirebaseMessaging.getInstance().send(message);
             log.info("전송 성공: " + response);
-        } catch (Exception e) {
+        } catch (FirebaseMessagingException e) {
             log.info("전송 실패: " + e);
         }
-    }
-
-    private Notification getnotification(){
-        Notification notification = Notification.builder()
-                .setTitle("새로운 알림")
-                .setBody("알림이 생성되었습니다")
-                .build();
-        return notification;
-    }
-
-    private Map<String, String> getData(ScheduleNotificationDto scheduleNotificationDto) {
-        Map<String, String> data = new HashMap<>();
-        data.put("alarmId", scheduleNotificationDto.alarmId().toString());
-        data.put("nickname", scheduleNotificationDto.nickname());
-        data.put("alarmType", scheduleNotificationDto.alarmType().toString());
-        data.put("message", scheduleNotificationDto.message());
-        data.put("url", scheduleNotificationDto.url());
-        data.put("createdTime", scheduleNotificationDto.createdTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-        return data;
     }
 }
