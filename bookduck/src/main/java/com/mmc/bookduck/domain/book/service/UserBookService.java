@@ -1,17 +1,26 @@
 package com.mmc.bookduck.domain.book.service;
 
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.response.ExcerptResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.ReviewResponseDto;
+import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
+import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
+import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
+import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
+import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
+import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
+import com.mmc.bookduck.domain.book.dto.common.ReviewExcerptUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
-import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.*;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
+import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -19,12 +28,13 @@ import com.mmc.bookduck.global.common.BaseTimeEntity;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -217,7 +227,7 @@ public class UserBookService {
     // 서재책 상세보기 - 기본정보
     @Transactional(readOnly = true)
     public BookInfoBasicResponseDto getUserBookInfoBasic(Long userBookId) {
-        UserBook userBook = findUserBookById(userBookId);
+        UserBook userBook = getUserBookById(userBookId);
 
         String koreanGenreName = genreService.genreNameToKorean(userBook.getBookInfo().getGenre());
         BookInfoDetailDto detailDto = BookInfoDetailDto.from(userBook.getBookInfo(), koreanGenreName);
@@ -238,7 +248,7 @@ public class UserBookService {
     // 서재 책 상세보기 - 추가정보
     @Transactional(readOnly = true)
     public BookInfoAdditionalResponseDto getUserBookInfoAdditional(Long userBookId) {
-        UserBook userBook = findUserBookById(userBookId);
+        UserBook userBook = getUserBookById(userBookId);
         List<UserBook> sameBookInfo_userBookList = findAllUserBookByBookInfo(userBook.getBookInfo());
 
         List<BookRatingUnitDto> oneLineList = new ArrayList<>();
@@ -296,7 +306,7 @@ public class UserBookService {
         if ((dto.rating() % 0.5) != 0.0){
             throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
         }
-        UserBook userBook = findUserBookById(userbookId);
+        UserBook userBook = getUserBookById(userbookId);
         userBook.changeRating(dto.rating());
 
         return RatingResponseDto.from(userBook);
@@ -304,7 +314,7 @@ public class UserBookService {
 
     @Transactional
     public RatingResponseDto deleteRating(Long userbookId) {
-        UserBook userBook = findUserBookById(userbookId);
+        UserBook userBook = getUserBookById(userbookId);
         userBook.changeRating(0.0);
 
         return RatingResponseDto.from(userBook);
@@ -312,7 +322,7 @@ public class UserBookService {
 
     @Transactional(readOnly = true)
     public UserBookReviewExcerptResponseDto getAllUserBookReviewExcerpt(Long userbookId) {
-        UserBook userBook = findUserBookById(userbookId);
+        UserBook userBook = getUserBookById(userbookId);
         List<Excerpt> excerpts = excerptRepository.findExcerptByUserBookOrderByCreatedTimeDesc(userBook);
         List<Review> reviews = reviewRepository.findReviewByUserBookOrderByCreatedTimeDesc(userBook);
 
