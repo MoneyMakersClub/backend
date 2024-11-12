@@ -42,5 +42,5 @@ src/main/resources/application-prod.yml
 src/main/resources/application-oauth.yml
 
 src/main/resources/mmc-bookduck-ocr.json
-src/main/resources/bookduck-3654b-firebase-adminsdk-qn65k-62b4610ee2.json
+src/main/resources/bookduck-firebase-adminsdk.json
 
