@@ -307,12 +307,12 @@ public class BookInfoService {
         UserBook userBook = userBookRepository.findByUserAndBookInfo(user, bookInfo)
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
 
-        User BookInfoCreaterUser = userService.getActiveUserByUserId(bookInfo.getCreatedUserId());
+        User bookInfoCreaterUser = userService.getActiveUserByUserId(bookInfo.getCreatedUserId());
 
         if(bookInfo.getCreatedUserId().equals(user.getUserId())){ // 내 customBook
             MyRatingOneLineReadStatusDto myRatingOneLine = getMyRatingOneLineReadStatus(bookInfo, user);
             return CustomBookResponseDto.from(userBook, myRatingOneLine.myRating(), myRatingOneLine.myOneLine(), true);
-        }else if(friendService.isFriendWithCurrentUser(BookInfoCreaterUser)){ //친구 customBook
+        }else if(friendService.isFriendWithCurrentUser(bookInfoCreaterUser)){ //친구 customBook
             return CustomBookResponseDto.from(userBook, false);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST); //내것도 아니고 친구것도 아닌 경우
