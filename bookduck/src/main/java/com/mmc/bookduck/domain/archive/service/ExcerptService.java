@@ -1,6 +1,8 @@
 package com.mmc.bookduck.domain.archive.service;
 
 import com.mmc.bookduck.domain.archive.dto.request.ExcerptCreateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.request.ExcerptUpdateRequestDto;
+import com.mmc.bookduck.domain.archive.entity.Archive;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
@@ -11,11 +13,9 @@ import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -24,15 +24,28 @@ public class ExcerptService {
     private final UserService userService;
     private final UserBookService userBookService;
 
+    // 생성
     public Excerpt createExcerpt(ExcerptCreateRequestDto requestDto){
-        log.debug("createExcerpt 접근 시도 : ", requestDto);
         User user = userService.getCurrentUser();
-        UserBook userBook = userBookService.findUserBookById(requestDto.getUserBookId());
-        log.debug("userBookId : ", userBook);
+        UserBook userBook = userBookService.getUserBookById(requestDto.getUserBookId());
         Visibility visibility = requestDto.getVisibility() != null ? requestDto.getVisibility() : Visibility.PUBLIC;
         Excerpt excerpt = requestDto.toEntity(user, userBook, false, visibility);
-        log.debug("excerpt : ", excerpt);
         return excerptRepository.save(excerpt);
+    }
+
+    // 수정
+    public Excerpt updateExcerpt(Long excerptId, ExcerptUpdateRequestDto requestDto) {
+        // 생성자 검증 archiveService.updateArchive에서 하고 있으므로 생략
+        Excerpt excerpt = getExcerptById(excerptId);
+        excerpt.updateExcerpt(requestDto.excerptContent(), requestDto.pageNumber(), requestDto.excerptVisibility());
+        return excerpt;
+    }
+
+    // 삭제
+    public void deleteExcerpt(Long excerptId) {
+        // 생성자 검증 archiveService.deleteArchive에서 하고 있으므로 생략
+        Excerpt excerpt = getExcerptById(excerptId);
+        excerptRepository.delete(excerpt);
     }
 
     @Transactional(readOnly = true)
@@ -40,5 +53,8 @@ public class ExcerptService {
         return excerptRepository.findById(excerptId)
                 .orElseThrow(() -> new CustomException(ErrorCode.EXCERPT_NOT_FOUND));
     }
+
+
+
 
 }
