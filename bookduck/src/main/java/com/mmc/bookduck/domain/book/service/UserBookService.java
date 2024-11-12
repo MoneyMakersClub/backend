@@ -60,7 +60,7 @@ public class UserBookService {
 
     public CustomBookResponseDto createCustomBook(CustomBookRequestDto requestDto) {
         UserBook userBook = createCustomBookEntity(requestDto);
-        return CustomBookResponseDto.from(userBook, 0.0, null);
+        return CustomBookResponseDto.from(userBook, 0.0, null, true);
     }
 
     // 서재에 책 추가
