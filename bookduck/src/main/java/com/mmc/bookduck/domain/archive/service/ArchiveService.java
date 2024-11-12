@@ -1,6 +1,9 @@
 package com.mmc.bookduck.domain.archive.service;
 
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.request.ArchiveUpdateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.request.ExcerptCreateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.request.ReviewCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.response.ArchiveResponseDto;
 import com.mmc.bookduck.domain.archive.dto.response.ExcerptResponseDto;
 import com.mmc.bookduck.domain.archive.dto.response.ReviewResponseDto;
@@ -58,18 +61,50 @@ public class ArchiveService {
 
     @Transactional(readOnly = true)
     public ArchiveResponseDto getArchive(Long id, ArchiveType archiveType) {
-        Archive archive;
-        if (ArchiveType.EXCERPT.equals(archiveType)) {
-            archive = archiveRepository.findByExcerpt_ExcerptId(id)
-                    .orElseThrow(()-> new CustomException(ErrorCode.EXCERPT_NOT_FOUND));
-        } else if (ArchiveType.REVIEW.equals(archiveType)) {
-            archive = archiveRepository.findByReview_ReviewId(id)
-                    .orElseThrow(()->new CustomException(ErrorCode.REVIEW_NOT_FOUND));
-        } else {
-            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
-        }
+        Archive archive = findArchiveByType(id, archiveType);
         UserBook userBook = userBookService.getUserBookFromExcerptOrReview(archive.getExcerpt(), archive.getReview());
         return createArchiveResponseDto(archive, archive.getExcerpt(), archive.getReview(), userBook);
+    }
+
+    public ArchiveResponseDto updateArchive(Long id, ArchiveType archiveType, ArchiveUpdateRequestDto requestDto) {
+        Archive archive = findArchiveByType(id, archiveType);
+        UserBook userBook = userBookService.getUserBookFromExcerptOrReview(archive.getExcerpt(), archive.getReview());
+        User currentUser = userService.getCurrentUser();
+        // 발췌 수정 혹은 생성
+        Excerpt updatedExcerpt = Optional.ofNullable(requestDto.excerpt())
+                .map(dto -> {
+                    if (archive.getExcerpt() == null) {
+                        ExcerptCreateRequestDto createRequestDto = ExcerptCreateRequestDto.builder()
+                                .excerptContent(dto.excerptContent())
+                                .pageNumber(dto.pageNumber())
+                                .visibility(dto.excerptVisibility())
+                                .userBookId(userBook.getUserBookId())
+                                .build();
+                        return excerptService.createExcerpt(createRequestDto);
+                    } else {
+                        return excerptService.updateExcerpt(archive.getExcerpt().getExcerptId(), dto.toExcerptEntity(userBook.getUserBookId()));
+                    }
+                })
+                .orElse(archive.getExcerpt());
+        // 리뷰 수정 혹은 생성
+        Review updatedReview = Optional.ofNullable(requestDto.review())
+                .map(dto -> {
+                    if (archive.getReview() == null) {
+                        ReviewCreateRequestDto createRequestDto = ReviewCreateRequestDto.builder()
+                                .reviewTitle(dto.reviewTitle())
+                                .reviewContent(dto.reviewContent())
+                                .color(dto.color())
+                                .visibility(dto.reviewVisibility())
+                                .userBookId(userBook.getUserBookId())
+                                .build();
+                    } else {
+                        return reviewService.updateReview(archive.getReview().getReviewId(), dto.toReviewEntity(userBook.getUserBookId()));
+                    }
+                }
+                .orElse(archive.getReview());
+        archive.updateArchive(updatedExcerpt, updatedReview);
+        archiveRepository.save(archive);
+        return createArchiveResponseDto(archive, updatedExcerpt, updatedReview, userBook);
     }
 
     public ArchiveResponseDto createArchiveResponseDto(Archive archive, Excerpt excerpt, Review review, UserBook userBook) {
@@ -84,5 +119,14 @@ public class ArchiveService {
         );
     }
 
+    public Archive findArchiveByType(Long id, ArchiveType archiveType) {
+        return switch (archiveType) {
+            case EXCERPT -> archiveRepository.findByExcerpt_ExcerptId(id)
+                    .orElseThrow(() -> new CustomException(ErrorCode.EXCERPT_NOT_FOUND));
+            case REVIEW -> archiveRepository.findByReview_ReviewId(id)
+                    .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
+            default -> throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
+        };
+    }
 
 }

@@ -6,9 +6,11 @@ import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.user.entity.User;
 import jakarta.validation.constraints.NotNull;
 
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class ReviewCreateRequestDto {
     @NotNull private String reviewTitle;
     @NotNull private String reviewContent;
