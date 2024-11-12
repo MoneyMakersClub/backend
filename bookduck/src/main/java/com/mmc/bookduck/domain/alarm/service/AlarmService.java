@@ -4,22 +4,19 @@ import com.mmc.bookduck.domain.alarm.dto.response.AlarmListResponseDto;
 import com.mmc.bookduck.domain.alarm.dto.response.AlarmUnitDto;
 import com.mmc.bookduck.domain.alarm.dto.ssedata.AlarmDefaultDataDto;
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
-import com.mmc.bookduck.domain.alarm.entity.AlarmType;
+import com.mmc.bookduck.domain.alarm.entity.PushAlarmFormat;
 import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.mmc.bookduck.global.fcm.FCMService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +27,7 @@ public class AlarmService {
     private final AlarmRepository alarmRepository;
     private final EmitterService emitterService;
     private final UserService userService;
+    private final FCMService fcmService;
 
     // 최근 알림 목록 읽어오기
     public AlarmListResponseDto getAndReadRecentAlarms(){
@@ -38,17 +36,15 @@ public class AlarmService {
         return AlarmListResponseDto.fromAlarmUnitDto(alarmUnitDtos);
     }
 
-    // 팔로우 알림 생성
-    public void createFriendRequestAlarm(User sender, User receiver) {
-        String message = MessageFormat.format(AlarmType.FRIEND_REQUEST.getMessagePattern(), sender.getNickname());
-        Alarm alarm = Alarm.builder()
-                .alarmType(AlarmType.FRIEND_REQUEST)
-                .message(message)
-                .sender(sender)
-                .receiver(receiver)
-                .build();
+    // Alarm 생성 읽어오기
+    public void createAlarm(Alarm alarm, User receiver) {
         alarmRepository.save(alarm);
         emitterService.notify(receiver.getUserId(), AlarmDefaultDataDto.from(true), "new alarm");
+
+        // 푸시알림 전송
+        if (alarm.getAlarmType().isSendPush()) {
+            fcmService.sendPushMessage(receiver.getFcmToken(), PushAlarmFormat.valueOf(alarm.getAlarmType().name()));
+        }
     }
 
     public void deleteAllAlarmsOfMember(User user){
@@ -62,10 +58,7 @@ public class AlarmService {
         Slice<Alarm> alarmSlice = alarmRepository.findByReceiverOrderByCreatedTimeDesc(currentUser, pageable);
         if (alarmSlice != null && alarmSlice.hasContent()) {
             for (Alarm alarm : alarmSlice) {
-                String message = switch (alarm.getAlarmType()){
-                    case FRIEND_REQUEST -> MessageFormat.format(AlarmType.FRIEND_REQUEST.getMessagePattern(), alarm.getSender().getNickname(), alarm.getSender().getHandle());
-                    case DEFAULT -> MessageFormat.format(AlarmType.DEFAULT.getMessagePattern(), alarm.getSender().getNickname(), alarm.getSender().getHandle());
-                };
+                String message = alarm.getMessage();
                 alarmList.add(AlarmUnitDto.from(alarm, message));
                 alarm.readAlarm();
             }

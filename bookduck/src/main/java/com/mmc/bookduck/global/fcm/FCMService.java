@@ -5,6 +5,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import com.mmc.bookduck.domain.alarm.entity.PushAlarmFormat;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -33,10 +34,10 @@ public class FCMService {
     }
 
     // 토큰 기반 전송
-    public void sendPushMessage(String token, String title, String body) {
+    public void sendPushMessage(String token, PushAlarmFormat pushAlarmFormat) {
         Message message = Message.builder().setNotification(Notification.builder()
-                        .setTitle(title)
-                        .setBody(body)
+                        .setTitle(pushAlarmFormat.getTitle())
+                        .setBody(pushAlarmFormat.getBody())
                         .build())
                 .setToken(token)  // 대상 디바이스의 등록 토큰
                 .build();
