@@ -17,12 +17,18 @@ jobs:
           java-version: 21
           distribution: 'zulu'
 
-      - name: Make application.yml, Make firebase admin sdk
+      - name: Make application.yml
         run: |
           mkdir -p ./bookduck/src/main/resources # 디렉토리가 없으면 생성
           echo "${{ secrets.APPLICATION }}" > ./bookduck/src/main/resources/application.yml
-          echo "${{ secrets.BOOKDUCK_FIREBASE_ADMINSDK }}" > ./bookduck/src/main/resources/bookduck-firebase-adminsdk.json
 
+      - name: Create firebase admin sdk JSON file
+        uses: jsdaniell/create-json@v1.2.2
+        with:
+          name: "bookduck-firebase-adminsdk.json"
+          json: ${{ secrets.BOOKDUCK_FIREBASE_ADMINSDK }}
+          dir: './bookduck/src/main/resources'
+          
       - name: Gradle Caching
         uses: actions/cache@v3
         with:
