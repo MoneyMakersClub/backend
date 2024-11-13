@@ -41,14 +41,14 @@ public class HomeBlock {
     private String imgPath;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", updatable = false)
+    @JoinColumn(name = "user_home_id", updatable = false)
     @NotNull
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private User user;
+    private UserHome userHome;
 
     @Builder
     public HomeBlock(BlockType blockType, Long xCoordinate, Long yCoordinate, Long width, Long height,
-                     String title, String content, String imgPath, User user) {
+                     String title, String content, String imgPath, UserHome userHome) {
         this.blockType = blockType;
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
@@ -57,6 +57,6 @@ public class HomeBlock {
         this.title = title;
         this.content = content;
         this.imgPath = imgPath;
-        this.user = user;
+        this.userHome = userHome;
     }
 }
