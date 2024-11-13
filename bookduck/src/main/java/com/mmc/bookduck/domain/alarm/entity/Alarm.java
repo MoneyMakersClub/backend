@@ -26,6 +26,12 @@ public class Alarm extends CreatedTimeEntity {
 
     private String url;
 
+    private String resourceName;
+
+    private Long resourceId;
+
+    private String resourceValue;
+
     @ColumnDefault("false")
     private boolean isRead;
 
@@ -41,13 +47,17 @@ public class Alarm extends CreatedTimeEntity {
     private User receiver;
 
     @Builder
-    public Alarm(AlarmType alarmType, String message, String url, User sender, User receiver) {
+    public Alarm(AlarmType alarmType, User sender, User receiver ,String message,
+                 String url, String resourceName, Long resourceId, String resourceValue) {
         this.alarmType = alarmType;
-        this.message = message;
-        this.url = url;
         this.isRead = false;
         this.sender = sender; // null일 수 있음
         this.receiver = receiver;
+        this.message = message;
+        this.url = url;
+        this.resourceName = resourceName;
+        this.resourceId = resourceId;
+        this.resourceValue = resourceValue;
     }
     
     public void readAlarm() {

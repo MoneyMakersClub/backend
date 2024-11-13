@@ -19,10 +19,12 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(400, "입력값이 잘못되었습니다."),
     MISSING_PARAMETER(400, "필수 파라미터가 누락되었습니다."),
     INVALID_UNLOCK_CONDITION(400, "해제 조건이 잘못되었습니다."),
+    ARCHIVE_DOES_NOT_MATCH(404, "발췌/리뷰Id와 archive에 등록된 Id가 일치하지않습니다."),
     // enum 값이 잘못됨
     INVALID_ENUM_VALUE(400, "enum 값이 잘못되었습니다."),
     ITEMTYPE_MISMATCH(400,"ItemType이 맞지 않습니다."),
     USERITEM_BAD_REQUEST(400, "유저의 소유가 아닌 userItemId입니다."),
+    BOOKINFO_BAD_REQUEST(400, "API 도서가 아닌 bookInfoId입니다."),
 
 
     // 401 Unauthorized
@@ -93,12 +95,14 @@ public enum ErrorCode {
     UPLOAD_FAIL_TO_GOOGLE(500, "Google Storage에 업로드하지 못했습니다."),
     UPLOAD_FAIL_TO_S3(500, "S3에 업로드하지 못했습니다."),
     EMPTY_IMAGE_FILE(500, "첨부 파일이 없습니다."),
-    //JSON
+    // JSON
     JSON_PARSING_ERROR(500, "API JSON에서 정보를 파싱하는 중 문제가 발생했습니다."),
     // Oauth2, JWT
     ILLEGAL_REGISTRATION_ID(500, "잘못된 registrationId입니다."),
     DATABASE_ERROR(500, "데이터베이스 오류가 발생했습니다."),
     INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다."),
+    // FCM
+    FIREBASE_SDK_ERROR(500, "Firebase Admin SDK 비공개 키를 찾을 수 없습니다."),
 
     ;
 

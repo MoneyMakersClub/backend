@@ -40,7 +40,7 @@ public class ArchiveService {
     // 생성
     public ArchiveResponseDto createArchive(ArchiveCreateRequestDto requestDto) {
         // UserBook 결정(createExcerpt,Review의 findById때문에)
-        UserBook userBook = userBookService.getUserBookOrAdd(null, null, requestDto);
+        UserBook userBook = userBookService.getUserBookOrAdd(requestDto.getExcerpt(), requestDto.getReview(), requestDto);
         // Excerpt 생성 시 결정된 UserBook 사용
         Excerpt excerpt = Optional.ofNullable(requestDto.getExcerpt())
                 .map(dto -> {
@@ -64,14 +64,14 @@ public class ArchiveService {
     @Transactional(readOnly = true)
     public ArchiveResponseDto getArchive(Long id, ArchiveType archiveType) {
         Archive archive = findArchiveByType(id, archiveType);
-        UserBook userBook = userBookService.getUserBookFromExcerptOrReview(archive.getExcerpt(), archive.getReview());
+        UserBook userBook = getUserBookFromExcerptOrReview(archive.getExcerpt().getExcerptId(), archive.getReview().getReviewId());
         return createArchiveResponseDto(archive, archive.getExcerpt(), archive.getReview(), userBook);
     }
 
     // 수정
     public ArchiveResponseDto updateArchive(Long id, ArchiveType archiveType, ArchiveUpdateRequestDto requestDto) {
         Archive archive = findArchiveByType(id, archiveType);
-        UserBook userBook = userBookService.getUserBookFromExcerptOrReview(archive.getExcerpt(), archive.getReview());
+        UserBook userBook = getUserBookFromExcerptOrReview(archive.getExcerpt().getExcerptId(), archive.getReview().getReviewId());
         // 생성자 검증
         userBookService.validateUserBookOwner(userBook.getUserBookId());
         // 발췌 수정 혹은 생성
@@ -115,15 +115,20 @@ public class ArchiveService {
     // 삭제
     public void deleteArchive(Long archiveId, Long reviewId, Long excerptId) {
         Archive archive = getArchiveById(archiveId);
-        UserBook userBook = userBookService.getUserBookFromExcerptOrReview(archive.getExcerpt(), archive.getReview());
+        UserBook userBook = getUserBookFromExcerptOrReview(reviewId, excerptId);
         // 생성자 검증
         userBookService.validateUserBookOwner(userBook.getUserBookId());
-        if (excerptId != null && archive.getExcerpt() != null && archive.getExcerpt().getExcerptId().equals(excerptId)) {
+        if (excerptId != null && archive.getExcerpt() != null) {
+            if (!archive.getExcerpt().getExcerptId().equals(excerptId)) {
+                throw new CustomException(ErrorCode.ARCHIVE_DOES_NOT_MATCH);
+            }
             excerptService.deleteExcerpt(excerptId);
             archive.updateExcerpt(null);
         }
-        if (reviewId != null && archive.getReview() != null &&
-                archive.getReview().getReviewId().equals(reviewId)) {
+        if (reviewId != null && archive.getReview() != null) {
+            if (!archive.getReview().getReviewId().equals(reviewId)) {
+                throw new CustomException(ErrorCode.ARCHIVE_DOES_NOT_MATCH);
+            }
             reviewService.deleteReview(reviewId);
             archive.updateReview(null);
         }
@@ -162,6 +167,20 @@ public class ArchiveService {
     public Archive getArchiveById(Long archiveId) {
         return archiveRepository.findById(archiveId)
                 .orElseThrow(()-> new CustomException(ErrorCode.ARCHIVE_NOT_FOUND));
+    }
+
+    // UserBook 정보 불러오거나 없으면 생성하기
+    @Transactional(readOnly = true)
+    public UserBook getUserBookFromExcerptOrReview(Long excerptId, Long reviewId) {
+        if (excerptId != null) {
+            Excerpt excerpt = excerptService.getExcerptById(excerptId);
+            return excerpt.getUserBook();
+        } else if (reviewId != null) {
+            Review review = reviewService.getReviewById(reviewId);
+            return review.getUserBook();
+        } else {
+            throw new CustomException(ErrorCode.USERBOOK_NOT_FOUND);
+        }
     }
 
 

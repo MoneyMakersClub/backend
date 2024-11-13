@@ -30,11 +30,17 @@ public class BookInfoController {
         return ResponseEntity.ok(bookInfoService.searchBookList(keyword, page, size));
     }
 
+    @Operation(summary = "bookInfoId로 API 도서 상세-기본 정보 조회", description = "bookInfoId로 구글 API 도서의 기본 정보를 상세 조회합니다.(책 정보 + 현재 사용자의 별점&한줄평)")
+    @GetMapping("/{bookinfoId}")
+    public ResponseEntity<BookInfoBasicResponseDto> getApiBookBasicByBookInfoId(@PathVariable(name = "bookinfoId") final Long bookinfoId){
+        return ResponseEntity.ok(bookInfoService.getApiBookBasicByBookInfoId(bookinfoId));
+    }
 
-    @Operation(summary = "API 도서 상세-기본 정보 조회", description = "구글 API 도서의 기본 정보를 상세 조회합니다.(책 정보 + 현재 사용자의 별점&한줄평)")
+
+    @Operation(summary = "providerId로 API 도서 상세-기본 정보 조회", description = "providerId로 구글 API 도서의 기본 정보를 상세 조회합니다.(책 정보 + 현재 사용자의 별점&한줄평)")
     @GetMapping("/external/{providerId}")
-    public ResponseEntity<BookInfoBasicResponseDto> getOneBookBasic(@PathVariable(name = "providerId") final String providerId){
-        return ResponseEntity.ok(bookInfoService.getOneBookBasic(providerId));
+    public ResponseEntity<BookInfoBasicResponseDto> getApiBookBasicByProviderId(@PathVariable(name = "providerId") final String providerId){
+        return ResponseEntity.ok(bookInfoService.getApiBookBasicByProviderId(providerId));
     }
 
 
