@@ -17,7 +17,7 @@ public class FCMController {
 
     @Operation(summary = "FCM 토큰 저장", description = "유저의 FCM 토큰을 저장합니다.")
     @PostMapping("/{userId}/token")
-    public ResponseEntity<String> setFcmToken(@PathVariable Long userId,
+    public ResponseEntity<String> setFcmToken(@PathVariable final Long userId,
                                              @RequestBody @Valid FCMTokenRequestDto requestDto) {
         fcmService.setFcmToken(userId, requestDto.getFcmToken());
         return ResponseEntity.ok().build();
