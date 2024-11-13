@@ -65,7 +65,7 @@ public class BookInfoService {
 
             if(bookInfo != null){
                 MyRatingOneLineReadStatusDto myRatingOneLine = getMyRatingOneLineReadStatus(bookInfo, user);
-                BookUnitResponseDto responseDto = BookUnitResponseDto.from(bookUnit, myRatingOneLine);
+                BookUnitResponseDto responseDto = BookUnitResponseDto.from(bookUnit, myRatingOneLine, bookInfo.getBookInfoId());
                 bookResponseList.add(responseDto);
             }
             else{
