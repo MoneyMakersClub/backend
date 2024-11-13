@@ -1,4 +1,4 @@
-package com.mmc.bookduck.domain.user.entity;
+package com.mmc.bookduck.domain.userhome.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -23,22 +23,15 @@ public class HomeBlock {
     private BlockType blockType;
 
     @NotNull
-    private Long xCoordinate;
+    private Long blockIndex;
 
-    @NotNull
-    private Long yCoordinate;
+    private Long resourceId1;
 
-    @NotNull
-    private Long width;
+    private Long resourceId2;
 
-    @NotNull
-    private Long height;
+    private String text1;
 
-    private String title;
-
-    private String content;
-
-    private String imgPath;
+    private String text2;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_home_id", updatable = false)
@@ -47,16 +40,14 @@ public class HomeBlock {
     private UserHome userHome;
 
     @Builder
-    public HomeBlock(BlockType blockType, Long xCoordinate, Long yCoordinate, Long width, Long height,
-                     String title, String content, String imgPath, UserHome userHome) {
+    public HomeBlock(BlockType blockType, Long blockIndex, Long resourceId1, Long resourceId2,
+                     String text1, String text2, UserHome userHome) {
         this.blockType = blockType;
-        this.xCoordinate = xCoordinate;
-        this.yCoordinate = yCoordinate;
-        this.width = width;
-        this.height = height;
-        this.title = title;
-        this.content = content;
-        this.imgPath = imgPath;
+        this.blockIndex = blockIndex;
+        this.resourceId1 = resourceId1;
+        this.resourceId2 = resourceId2;
+        this.text1 = text1;
+        this.text2 = text2;
         this.userHome = userHome;
     }
 }
