@@ -1,7 +1,7 @@
 package com.mmc.bookduck.domain.userhome.dto.common;
 
-public record BookWithSongBlockDto(
-        Long homeBlockId,
+public record BookWithSongCardDto(
+        Long homeCardId,
         Long bookInfoId1,
         Long bookInfoId2,
         String imgPath1,
@@ -10,6 +10,6 @@ public record BookWithSongBlockDto(
         String text1,
         String text2,
         String nickname
-) implements HomeBlockDto {
+) implements HomeCardDto {
 
 }

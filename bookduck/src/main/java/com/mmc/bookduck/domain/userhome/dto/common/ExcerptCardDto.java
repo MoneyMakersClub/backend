@@ -1,11 +1,11 @@
 package com.mmc.bookduck.domain.userhome.dto.common;
 
-public record ExcerptBlockDto(
-        Long homeBlockId,
+public record ExcerptCardDto(
+        Long homeCardId,
         Long excerptId,
         String title,
         String author,
         Long pageNumber, // null일 수 있음
         String content
-) implements HomeBlockDto {
+) implements HomeCardDto {
 }

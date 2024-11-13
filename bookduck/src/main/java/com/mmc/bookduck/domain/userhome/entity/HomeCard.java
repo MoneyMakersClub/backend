@@ -12,18 +12,18 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class HomeBlock {
+public class HomeCard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
-    private Long homeBlockId;
+    private Long homeCardId;
 
     @Enumerated(EnumType.STRING)
     @NotNull
-    private BlockType blockType;
+    private CardType cardType;
 
     @NotNull
-    private Long blockIndex;
+    private Long cardIndex;
 
     private Long resourceId1;
 
@@ -40,10 +40,10 @@ public class HomeBlock {
     private UserHome userHome;
 
     @Builder
-    public HomeBlock(BlockType blockType, Long blockIndex, Long resourceId1, Long resourceId2,
-                     String text1, String text2, UserHome userHome) {
-        this.blockType = blockType;
-        this.blockIndex = blockIndex;
+    public HomeCard(CardType cardType, Long cardIndex, Long resourceId1, Long resourceId2,
+                    String text1, String text2, UserHome userHome) {
+        this.cardType = cardType;
+        this.cardIndex = cardIndex;
         this.resourceId1 = resourceId1;
         this.resourceId2 = resourceId2;
         this.text1 = text1;
