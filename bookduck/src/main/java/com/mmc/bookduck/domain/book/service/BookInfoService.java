@@ -208,8 +208,7 @@ public class BookInfoService {
 
     // custom bookInfo 삭제
     public void deleteCustomBookInfo(Long bookInfoId) {
-        BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
-                .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
+        BookInfo bookInfo = getBookInfoById(bookInfoId);
         if(bookInfo.getImgPath() != null){
             s3Service.deleteFile(bookInfo.getImgPath());
         }
@@ -275,8 +274,7 @@ public class BookInfoService {
     public BookInfoBasicResponseDto getApiBookBasicByBookInfoId(Long bookInfoId) {
         User user = userService.getCurrentUser();
 
-        BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
-                .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
+        BookInfo bookInfo = getBookInfoById(bookInfoId);
         if(bookInfo.getProviderId() == null){
             throw new CustomException(ErrorCode.BOOKINFO_BAD_REQUEST);
         }
@@ -299,8 +297,7 @@ public class BookInfoService {
     public CustomBookResponseDto getCustomBookBasic(Long bookInfoId) {
         User user = userService.getCurrentUser();
 
-        BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
-                .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
+        BookInfo bookInfo = getBookInfoById(bookInfoId);
         if(bookInfo.getCreatedUserId() == null){
             throw new CustomException(ErrorCode.CUSTOM_BOOKINFO_NOT_FOUND);
         }
@@ -345,8 +342,7 @@ public class BookInfoService {
 
     @Transactional
     public CustomBookResponseDto updateCustomBookInfo(Long bookInfoId, CustomBookUpdateDto dto) {
-        BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
-                .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
+        BookInfo bookInfo = getBookInfoById(bookInfoId);
         User user = userService.getCurrentUser();
 
         if(bookInfo.getCreatedUserId() != null){
@@ -397,5 +393,12 @@ public class BookInfoService {
                 return new MyRatingOneLineReadStatusDto(userBook.getRating(), oneLineRating.getOneLineContent(), userBook.getReadStatus());
             }
         }
+    }
+
+    @Transactional(readOnly = true)
+    public BookInfo getBookInfoById(Long bookInfoId){
+        BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
+                .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
+        return bookInfo;
     }
 }
