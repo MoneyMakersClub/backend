@@ -1,0 +1,68 @@
+package com.mmc.bookduck.domain.alarm.service;
+
+import com.mmc.bookduck.domain.alarm.dto.response.AlarmListResponseDto;
+import com.mmc.bookduck.domain.alarm.dto.response.AlarmUnitDto;
+import com.mmc.bookduck.domain.alarm.dto.ssedata.AlarmDefaultDataDto;
+import com.mmc.bookduck.domain.alarm.entity.Alarm;
+import com.mmc.bookduck.domain.alarm.entity.PushAlarmFormat;
+import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
+import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.service.UserService;
+import com.mmc.bookduck.global.fcm.FCMService;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class AlarmService {
+    private final AlarmRepository alarmRepository;
+    private final EmitterService emitterService;
+    private final UserService userService;
+    private final FCMService fcmService;
+
+    // 최근 알림 목록 읽어오기
+    public AlarmListResponseDto getAndReadRecentAlarms(){
+        Pageable pageable = PageRequest.of(0, 30);
+        List<AlarmUnitDto> alarmUnitDtos = getAndReadAlarms(pageable);
+        return AlarmListResponseDto.fromAlarmUnitDto(alarmUnitDtos);
+    }
+
+    // Alarm 생성 읽어오기
+    public void createAlarm(Alarm alarm, User receiver) {
+        alarmRepository.save(alarm);
+        emitterService.notify(receiver.getUserId(), AlarmDefaultDataDto.from(true), "new alarm");
+
+        // 푸시알림 전송
+        if (alarm.getAlarmType().isSendPush()) {
+            fcmService.sendPushMessage(receiver.getFcmToken(), PushAlarmFormat.valueOf(alarm.getAlarmType().name()));
+        }
+    }
+
+    public void deleteAllAlarmsOfMember(User user){
+        alarmRepository.deleteAllBySender(user);
+        alarmRepository.deleteAllByReceiver(user);
+    }
+
+    private List<AlarmUnitDto> getAndReadAlarms(Pageable pageable) {
+        List<AlarmUnitDto> alarmUnitDtoList = new ArrayList<>();
+        User currentUser = userService.getCurrentUser();
+        Slice<Alarm> alarmSlice = alarmRepository.findByReceiverOrderByCreatedTimeDesc(currentUser, pageable);
+        if (alarmSlice != null && alarmSlice.hasContent()) {
+            for (Alarm alarm : alarmSlice) {
+                alarmUnitDtoList.add(AlarmUnitDto.from(alarm));
+                alarm.readAlarm();
+            }
+            alarmRepository.saveAll(alarmSlice);
+        }
+        return alarmUnitDtoList;
+    }
+}

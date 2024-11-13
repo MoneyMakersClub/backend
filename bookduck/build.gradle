@@ -61,8 +61,12 @@ dependencies {
 	implementation 'org.json:json:20231013' //JsonObject 사용 관련
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.17.1' //Jackson - ObjectMapper 시간 직렬화 관련
 
-	// S3관련
+	// S3 관련
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	// FCM
+	implementation group: 'com.google.firebase', name: 'firebase-admin', version: '9.2.0'
+	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.12.0'
 }
 
 tasks.named('test') {

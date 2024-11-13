@@ -33,11 +33,7 @@ public class User extends BaseTimeEntity {
     @NotNull
     private UserStatus userStatus;
 
-    private String birth;
-
-    private String gender;
-
-    private String country;
+    private String fcmToken;
 
     @Builder
     public User(Long userId, String email, LoginType loginType, String nickname) {
@@ -52,5 +48,10 @@ public class User extends BaseTimeEntity {
     // 닉네임 변경
     public void updateNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    // FCM 토큰 세팅
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 }

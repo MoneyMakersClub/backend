@@ -35,10 +35,4 @@ public class ErrorResponseUtil {
             e.printStackTrace();
         }
     }
-
-    // Location 있는 에러 응답
-    public static void writeErrorResponseWithLocationHeader(HttpServletResponse response, ErrorCode errorCode, String requestUri, String locationUri) {
-        response.setHeader("Location", locationUri);
-        writeErrorResponse(response, errorCode, requestUri);
-    }
 }
