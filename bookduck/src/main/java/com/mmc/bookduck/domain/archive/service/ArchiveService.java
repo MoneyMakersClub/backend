@@ -13,6 +13,7 @@ import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ArchiveRepository;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
+import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -137,12 +138,14 @@ public class ArchiveService {
     }
 
     public ArchiveResponseDto createArchiveResponseDto(Archive archive, Excerpt excerpt, Review review, UserBook userBook) {
+        Long bookInfoId = userBook.getBookInfo().getBookInfoId();
         String title = userBook.getBookInfo().getTitle();
         String author = userBook.getBookInfo().getAuthor();
         return ArchiveResponseDto.from(
                 archive,
                 excerpt != null ? ExcerptResponseDto.from(excerpt) : null,
                 review != null ? ReviewResponseDto.from(review) : null,
+                bookInfoId,
                 title,
                 author
         );
