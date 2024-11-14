@@ -1,6 +1,5 @@
 package com.mmc.bookduck.domain.oneline.service;
 
-import com.mmc.bookduck.domain.archive.entity.Archive;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.oneline.dto.request.OneLineCreateRequestDto;
@@ -35,7 +34,7 @@ public class OneLineService {
     // 수정
     public void updateOneLine(Long oneLineId, OneLineUpdateRequestDto requestDto){
         OneLine oneLine = ValidateOneLineCreator(oneLineId);
-        oneLine.updateOneLine(requestDto.OneLineContent());
+        oneLine.updateOneLine(requestDto.oneLineContent());
     }
 
     // 삭제
