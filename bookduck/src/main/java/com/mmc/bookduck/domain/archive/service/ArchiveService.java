@@ -62,14 +62,14 @@ public class ArchiveService {
     @Transactional(readOnly = true)
     public ArchiveResponseDto getArchive(Long id, ArchiveType archiveType) {
         Archive archive = findArchiveByType(id, archiveType);
-        UserBook userBook = getUserBookFromExcerptOrReview(archive.getExcerpt().getExcerptId(), archive.getReview().getReviewId());
+        UserBook userBook = getUserBookFromExcerptOrReview(archive);
         return createArchiveResponseDto(archive, archive.getExcerpt(), archive.getReview(), userBook);
     }
 
     // 수정
     public ArchiveResponseDto updateArchive(Long id, ArchiveType archiveType, ArchiveUpdateRequestDto requestDto) {
         Archive archive = findArchiveByType(id, archiveType);
-        UserBook userBook = getUserBookFromExcerptOrReview(archive.getExcerpt().getExcerptId(), archive.getReview().getReviewId());
+        UserBook userBook = getUserBookFromExcerptOrReview(archive);
         // 생성자 검증
         userBookService.validateUserBookOwner(userBook);
         // 발췌 수정 혹은 생성
@@ -113,7 +113,7 @@ public class ArchiveService {
     // 삭제
     public void deleteArchive(Long archiveId, Long reviewId, Long excerptId) {
         Archive archive = getArchiveById(archiveId);
-        UserBook userBook = getUserBookFromExcerptOrReview(reviewId, excerptId);
+        UserBook userBook = getUserBookFromExcerptOrReview(archive);
         // 생성자 검증
         userBookService.validateUserBookOwner(userBook);
         if (excerptId != null && archive.getExcerpt() != null) {
@@ -173,7 +173,9 @@ public class ArchiveService {
 
     // UserBook 정보 불러오기
     @Transactional(readOnly = true)
-    public UserBook getUserBookFromExcerptOrReview(Long excerptId, Long reviewId) {
+    public UserBook getUserBookFromExcerptOrReview(Archive archive) {
+        Long excerptId = (archive.getExcerpt() != null) ? archive.getExcerpt().getExcerptId() : null;
+        Long reviewId = (archive.getReview() != null) ? archive.getReview().getReviewId() : null;
         if (excerptId != null) {
             Excerpt excerpt = excerptService.getExcerptById(excerptId);
             return excerpt.getUserBook();
