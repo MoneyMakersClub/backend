@@ -79,7 +79,7 @@ public enum ErrorCode {
     USERBOOK_ALREADY_EXISTS(409, "이미 사용자의 책이 등록되어 있습니다."),
     REVIEW_ALREADY_EXISTS(409, "이미 존재하는 감상평입니다."),
     EXCERPT_ALREADY_EXISTS(409, "이미 존재하는 발췌입니다."),
-    ONELINERATINGLIKE_ALREADY_EXISTS(409, "이미 존재하는 한줄평점입니다."),
+    ONELINELIKE_ALREADY_EXISTS(409, "이미 존재하는 한줄평점입니다."),
     ALARM_ALREADY_EXISTS(409, "이미 존재하는 알림입니다."),
     FOLDERNAME_ALREADY_EXISTS(409, "이미 존재하는 폴더 이름입니다."),
     FOLDERBOOK_ALREADY_EXISTS(409, "이미 폴더 내에 존재하는 책입니다."),
