@@ -36,11 +36,10 @@ public class HomeCard {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_home_id", updatable = false)
     @NotNull
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserHome userHome;
 
     @Builder
-    public HomeCard(CardType cardType, Long cardIndex, Long resourceId1, Long resourceId2,
+    public HomeCard(CardType cardType, long cardIndex, Long resourceId1, Long resourceId2,
                     String text1, String text2, UserHome userHome) {
         this.cardType = cardType;
         this.cardIndex = cardIndex;
@@ -48,6 +47,17 @@ public class HomeCard {
         this.resourceId2 = resourceId2;
         this.text1 = text1;
         this.text2 = text2;
+        setUserHome(userHome);
+    }
+
+    public void updateCardIndex(long cardIndex) {
+        this.cardIndex = cardIndex;
+    }
+
+    public void setUserHome(UserHome userHome) {
         this.userHome = userHome;
+        if (userHome != null && !userHome.getHomeCards().contains(this)) {
+            userHome.getHomeCards().add(this);
+        }
     }
 }

@@ -1,11 +1,7 @@
 package com.mmc.bookduck.domain.userhome.service;
 
-import com.mmc.bookduck.domain.archive.entity.ArchiveType;
-import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.service.ArchiveService;
-import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.service.BookInfoService;
-import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.domain.userhome.dto.common.*;
@@ -23,7 +19,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,9 +32,7 @@ public class UserHomeService {
     private final UserService userService;
     private final UserHomeRepository userHomeRepository;
     private final HomeCardRepository homeCardRepository;
-    private final ArchiveService archiveService;
-    private final OneLineRepository oneLineRepository;
-    private final BookInfoService bookInfoService;
+    private final HomeCardConverter homeCardConverter;  // HomeCardConverter 주입
 
     @Transactional(readOnly = true)
     public ReadingSpaceResponseDto getUserReadingSpace(Long userId) {
@@ -43,83 +40,13 @@ public class UserHomeService {
         UserHome userHome = getUserHomeOfUser(user);
         List<HomeCard> homeCards = getAllHomeCardsOfUserHome(userHome);
         String nickname = user.getNickname();
+
+        // HomeCardConverter를 사용하여 HomeCard를 HomeCardDto로 변환
         List<HomeCardDto> homeCardDtos = homeCards.stream()
-                .map((HomeCard homeCard) -> mapToHomeCardDto(homeCard, nickname))
+                .map(homeCard -> homeCardConverter.mapToHomeCardDto(homeCard, nickname))
                 .collect(Collectors.toList());
+
         return new ReadingSpaceResponseDto(homeCardDtos);
-    }
-
-    @Transactional(readOnly = true)
-    public HomeCardDto mapToHomeCardDto(HomeCard homeCard, String nickname) {
-        return switch (homeCard.getCardType()) {
-            case EXCERPT -> convertToExcerptCardDto(homeCard);
-            case ONELINE -> convertToOneLineCardDto(homeCard);
-            case BOOK_WITH_MEMO -> convertToBookWithMemoCardDto(homeCard);
-            case BOOK_WITH_SONG -> convertToBookWithSongCardDto(homeCard, nickname);
-        };
-    }
-
-    @Transactional(readOnly = true)
-    public ExcerptCardDto convertToExcerptCardDto(HomeCard homeCard) {
-        Excerpt excerpt = archiveService.findArchiveByType(homeCard.getResourceId1(), ArchiveType.EXCERPT).getExcerpt();
-        return new ExcerptCardDto(
-                homeCard.getHomeCardId(),
-                homeCard.getCardIndex(),
-                excerpt.getExcerptId(),
-                excerpt.getUserBook().getBookInfo().getTitle(),
-                excerpt.getUserBook().getBookInfo().getAuthor(),
-                excerpt.getPageNumber(),
-                excerpt.getExcerptContent()
-        );
-    }
-
-    @Transactional(readOnly = true)
-    public OneLineCardDto convertToOneLineCardDto(HomeCard homeCard) {
-        OneLine oneLine = oneLineRepository.findById(homeCard.getResourceId1()).get(); //TODO: 추후 수정!!
-        return new OneLineCardDto(
-                homeCard.getHomeCardId(),
-                homeCard.getCardIndex(),
-                oneLine.getOneLineId(),
-                oneLine.getUserBook().getBookInfo().getTitle(),
-                oneLine.getUserBook().getBookInfo().getAuthor(),
-                oneLine.getUserBook().getRating(),
-                oneLine.getOneLineContent()
-        );
-    }
-
-    @Transactional(readOnly = true)
-    public BookWithMemoCardDto convertToBookWithMemoCardDto(HomeCard homeCard) {
-        BookInfo bookInfo1 = bookInfoService.getBookInfoById(homeCard.getResourceId1());
-        BookInfo bookInfo2 = homeCard.getResourceId2() != null ? bookInfoService.getBookInfoById(homeCard.getResourceId2()) : null;
-        return new BookWithMemoCardDto(
-                homeCard.getHomeCardId(),
-                homeCard.getCardIndex(),
-                bookInfo1.getBookInfoId(),
-                bookInfo2 != null ? bookInfo2.getBookInfoId() : null,
-                bookInfo1.getImgPath(),
-                bookInfo2 != null ? bookInfo2.getImgPath() : null,
-                "MEMO",
-                homeCard.getText1(),
-                homeCard.getText2()
-        );
-    }
-
-    @Transactional(readOnly = true)
-    public BookWithSongCardDto convertToBookWithSongCardDto(HomeCard homeCard, String nickname) {
-        BookInfo bookInfo1 = bookInfoService.getBookInfoById(homeCard.getResourceId1());
-        BookInfo bookInfo2 = homeCard.getResourceId2() != null ? bookInfoService.getBookInfoById(homeCard.getResourceId2()) : null;
-        return new BookWithSongCardDto(
-                homeCard.getHomeCardId(),
-                homeCard.getCardIndex(),
-                bookInfo1.getBookInfoId(),
-                bookInfo2 != null ? bookInfo2.getBookInfoId() : null,
-                bookInfo1.getImgPath(),
-                bookInfo2 != null ? bookInfo2.getImgPath() : null,
-                "SONG",
-                homeCard.getText1(),
-                homeCard.getText2(),
-                nickname
-        );
     }
 
     @Transactional(readOnly = true)
@@ -137,8 +64,10 @@ public class UserHomeService {
         User user = userService.getCurrentUser();
         UserHome userHome = getUserHomeOfUser(user);
         List<HomeCard> homeCards = getAllHomeCardsOfUserHome(userHome);
+
+        // 새로운 HomeCard를 추가하고 HomeCardDto로 변환
         HomeCard homeCard = addHomeCard(requestDto, userHome, homeCards.size());
-        return mapToHomeCardDto(homeCard, user.getNickname());
+        return homeCardConverter.mapToHomeCardDto(homeCard, user.getNickname());
     }
 
     public HomeCard addHomeCard(HomeCardRequestDto requestDto, UserHome userHome, long cardIndex) {
@@ -151,9 +80,39 @@ public class UserHomeService {
                 .text2(requestDto.text2())
                 .userHome(userHome)
                 .build();
+        userHome.addHomeCard(homeCard);
         return homeCardRepository.save(homeCard);
     }
 
     public void updateReadingSpace(ReadingSpaceUpdateRequestDto requestDto) {
+        UserHome userHome = getUserHomeOfUser(userService.getCurrentUser());
+
+        Map<Long, HomeCard> currentHomeCardsMap = getAllHomeCardsOfUserHome(userHome).stream()
+                .collect(Collectors.toMap(HomeCard::getHomeCardId, homeCard -> homeCard));
+
+        List<HomeCard> cardsToUpdate = new ArrayList<>();
+
+        // 업데이트할 카드 목록 처리
+        for (HomeCardUpdateUnitDto cardDto : requestDto.homeCardUpdateUnitDtos()) {
+            HomeCard existingCard = currentHomeCardsMap.get(cardDto.homeCardId());
+
+            if (existingCard != null) {
+                existingCard.updateCardIndex(cardDto.cardIndex());
+                cardsToUpdate.add(existingCard);
+                currentHomeCardsMap.remove(cardDto.homeCardId());
+            } else {
+                throw new CustomException(ErrorCode.HOMECARD_NOT_FOUND);
+            }
+        }
+
+        List<HomeCard> cardsToDelete = new ArrayList<>(currentHomeCardsMap.values());
+        for (HomeCard homeCard : cardsToDelete) {
+            userHome.removeHomeCard(homeCard);
+        }
+        userHome.updateLastModifiedAt(LocalDateTime.now());
+
+        // 삭제할 카드와 업데이트할 카드를 처리
+        homeCardRepository.deleteAll(cardsToDelete);
+        homeCardRepository.saveAll(cardsToUpdate);
     }
 }
