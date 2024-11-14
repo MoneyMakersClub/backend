@@ -143,13 +143,15 @@ public class ArchiveService {
         Long bookInfoId = userBook.getBookInfo().getBookInfoId();
         String title = userBook.getBookInfo().getTitle();
         String author = userBook.getBookInfo().getAuthor();
+        String imgPath = userBook.getBookInfo().getImgPath();
         return ArchiveResponseDto.from(
                 archive,
                 excerpt != null ? ExcerptResponseDto.from(excerpt) : null,
                 review != null ? ReviewResponseDto.from(review) : null,
                 bookInfoId,
                 title,
-                author
+                author,
+                imgPath
         );
     }
 

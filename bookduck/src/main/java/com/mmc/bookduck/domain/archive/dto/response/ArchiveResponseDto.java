@@ -8,13 +8,10 @@ public record ArchiveResponseDto(
         ReviewResponseDto review,
         Long bookInfoId,
         String title,
-        String author
-        // ToDo: 디자인 수정사항 보고 응답 수정
-        // 책커버
-        // 출판사?
-        // 출판년도?
+        String author,
+        String imgPath
 ) {
-    public static ArchiveResponseDto from(Archive archive, ExcerptResponseDto excerpt, ReviewResponseDto review, Long bookInfoId, String title, String author) {
-        return new ArchiveResponseDto(archive.getArchiveId(), excerpt, review, bookInfoId, title, author);
+    public static ArchiveResponseDto from(Archive archive, ExcerptResponseDto excerpt, ReviewResponseDto review, Long bookInfoId, String title, String author, String imgPath) {
+        return new ArchiveResponseDto(archive.getArchiveId(), excerpt, review, bookInfoId, title, author, imgPath);
     }
 }
