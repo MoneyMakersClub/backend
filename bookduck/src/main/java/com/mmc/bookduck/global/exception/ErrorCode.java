@@ -43,7 +43,7 @@ public enum ErrorCode {
     // 액세스 토큰이 만료되지 않은 상황에서 재발급받으려는 경우
     ACCESS_TOKEN_NOT_EXPIRED(401,"액세스 토큰이 아직 만료되지 않았습니다."),
     // 쿠키에 리프레시 토큰이 들어있지 않은 경우
-    NO_COOKIE(401, "쿠키에 값이 존재하지 않습니다."),
+    NO_COOKIE(401, "쿠키에 리프레시 토큰이 존재하지 않습니다."),
     USER_STATUS_IS_NOT_ACTIVE(401, "계정이 활성 상태가 아닙니다."),
 
     // 404 Not Found
