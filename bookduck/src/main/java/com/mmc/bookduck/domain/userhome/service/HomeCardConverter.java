@@ -7,11 +7,8 @@ import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.service.BookInfoService;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
-import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.domain.userhome.dto.common.*;
 import com.mmc.bookduck.domain.userhome.entity.HomeCard;
-import com.mmc.bookduck.domain.userhome.repository.HomeCardRepository;
-import com.mmc.bookduck.domain.userhome.repository.UserHomeRepository;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +19,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class HomeCardConverter {
-    private final UserService userService;
-    private final UserHomeRepository userHomeRepository;
-    private final HomeCardRepository homeCardRepository;
     private final ArchiveService archiveService;
     private final OneLineRepository oneLineRepository;
     private final BookInfoService bookInfoService;

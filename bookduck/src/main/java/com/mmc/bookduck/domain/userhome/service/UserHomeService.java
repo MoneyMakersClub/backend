@@ -80,7 +80,6 @@ public class UserHomeService {
                 .text2(requestDto.text2())
                 .userHome(userHome)
                 .build();
-        userHome.addHomeCard(homeCard);
         return homeCardRepository.save(homeCard);
     }
 
@@ -106,9 +105,6 @@ public class UserHomeService {
         }
 
         List<HomeCard> cardsToDelete = new ArrayList<>(currentHomeCardsMap.values());
-        for (HomeCard homeCard : cardsToDelete) {
-            userHome.removeHomeCard(homeCard);
-        }
         userHome.updateLastModifiedAt(LocalDateTime.now());
 
         // 삭제할 카드와 업데이트할 카드를 처리

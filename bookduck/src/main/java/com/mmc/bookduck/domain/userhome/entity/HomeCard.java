@@ -36,6 +36,7 @@ public class HomeCard {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_home_id", updatable = false)
     @NotNull
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserHome userHome;
 
     @Builder
@@ -47,17 +48,10 @@ public class HomeCard {
         this.resourceId2 = resourceId2;
         this.text1 = text1;
         this.text2 = text2;
-        setUserHome(userHome);
+        this.userHome = userHome;
     }
 
     public void updateCardIndex(long cardIndex) {
         this.cardIndex = cardIndex;
-    }
-
-    public void setUserHome(UserHome userHome) {
-        this.userHome = userHome;
-        if (userHome != null && !userHome.getHomeCards().contains(this)) {
-            userHome.getHomeCards().add(this);
-        }
     }
 }
