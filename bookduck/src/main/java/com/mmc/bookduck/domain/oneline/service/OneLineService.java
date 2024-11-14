@@ -27,7 +27,7 @@ public class OneLineService {
         User user = userService.getCurrentUser();
         UserBook userBook = userBookService.getUserBookById(requestDto.userBookId());
         userBookService.validateUserBookOwner(userBook);
-        OneLine oneLine = requestDto.toEntity(user, userBook, false);
+        OneLine oneLine = requestDto.toEntity(user, userBook);
         return oneLineRepository.save(oneLine);
     }
 

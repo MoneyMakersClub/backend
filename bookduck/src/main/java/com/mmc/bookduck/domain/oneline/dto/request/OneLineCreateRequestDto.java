@@ -9,10 +9,9 @@ public record OneLineCreateRequestDto(
         @NotNull String oneLineContent,
         @NotNull Long userBookId
 ) {
-    public OneLine toEntity(User user, UserBook userBook, boolean isMain){
+    public OneLine toEntity(User user, UserBook userBook){
         return OneLine.builder()
                 .oneLineContent(oneLineContent)
-                .isMain(isMain)
                 .user(user)
                 .userBook(userBook)
                 .build();

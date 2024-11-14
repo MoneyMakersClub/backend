@@ -21,11 +21,10 @@ public class ExcerptCreateRequestDto {
         this.userBookId = userBookId;
     }
 
-    public Excerpt toEntity(User user, UserBook userBook, boolean isMain, Visibility visibility) {
+    public Excerpt toEntity(User user, UserBook userBook, Visibility visibility) {
         return Excerpt.builder()
                 .excerptContent(excerptContent)
                 .visibility(visibility)
-                .isMain(isMain)
                 .pageNumber(pageNumber)
                 .user(user)
                 .userBook(userBook)
