@@ -20,17 +20,17 @@ public interface OneLineRepository extends JpaRepository<OneLine, Long> {
 
     // 좋아요 수 내림차순 정렬
     @Query("SELECT o FROM OneLine o WHERE o.userBook.bookInfo = :bookInfo ORDER BY SIZE(o.oneLineLikes) DESC")
-    Page<OneLine> findByBookInfoOrderByLikesDesc(@Param("bookInfo") BookInfo bookInfo, Pageable pageable);
+    Page<OneLine> findByBookInfoOrderByOneLineLikesDesc(@Param("bookInfo") BookInfo bookInfo, Pageable pageable);
 
     // 생성일 내림차순 정렬
     @Query("SELECT o FROM OneLine o WHERE o.userBook.bookInfo = :bookInfo ORDER BY o.createdTime DESC")
     Page<OneLine> findByBookInfoOrderByCreatedTimeDesc(@Param("bookInfo") BookInfo bookInfo, Pageable pageable);
 
     // 별점 높은 순 정렬, null은 마지막
-    @Query("SELECT o FROM OneLine o WHERE o.userBook.bookInfo = :bookInfo ORDER BY o.userBook.rating DESC")
+    @Query("SELECT o FROM OneLine o WHERE o.userBook.bookInfo = :bookInfo ORDER BY o.userBook.rating DESC NULLS LAST")
     Page<OneLine> findByBookInfoOrderByRatingDesc(@Param("bookInfo") BookInfo bookInfo, Pageable pageable);
 
     // 별점 낮은 순 정렬, null은 마지막
-    @Query("SELECT o FROM OneLine o WHERE o.userBook.bookInfo = :bookInfo ORDER BY o.userBook.rating ASC")
+    @Query("SELECT o FROM OneLine o WHERE o.userBook.bookInfo = :bookInfo ORDER BY o.userBook.rating ASC NULLS LAST")
     Page<OneLine> findByBookInfoOrderByRatingAsc(@Param("bookInfo") BookInfo bookInfo, Pageable pageable);
 }

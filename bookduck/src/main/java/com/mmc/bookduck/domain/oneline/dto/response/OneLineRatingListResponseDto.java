@@ -13,7 +13,7 @@ public record OneLineRatingListResponseDto(
     public static OneLineRatingListResponseDto from(Page<OneLineRatingUnitDto> oneLineRatingPage) {
         return new OneLineRatingListResponseDto(
                 oneLineRatingPage.getTotalPages(),
-                oneLineRatingPage.getNumber(),
+                oneLineRatingPage.getNumber() + 1,
                 oneLineRatingPage.getSize(),
                 oneLineRatingPage.getTotalElements(),
                 oneLineRatingPage.getContent()

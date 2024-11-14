@@ -34,9 +34,11 @@ import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.google.GoogleBooksApiService;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -409,20 +411,20 @@ public class BookInfoService {
 
     // 한줄평&별점 조회
     @Transactional(readOnly = true)
-    public OneLineRatingListResponseDto getOneLineList(Long bookInfoId, String sort, Pageable pageable) {
+    public OneLineRatingListResponseDto getOneLineList(Long bookInfoId, String orderBy, Pageable pageable) {
         BookInfo bookInfo = getBookInfoById(bookInfoId);
         Page<OneLine> oneLinePage;
-        switch (sort) {
+        switch (orderBy) {
             case "likes":
-                oneLinePage = oneLineRepository.findByBookInfoOrderByLikesDesc(bookInfo, pageable);
+                oneLinePage = oneLineRepository.findByBookInfoOrderByOneLineLikesDesc(bookInfo, pageable);
                 break;
             case "latest":
                 oneLinePage = oneLineRepository.findByBookInfoOrderByCreatedTimeDesc(bookInfo, pageable);
                 break;
-            case "rating_high":
+            case "highest":
                 oneLinePage = oneLineRepository.findByBookInfoOrderByRatingDesc(bookInfo, pageable);
                 break;
-            case "rating_low":
+            case "lowest":
                 oneLinePage = oneLineRepository.findByBookInfoOrderByRatingAsc(bookInfo, pageable);
                 break;
             default:
