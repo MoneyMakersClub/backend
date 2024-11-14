@@ -4,7 +4,7 @@ import com.mmc.bookduck.domain.userhome.dto.common.HomeCardDto;
 
 import java.util.List;
 
-public record UserReadingSpaceResponseDto(
+public record ReadingSpaceResponseDto(
         List<HomeCardDto> homeCardList
 ) {
 }

@@ -9,7 +9,9 @@ import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.domain.userhome.dto.common.*;
-import com.mmc.bookduck.domain.userhome.dto.response.UserReadingSpaceResponseDto;
+import com.mmc.bookduck.domain.userhome.dto.request.ReadingSpaceUpdateRequestDto;
+import com.mmc.bookduck.domain.userhome.dto.request.UserHomeCardRequestDto;
+import com.mmc.bookduck.domain.userhome.dto.response.ReadingSpaceResponseDto;
 import com.mmc.bookduck.domain.userhome.entity.HomeCard;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.userhome.entity.UserHome;
@@ -35,26 +37,30 @@ public class UserHomeService {
     private final OneLineRepository oneLineRepository;
     private final BookInfoService bookInfoService;
 
-    public UserReadingSpaceResponseDto getUserReadingSpace(Long userId) {
+    @Transactional(readOnly = true)
+    public ReadingSpaceResponseDto getUserReadingSpace(Long userId) {
         User user = userService.getActiveUserByUserId(userId);
-        List<HomeCard> homeCards = getAllHomeCardsOfUser(user);
+        UserHome userHome = getUserHomeOfUser(user);
+        List<HomeCard> homeCards = getAllHomeCardsOfUserHome(userHome);
         String nickname = user.getNickname();
         List<HomeCardDto> homeCardDtos = homeCards.stream()
                 .map((HomeCard homeCard) -> mapToHomeCardDto(homeCard, nickname))
                 .collect(Collectors.toList());
-        return new UserReadingSpaceResponseDto(homeCardDtos);
+        return new ReadingSpaceResponseDto(homeCardDtos);
     }
 
-    private HomeCardDto mapToHomeCardDto(HomeCard homeCard, String nickname) {
+    @Transactional(readOnly = true)
+    public HomeCardDto mapToHomeCardDto(HomeCard homeCard, String nickname) {
         return switch (homeCard.getCardType()) {
-            case EXCERPT -> createExcerptCardDto(homeCard);
-            case ONELINE -> createOneLineCardDto(homeCard);
-            case BOOK_WITH_MEMO -> createBookWithMemoCardDto(homeCard);
-            case BOOK_WITH_SONG -> createBookWithSongCardDto(homeCard, nickname);
+            case EXCERPT -> convertToExcerptCardDto(homeCard);
+            case ONELINE -> convertToOneLineCardDto(homeCard);
+            case BOOK_WITH_MEMO -> convertToBookWithMemoCardDto(homeCard);
+            case BOOK_WITH_SONG -> convertToBookWithSongCardDto(homeCard, nickname);
         };
     }
 
-    private ExcerptCardDto createExcerptCardDto(HomeCard homeCard) {
+    @Transactional(readOnly = true)
+    public ExcerptCardDto convertToExcerptCardDto(HomeCard homeCard) {
         Excerpt excerpt = archiveService.findArchiveByType(homeCard.getResourceId1(), ArchiveType.EXCERPT).getExcerpt();
         return new ExcerptCardDto(
                 homeCard.getHomeCardId(),
@@ -66,7 +72,8 @@ public class UserHomeService {
         );
     }
 
-    private OneLineCardDto createOneLineCardDto(HomeCard homeCard) {
+    @Transactional(readOnly = true)
+    public OneLineCardDto convertToOneLineCardDto(HomeCard homeCard) {
         OneLine oneLine = oneLineRepository.findById(homeCard.getResourceId1()).get(); //TODO: 추후 수정!!
         return new OneLineCardDto(
                 homeCard.getHomeCardId(),
@@ -78,7 +85,8 @@ public class UserHomeService {
         );
     }
 
-    private BookWithMemoCardDto createBookWithMemoCardDto(HomeCard homeCard) {
+    @Transactional(readOnly = true)
+    public BookWithMemoCardDto convertToBookWithMemoCardDto(HomeCard homeCard) {
         BookInfo bookInfo1 = bookInfoService.getBookInfoById(homeCard.getResourceId1());
         BookInfo bookInfo2 = homeCard.getResourceId2() != null ? bookInfoService.getBookInfoById(homeCard.getResourceId2()) : null;
         return new BookWithMemoCardDto(
@@ -93,7 +101,8 @@ public class UserHomeService {
         );
     }
 
-    private BookWithSongCardDto createBookWithSongCardDto(HomeCard homeCard, String nickname) {
+    @Transactional(readOnly = true)
+    public BookWithSongCardDto convertToBookWithSongCardDto(HomeCard homeCard, String nickname) {
         BookInfo bookInfo1 = bookInfoService.getBookInfoById(homeCard.getResourceId1());
         BookInfo bookInfo2 = homeCard.getResourceId2() != null ? bookInfoService.getBookInfoById(homeCard.getResourceId2()) : null;
         return new BookWithSongCardDto(
@@ -110,13 +119,37 @@ public class UserHomeService {
     }
 
     @Transactional(readOnly = true)
-    public List<HomeCard> getAllHomeCardsOfUser(User user) {
-        UserHome userHome = userHomeRepository.findByUser(user)
-                .orElseThrow(() -> new CustomException(ErrorCode.USERHOME_NOT_FOUND));
+    public List<HomeCard> getAllHomeCardsOfUserHome(UserHome userHome) {
         return homeCardRepository.findAllByUserHome(userHome);
     }
 
-    public HomeCard addCard() {
-        return null;
+    @Transactional(readOnly = true)
+    public UserHome getUserHomeOfUser(User user) {
+        return userHomeRepository.findByUser(user)
+                .orElseThrow(() -> new CustomException(ErrorCode.USERHOME_NOT_FOUND));
+    }
+
+    public HomeCardDto addHomeCardToReadingSpace(UserHomeCardRequestDto requestDto) {
+        User user = userService.getCurrentUser();
+        UserHome userHome = getUserHomeOfUser(user);
+        List<HomeCard> homeCards = getAllHomeCardsOfUserHome(userHome);
+        HomeCard homeCard = addHomeCard(requestDto, userHome, homeCards.size());
+        return mapToHomeCardDto(homeCard, user.getNickname());
+    }
+
+    public HomeCard addHomeCard(UserHomeCardRequestDto requestDto, UserHome userHome, long cardIndex) {
+        HomeCard homeCard = HomeCard.builder()
+                .userHome(userHome)
+                .cardType(requestDto.cardType())
+                .cardIndex(cardIndex)
+                .resourceId1(requestDto.resourceId1())
+                .resourceId2(requestDto.resourceId2())
+                .text1(requestDto.text1())
+                .text2(requestDto.text2())
+                .build();
+        return homeCardRepository.save(homeCard);
+    }
+
+    public void updateReadingSpace(ReadingSpaceUpdateRequestDto requestDto) {
     }
 }
