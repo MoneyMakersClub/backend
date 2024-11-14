@@ -409,10 +409,10 @@ public class BookInfoService {
 
     // 한줄평&별점 조회
     @Transactional(readOnly = true)
-    public OneLineRatingListResponseDto getOneLineList(Long bookInfoId, String sortOption, Pageable pageable) {
+    public OneLineRatingListResponseDto getOneLineList(Long bookInfoId, String sort, Pageable pageable) {
         BookInfo bookInfo = getBookInfoById(bookInfoId);
         Page<OneLine> oneLinePage;
-        switch (sortOption) {
+        switch (sort) {
             case "likes":
                 oneLinePage = oneLineRepository.findByBookInfoOrderByLikesDesc(bookInfo, pageable);
                 break;

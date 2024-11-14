@@ -78,8 +78,8 @@ public class BookInfoController {
 
     @GetMapping("/{bookinfoId}/onelineratings")
     @Operation(summary = "도서의 한줄평&별점 목록 조회", description = "도서의 한줄평&별점 목록을 조회합니다.")
-    public ResponseEntity<?> getOneLineList(@PathVariable("bookinfoId") Long bookInfoId, @RequestParam(defaultValue = "likes") String sortOption, Pageable pageable){
-        OneLineRatingListResponseDto responseDto = bookInfoService.getOneLineList(bookInfoId, sortOption, pageable);
+    public ResponseEntity<?> getOneLineList(@PathVariable("bookinfoId") Long bookInfoId, @RequestParam(defaultValue = "likes") String sort, Pageable pageable){
+        OneLineRatingListResponseDto responseDto = bookInfoService.getOneLineList(bookInfoId, sort, pageable);
         return ResponseEntity.ok().build();
     }
 }
