@@ -28,6 +28,8 @@ public class OneLine {
     @NotNull
     private String oneLineContent;
 
+    private boolean isMain;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", updatable = false)
     @NotNull
@@ -44,11 +46,16 @@ public class OneLine {
     private List<OneLineLike> oneLineLikes;
 
     @Builder
-    public OneLine(String oneLineContent, User user, UserBook userBook) {
+    public OneLine(String oneLineContent, boolean isMain, User user, UserBook userBook) {
         this.oneLineContent = oneLineContent;
+        this.isMain = isMain;
         this.user = user;
         this.userBook = userBook;
         this.oneLineLikes = new ArrayList<>();
+    }
+
+    public void updateOneLine(String oneLineContent){
+        this.oneLineContent = oneLineContent;
     }
 
     // OneLineLike 추가

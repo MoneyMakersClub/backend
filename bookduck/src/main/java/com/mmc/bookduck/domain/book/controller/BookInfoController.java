@@ -72,4 +72,10 @@ public class BookInfoController {
                                                                       @ModelAttribute final CustomBookUpdateDto dto){
         return ResponseEntity.ok(bookInfoService.updateCustomBookInfo(bookInfoId, dto));
     }
+
+    @GetMapping("/{bookinfoId}/onelines")
+    @Operation(summary = "도서의 한줄평/별점 목록 조회", description = "도서의 한줄평&별점 목록을 조회합니다.")
+    public ResponseEntity<?> getOneLineList(){
+        return ResponseEntity.ok().build();
+    }
 }

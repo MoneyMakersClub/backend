@@ -398,8 +398,7 @@ public class UserBookService {
     }
 
     @Transactional(readOnly = true)
-    public void validateUserBookOwner(Long userBookId) {
-        UserBook userBook = getUserBookById(userBookId);
+    public void validateUserBookOwner(UserBook userBook) {
         User currentUser = userService.getCurrentUser();
         if(!userBook.getUser().getUserId().equals(currentUser.getUserId())){
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
