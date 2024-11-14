@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.userhome.dto.common;
 
 public record OneLineCardDto(
         Long homeCardId,
+        Long cardIndex,
         Long oneLineId,
         String title,
         String author,

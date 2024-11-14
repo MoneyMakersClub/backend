@@ -1,9 +1,8 @@
 package com.mmc.bookduck.domain.userhome.controller;
 
 import com.mmc.bookduck.domain.userhome.dto.common.HomeCardDto;
-import com.mmc.bookduck.domain.userhome.dto.request.UserHomeCardRequestDto;
+import com.mmc.bookduck.domain.userhome.dto.request.HomeCardRequestDto;
 import com.mmc.bookduck.domain.userhome.dto.request.ReadingSpaceUpdateRequestDto;
-import com.mmc.bookduck.domain.userhome.dto.response.ReadingSpaceResponseDto;
 import com.mmc.bookduck.domain.userhome.service.UserHomeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +20,7 @@ public class UserHomeController {
 
     @Operation(summary = "내 리딩스페이스에 카드 추가", description = "내 리딩스페이스에 카드를 추가합니다.")
     @PostMapping
-    public ResponseEntity<?> addHomeCardToReadingSpace(@RequestBody @Valid UserHomeCardRequestDto requestDto) {
+    public ResponseEntity<?> addHomeCardToReadingSpace(@RequestBody @Valid HomeCardRequestDto requestDto) {
         HomeCardDto homeCardDto = userHomeService.addHomeCardToReadingSpace(requestDto);
         return ResponseEntity.ok().body(homeCardDto);
     }

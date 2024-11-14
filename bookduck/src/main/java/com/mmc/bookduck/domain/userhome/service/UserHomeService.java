@@ -10,7 +10,7 @@ import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.domain.userhome.dto.common.*;
 import com.mmc.bookduck.domain.userhome.dto.request.ReadingSpaceUpdateRequestDto;
-import com.mmc.bookduck.domain.userhome.dto.request.UserHomeCardRequestDto;
+import com.mmc.bookduck.domain.userhome.dto.request.HomeCardRequestDto;
 import com.mmc.bookduck.domain.userhome.dto.response.ReadingSpaceResponseDto;
 import com.mmc.bookduck.domain.userhome.entity.HomeCard;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -64,6 +64,7 @@ public class UserHomeService {
         Excerpt excerpt = archiveService.findArchiveByType(homeCard.getResourceId1(), ArchiveType.EXCERPT).getExcerpt();
         return new ExcerptCardDto(
                 homeCard.getHomeCardId(),
+                homeCard.getCardIndex(),
                 excerpt.getExcerptId(),
                 excerpt.getUserBook().getBookInfo().getTitle(),
                 excerpt.getUserBook().getBookInfo().getAuthor(),
@@ -77,6 +78,7 @@ public class UserHomeService {
         OneLine oneLine = oneLineRepository.findById(homeCard.getResourceId1()).get(); //TODO: 추후 수정!!
         return new OneLineCardDto(
                 homeCard.getHomeCardId(),
+                homeCard.getCardIndex(),
                 oneLine.getOneLineId(),
                 oneLine.getUserBook().getBookInfo().getTitle(),
                 oneLine.getUserBook().getBookInfo().getAuthor(),
@@ -91,6 +93,7 @@ public class UserHomeService {
         BookInfo bookInfo2 = homeCard.getResourceId2() != null ? bookInfoService.getBookInfoById(homeCard.getResourceId2()) : null;
         return new BookWithMemoCardDto(
                 homeCard.getHomeCardId(),
+                homeCard.getCardIndex(),
                 bookInfo1.getBookInfoId(),
                 bookInfo2 != null ? bookInfo2.getBookInfoId() : null,
                 bookInfo1.getImgPath(),
@@ -107,6 +110,7 @@ public class UserHomeService {
         BookInfo bookInfo2 = homeCard.getResourceId2() != null ? bookInfoService.getBookInfoById(homeCard.getResourceId2()) : null;
         return new BookWithSongCardDto(
                 homeCard.getHomeCardId(),
+                homeCard.getCardIndex(),
                 bookInfo1.getBookInfoId(),
                 bookInfo2 != null ? bookInfo2.getBookInfoId() : null,
                 bookInfo1.getImgPath(),
@@ -129,7 +133,7 @@ public class UserHomeService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USERHOME_NOT_FOUND));
     }
 
-    public HomeCardDto addHomeCardToReadingSpace(UserHomeCardRequestDto requestDto) {
+    public HomeCardDto addHomeCardToReadingSpace(HomeCardRequestDto requestDto) {
         User user = userService.getCurrentUser();
         UserHome userHome = getUserHomeOfUser(user);
         List<HomeCard> homeCards = getAllHomeCardsOfUserHome(userHome);
@@ -137,15 +141,15 @@ public class UserHomeService {
         return mapToHomeCardDto(homeCard, user.getNickname());
     }
 
-    public HomeCard addHomeCard(UserHomeCardRequestDto requestDto, UserHome userHome, long cardIndex) {
+    public HomeCard addHomeCard(HomeCardRequestDto requestDto, UserHome userHome, long cardIndex) {
         HomeCard homeCard = HomeCard.builder()
-                .userHome(userHome)
                 .cardType(requestDto.cardType())
                 .cardIndex(cardIndex)
                 .resourceId1(requestDto.resourceId1())
                 .resourceId2(requestDto.resourceId2())
                 .text1(requestDto.text1())
                 .text2(requestDto.text2())
+                .userHome(userHome)
                 .build();
         return homeCardRepository.save(homeCard);
     }

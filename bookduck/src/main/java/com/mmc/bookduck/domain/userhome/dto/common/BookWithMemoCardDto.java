@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.userhome.dto.common;
 
 public record BookWithMemoCardDto(
         Long homeCardId,
+        Long cardIndex,
         Long bookInfoId1,
         Long bookInfoId2,
         String imgPath1,

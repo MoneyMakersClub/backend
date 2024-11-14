@@ -1,9 +1,11 @@
-package com.mmc.bookduck.domain.userhome.dto.request;
+package com.mmc.bookduck.domain.userhome.dto.common;
 
 import com.mmc.bookduck.domain.userhome.entity.CardType;
 import jakarta.validation.constraints.NotNull;
 
-public record UserHomeCardRequestDto(
+public record HomeCardUpdateUnitDto(
+        Long homeCardId,
+        Long cardIndex,
         @NotNull CardType cardType,
         @NotNull Long resourceId1,
         Long resourceId2,

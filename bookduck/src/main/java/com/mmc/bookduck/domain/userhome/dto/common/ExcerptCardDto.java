@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.userhome.dto.common;
 
 public record ExcerptCardDto(
         Long homeCardId,
+        Long cardIndex,
         Long excerptId,
         String title,
         String author,
