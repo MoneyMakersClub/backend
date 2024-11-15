@@ -95,7 +95,12 @@ public class UserReadingReportService {
 
     public List<String> getUserKeywordAnalysis(Long userId) {
         User user = userService.getActiveUserByUserId(userId);
-        List<Review> reviews = reviewRepository.findTop50ByUserOrderByCreatedTimeDesc(user);
+        List<Review> reviews = reviewRepository.findTop30ByUserOrderByCreatedTimeDesc(user);
+
+        // 리뷰 내용을 모두 합치기
+        String allContent = reviews.stream()
+                .map(Review::getReviewContent)
+                .collect(Collectors.joining(" "));
 
         // reviewCount를 토큰화하여 명사와 형용사만 추출
         List<String> tokens = new ArrayList<>();
@@ -110,7 +115,7 @@ public class UserReadingReportService {
         // Top 10 뽑기
         return frequencyMap.entrySet().stream()
                 .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue())) // Descending order
-                .limit(10)
+                .limit(3)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }

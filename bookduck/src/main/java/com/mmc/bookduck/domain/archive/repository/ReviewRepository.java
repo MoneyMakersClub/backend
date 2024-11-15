@@ -18,7 +18,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     List<Review> findReviewByUserBookOrderByCreatedTimeDesc(UserBook userBook);
 
-    List<Review> findTop50ByUserOrderByCreatedTimeDesc(User user);
+    List<Review> findTop30ByUserOrderByCreatedTimeDesc(User user);
 
     List<Review> findAllByUserAndCreatedTimeAfter(User user, LocalDateTime createdTime);
 }
