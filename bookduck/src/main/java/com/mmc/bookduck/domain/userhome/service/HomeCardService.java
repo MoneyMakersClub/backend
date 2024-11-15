@@ -47,7 +47,6 @@ public class HomeCardService {
     }
 
     public void updateHomeCards(ReadingSpaceUpdateRequestDto requestDto, UserHome userHome) {
-
         Map<Long, HomeCard> currentHomeCardsMap = getAllHomeCardsOfUserHome(userHome).stream()
                 .collect(Collectors.toMap(HomeCard::getHomeCardId, homeCard -> homeCard));
 
@@ -67,7 +66,6 @@ public class HomeCardService {
         }
 
         List<HomeCard> cardsToDelete = new ArrayList<>(currentHomeCardsMap.values());
-        userHome.updateLastModifiedAt();
 
         // 삭제할 카드와 업데이트할 카드를 처리
         homeCardRepository.deleteAll(cardsToDelete);
