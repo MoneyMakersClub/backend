@@ -41,7 +41,7 @@ public interface OneLineRepository extends JpaRepository<OneLine, Long> {
             "OR ub.bookInfo.author LIKE %:keyword%) " +
             "AND o.user = :user " +
             "ORDER BY o.createdTime DESC")
-    Page<OneLine> searchAllByOneLineContentOrBookInfoTitleOrAuthorByCreatedTimeDescAndUser(
+    Page<OneLine> searchAllByOneLineContentOrBookInfoTitleOrAuthorByUserAndCreatedTimeDesc(
             @Param("keyword") String keyword,
             @Param("user") User user,
             Pageable pageable);

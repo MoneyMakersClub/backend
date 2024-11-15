@@ -66,7 +66,7 @@ public class ExcerptService {
     public ExcerptListResponseDto searchExcerpts(String keyword, Pageable pageable) {
         User user = userService.getCurrentUser();
         String escapedWord = escapeSpecialCharacters(keyword);
-        Page<Excerpt> excerptPage = excerptRepository.searchAllByExcerptContentOrBookInfoTitleOrAuthorByCreatedTimeDescAndUser(escapedWord, user, pageable);
+        Page<Excerpt> excerptPage = excerptRepository.searchAllByExcerptContentOrBookInfoTitleOrAuthorByUserAndCreatedTimeDesc(escapedWord, user, pageable);
         Page<ExcerptResponseDto> excerptResponseDtoPage = excerptPage.map(ExcerptResponseDto::from);
         return ExcerptListResponseDto.from(excerptResponseDtoPage);
     }

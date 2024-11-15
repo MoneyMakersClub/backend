@@ -30,7 +30,7 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
             "OR ub.bookInfo.author LIKE %:keyword%) " +
             "AND e.user = :user " +
             "ORDER BY e.createdTime DESC")
-    Page<Excerpt> searchAllByExcerptContentOrBookInfoTitleOrAuthorByCreatedTimeDescAndUser(
+    Page<Excerpt> searchAllByExcerptContentOrBookInfoTitleOrAuthorByUserAndCreatedTimeDesc(
             @Param("keyword") String keyword,
             @Param("user") User user,
             Pageable pageable);
