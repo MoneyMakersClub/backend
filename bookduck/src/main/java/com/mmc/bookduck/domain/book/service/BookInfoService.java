@@ -2,6 +2,9 @@ package com.mmc.bookduck.domain.book.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mmc.bookduck.domain.archive.entity.Excerpt;
+import com.mmc.bookduck.domain.archive.entity.Review;
+import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookUnitParseDto;
 import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineReadStatusDto;
@@ -27,10 +30,15 @@ import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.S3.S3Service;
 import com.mmc.bookduck.domain.user.service.UserService;
+import com.mmc.bookduck.global.common.BaseTimeEntity;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.google.GoogleBooksApiService;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -400,5 +408,30 @@ public class BookInfoService {
         BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
                 .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
         return bookInfo;
+    }
+
+    public BookListResponseDto<BookCoverImageUnitDto> getMostReadBooks() {
+        LocalDateTime monthsAgo = LocalDateTime.now().minusMonths(3);
+        List<UserBook> userBookList = userBookRepository.findAllByCreatedTimeAfter(monthsAgo);
+
+        Map<Long, Integer> bookInfoCountMap = new HashMap<>();
+        for (UserBook userBook : userBookList) {
+            Long bookInfoId = userBook.getBookInfo().getBookInfoId();
+            bookInfoCountMap.put(bookInfoId, bookInfoCountMap.getOrDefault(bookInfoId, 0) + 1);
+        }
+
+        List<Long> bookInfoIdList=  bookInfoCountMap.entrySet().stream()
+                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
+                .limit(12)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        List<BookCoverImageUnitDto> coverList = new ArrayList<>();
+        for(Long bookInfoId : bookInfoIdList){
+            BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
+                            .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
+            coverList.add(BookCoverImageUnitDto.from(bookInfo));
+        }
+        return new BookListResponseDto<>(coverList);
     }
 }

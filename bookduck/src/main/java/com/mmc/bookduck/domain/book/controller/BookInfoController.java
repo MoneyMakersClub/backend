@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.book.controller;
 
+import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.common.CustomBookUnitDto;
@@ -11,6 +12,7 @@ import com.mmc.bookduck.domain.book.service.BookInfoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,5 +73,12 @@ public class BookInfoController {
     public ResponseEntity<CustomBookResponseDto> updateCustomBookInfo(@PathVariable(name = "bookinfoId") final Long bookInfoId,
                                                                       @ModelAttribute final CustomBookUpdateDto dto){
         return ResponseEntity.ok(bookInfoService.updateCustomBookInfo(bookInfoId, dto));
+    }
+
+    @Operation(summary = "요즘 많이 읽는 책 목록 조회", description = "최근 많이 읽는 책 목록을 조회합니다.")
+    @GetMapping("/most")
+    public ResponseEntity<BookListResponseDto<BookCoverImageUnitDto>> getMostReadBooks(){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(bookInfoService.getMostReadBooks());
     }
 }
