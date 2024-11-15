@@ -3,7 +3,7 @@ package com.mmc.bookduck.domain.userhome.dto.common;
 import com.mmc.bookduck.domain.userhome.entity.CardType;
 
 public record OneLineCardDto(
-        Long homeCardId,
+        Long cardId,
         Long cardIndex,
         CardType cardType,
         String title,

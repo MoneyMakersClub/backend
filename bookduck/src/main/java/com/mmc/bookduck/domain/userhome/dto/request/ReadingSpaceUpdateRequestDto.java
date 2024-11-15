@@ -5,6 +5,6 @@ import com.mmc.bookduck.domain.userhome.dto.common.HomeCardUpdateUnitDto;
 import java.util.List;
 
 public record ReadingSpaceUpdateRequestDto(
-        List<HomeCardUpdateUnitDto> homeCardUpdateUnitDtos
+        List<HomeCardUpdateUnitDto> updatedCardList
 ) {
 }
