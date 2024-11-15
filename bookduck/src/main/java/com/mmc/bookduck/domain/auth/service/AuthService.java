@@ -3,9 +3,11 @@ package com.mmc.bookduck.domain.auth.service;
 import com.mmc.bookduck.domain.auth.dto.response.TokenResponseDto;
 import com.mmc.bookduck.global.exception.CustomTokenException;
 import com.mmc.bookduck.global.exception.ErrorCode;
+import com.mmc.bookduck.global.security.CookieUtil;
 import com.mmc.bookduck.global.security.JwtUtil;
 import com.mmc.bookduck.global.security.RedisService;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,9 +21,10 @@ import java.util.Collections;
 public class AuthService {
     private final JwtUtil jwtUtil;
     private final RedisService redisService;
+    private final CookieUtil cookieUtil;
 
-    // 액세스 토큰 및 리프레시 토큰 재발급
-    public TokenResponseDto refreshTokens(String accessToken, String refreshToken) {
+    // 리프레시 토큰 검증 및 액세스 토큰과 리프레시 토큰 재발급
+    public TokenResponseDto refreshTokens(String accessToken, String refreshToken, HttpServletResponse response) {
         // 액세스 토큰 만료 여부 확인
         if (accessToken != null && accessToken.startsWith("Bearer ")) {
             accessToken = accessToken.substring(7);
@@ -42,14 +45,19 @@ public class AuthService {
             throw new CustomTokenException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        // 이전 리프레시 토큰 삭제
+        // 기존 리프레시 토큰 삭제
         redisService.deleteValues(email);
 
-        // 새로운 액세스 토큰 및 리프레시 토큰 생성
+        // 새 액세스 토큰 및 리프레시 토큰 생성
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, Collections.singletonList(new SimpleGrantedAuthority(claims.get("role").toString())));
         String newAccessToken = jwtUtil.generateAccessToken(authentication);
         String newRefreshToken = jwtUtil.generateRefreshToken(authentication); // Redis에 저장
 
-        return new TokenResponseDto(newAccessToken, newRefreshToken, jwtUtil.getAccessTokenMaxAge(), jwtUtil.getRefreshTokenMaxAge());
+        // 기존 쿠키 삭제
+        cookieUtil.deleteCookie(response, "refreshToken");
+        // 새 리프레시 토큰을 HttpOnly 쿠키에 저장
+        cookieUtil.addCookie(response, "refreshToken", newRefreshToken, jwtUtil.getRefreshTokenMaxAge());
+
+        return new TokenResponseDto(newAccessToken, jwtUtil.getAccessTokenMaxAge());
     }
 }
