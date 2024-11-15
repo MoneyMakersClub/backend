@@ -1,9 +1,10 @@
 package com.mmc.bookduck.domain.alarm.service;
 
 import com.mmc.bookduck.domain.alarm.dto.response.AlarmListResponseDto;
-import com.mmc.bookduck.domain.alarm.dto.response.AlarmUnitDto;
+import com.mmc.bookduck.domain.alarm.dto.common.AlarmUnitDto;
 import com.mmc.bookduck.domain.alarm.dto.ssedata.AlarmDefaultDataDto;
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
+import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 import com.mmc.bookduck.domain.alarm.entity.PushAlarmFormat;
 import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -11,14 +12,15 @@ import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.fcm.FCMService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -55,14 +57,22 @@ public class AlarmService {
     private List<AlarmUnitDto> getAndReadAlarms(Pageable pageable) {
         List<AlarmUnitDto> alarmUnitDtoList = new ArrayList<>();
         User currentUser = userService.getCurrentUser();
-        Slice<Alarm> alarmSlice = alarmRepository.findByReceiverOrderByCreatedTimeDesc(currentUser, pageable);
-        if (alarmSlice != null && alarmSlice.hasContent()) {
-            for (Alarm alarm : alarmSlice) {
+        // Announcement 유형 제외 가져오기
+        Page<Alarm> alarmPage = alarmRepository.findByReceiverAndNotAnnouncementOrderByCreatedTimeDesc(currentUser, pageable);
+        if (alarmPage != null && alarmPage.hasContent()) {
+            for (Alarm alarm : alarmPage) {
                 alarmUnitDtoList.add(AlarmUnitDto.from(alarm));
                 alarm.readAlarm();
             }
-            alarmRepository.saveAll(alarmSlice);
+            alarmRepository.saveAll(alarmPage);
         }
         return alarmUnitDtoList;
+    }
+
+    public List<AlarmUnitDto> getRecentAnnouncements() {
+        Pageable pageable = PageRequest.of(0, 30);
+        // Announcement 유형만 가져오기
+        Page<Alarm> announcementPage = alarmRepository.findByAlarmTypeOrderByCreatedTimeDesc(AlarmType.ANNOUNCEMENT, pageable);
+        return announcementPage.stream().map(AlarmUnitDto::from).collect(Collectors.toList());
     }
 }

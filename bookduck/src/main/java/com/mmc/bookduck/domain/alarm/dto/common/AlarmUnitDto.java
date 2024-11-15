@@ -1,4 +1,4 @@
-package com.mmc.bookduck.domain.alarm.dto.response;
+package com.mmc.bookduck.domain.alarm.dto.common;
 
 
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
