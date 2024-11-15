@@ -31,14 +31,14 @@ public class HomeCardConverter {
 
     private ExcerptCardDto convertToExcerptCardDto(HomeCard homeCard) {
         Excerpt excerpt = excerptService.getExcerptById(homeCard.getResourceId1());
-        return new ExcerptCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(), excerpt.getExcerptId(),
+        return new ExcerptCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType()
                 excerpt.getUserBook().getBookInfo().getTitle(), excerpt.getUserBook().getBookInfo().getAuthor(),
                 excerpt.getPageNumber(), excerpt.getExcerptContent());
     }
 
     private OneLineCardDto convertToOneLineCardDto(HomeCard homeCard) {
         OneLine oneLine = oneLineService.getOneLineById(homeCard.getResourceId1());
-        return new OneLineCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(), oneLine.getOneLineId(),
+        return new OneLineCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(),
                 oneLine.getUserBook().getBookInfo().getTitle(), oneLine.getUserBook().getBookInfo().getAuthor(),
                 oneLine.getUserBook().getRating(), oneLine.getOneLineContent());
     }
@@ -48,9 +48,8 @@ public class HomeCardConverter {
         BookInfo bookInfo2 = Optional.ofNullable(homeCard.getResourceId2())
                 .map(bookInfoService::getBookInfoById)
                 .orElse(null);
-        return new BookWithMemoCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(), bookInfo1.getBookInfoId(),
-                bookInfo2 != null ? bookInfo2.getBookInfoId() : null, bookInfo1.getImgPath(),
-                bookInfo2 != null ? bookInfo2.getImgPath() : null, homeCard.getText1());
+        return new BookWithMemoCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(),
+                bookInfo1.getImgPath(), bookInfo2 != null ? bookInfo2.getImgPath() : null, homeCard.getText1());
     }
 
     private BookWithSongCardDto convertToBookWithSongCardDto(HomeCard homeCard, String nickname) {
@@ -58,8 +57,7 @@ public class HomeCardConverter {
         BookInfo bookInfo2 = Optional.ofNullable(homeCard.getResourceId2())
                 .map(bookInfoService::getBookInfoById)
                 .orElse(null);
-        return new BookWithSongCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(), bookInfo1.getBookInfoId(),
-                bookInfo2 != null ? bookInfo2.getBookInfoId() : null, bookInfo1.getImgPath(),
-                bookInfo2 != null ? bookInfo2.getImgPath() : null, homeCard.getText1(), homeCard.getText2(), nickname);
+        return new BookWithSongCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(),
+                bookInfo1.getImgPath(), bookInfo2 != null ? bookInfo2.getImgPath() : null, homeCard.getText1(), homeCard.getText2(), nickname);
     }
 }
