@@ -1,5 +1,7 @@
 package com.mmc.bookduck.domain.friend.service;
 
+import com.mmc.bookduck.domain.alarm.entity.AlarmType;
+import com.mmc.bookduck.domain.alarm.service.AlarmByTypeService;
 import com.mmc.bookduck.domain.friend.dto.common.FriendRequestUnitDto;
 import com.mmc.bookduck.domain.friend.dto.request.FriendRequestDto;
 import com.mmc.bookduck.domain.friend.dto.response.FriendRequestListResponseDto;
@@ -27,6 +29,7 @@ public class FriendRequestService {
     private final FriendRepository friendRepository;
     private final UserService userService;
     private final UserItemService userItemService;
+    private final AlarmByTypeService alarmByTypeService;
 
     // 친구 요청 전송
     public void sendFriendRequest(FriendRequestDto requestDto) {
@@ -48,6 +51,7 @@ public class FriendRequestService {
         }
         FriendRequest friendRequest = requestDto.toEntity(sender, receiver);
         friendRequestRepository.save(friendRequest);
+        alarmByTypeService.createFriendAlarm(sender, receiver, AlarmType.FRIEND_REQUEST);
     }
 
     // 친구 요청 취소
