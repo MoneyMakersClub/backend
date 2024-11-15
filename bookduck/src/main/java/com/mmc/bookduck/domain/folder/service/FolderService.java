@@ -4,6 +4,7 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.folder.dto.common.CandidateFolderBookDto;
 import com.mmc.bookduck.domain.folder.dto.common.FolderBookCoverListDto;
+import com.mmc.bookduck.domain.folder.dto.request.FolderBookOrderRequestDto;
 import com.mmc.bookduck.domain.folder.dto.request.FolderRequestDto;
 import com.mmc.bookduck.domain.folder.dto.response.AllFolderListResponseDto;
 import com.mmc.bookduck.domain.folder.dto.response.CandidateFolderBookListResponseDto;
@@ -99,10 +100,12 @@ public class FolderService {
                 // 이미 folderBook 있을 때,
                 throw new CustomException(ErrorCode.FOLDERBOOK_ALREADY_EXISTS);
             }
+            folderBookService.incrementOrderFolderBooks(folder);
             FolderBook newFolderBook = folderBookService.createFolderBook(userBook, folder);
             folder.addFolderBook(newFolderBook);
 
-            for(FolderBook folderBook : folder.getFolderBooks()){
+            List<FolderBook> folderBooks = folderBookService.orderFolderBooks(folder);
+            for(FolderBook folderBook : folderBooks){
                 folderBookList.add(FolderBookUnitDto.from(folderBook));
             }
             return new FolderBookListResponseDto(folder, folderBookList);
@@ -123,6 +126,7 @@ public class FolderService {
         if(folder.getUser().equals(user) && folderBook.getUserBook().getUser().equals(user)){
             folder.removeFolderBook(folderBook);
             folderBookService.deleteOneFolderBook(folderBook);
+            folderBookService.decrementOrderFolderBooks(folder, folderBook.getBookOrder());
 
             for(FolderBook book : folder.getFolderBooks()){
                 folderBookList.add(FolderBookUnitDto.from(book));
@@ -222,5 +226,17 @@ public class FolderService {
             dtoList.add(CandidateFolderBookDto.from(userBook));
         }
         return new CandidateFolderBookListResponseDto(dtoList);
+    }
+
+    public FolderBookListResponseDto updateFolderBookOrder(Long folderId, FolderBookOrderRequestDto requestDto) {
+        Folder folder = findFolderById(folderId);
+        folderBookService.updateFolderBookOrder(folder, requestDto);
+
+        List<FolderBookUnitDto> folderBookList = new ArrayList<>();
+        List<FolderBook> folderBooks = folderBookService.orderFolderBooks(folder);
+        for (FolderBook folderBook : folderBooks) {
+            folderBookList.add(FolderBookUnitDto.from(folderBook));
+        }
+        return new FolderBookListResponseDto(folder, folderBookList);
     }
 }
