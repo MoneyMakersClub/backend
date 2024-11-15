@@ -4,7 +4,7 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-public record ExcerptSearchResponseDto (
+public record ExcerptListResponseDto(
         int currentPage,
         int pageSize,
         long totalElements,
@@ -12,8 +12,8 @@ public record ExcerptSearchResponseDto (
         List<ExcerptResponseDto> excerptList
 ) {
 
-    public static ExcerptSearchResponseDto from(Page<ExcerptResponseDto> excerptPage) {
-        return new ExcerptSearchResponseDto(
+    public static ExcerptListResponseDto from(Page<ExcerptResponseDto> excerptPage) {
+        return new ExcerptListResponseDto(
                 excerptPage.getNumber(),
                 excerptPage.getSize(),
                 excerptPage.getTotalElements(),

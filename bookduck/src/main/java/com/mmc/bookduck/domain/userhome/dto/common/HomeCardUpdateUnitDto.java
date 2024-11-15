@@ -1,7 +1,7 @@
 package com.mmc.bookduck.domain.userhome.dto.common;
 
 public record HomeCardUpdateUnitDto(
-        Long homeCardId,
+        Long cardId,
         Long cardIndex
 ) {
 }

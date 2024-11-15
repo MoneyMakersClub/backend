@@ -10,7 +10,7 @@ import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
-import com.mmc.bookduck.domain.archive.dto.response.ExcerptSearchResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.ExcerptListResponseDto;
 import com.mmc.bookduck.domain.userhome.service.UserHomeService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -63,10 +63,11 @@ public class ExcerptService {
     }
 
     @Transactional(readOnly = true)
-    public ExcerptSearchResponseDto searchExcerpts(String keyword, Pageable pageable) {
+    public ExcerptListResponseDto searchExcerpts(String keyword, Pageable pageable) {
+        User user = userService.getCurrentUser();
         String escapedWord = escapeSpecialCharacters(keyword);
-        Page<Excerpt> excerptPage = excerptRepository.searchAllByExcerptContentOrBookInfoTitleOrAuthorByCreatedTimeDesc(escapedWord, pageable);
+        Page<Excerpt> excerptPage = excerptRepository.searchAllByExcerptContentOrBookInfoTitleOrAuthorByUserAndCreatedTimeDesc(escapedWord, user, pageable);
         Page<ExcerptResponseDto> excerptResponseDtoPage = excerptPage.map(ExcerptResponseDto::from);
-        return ExcerptSearchResponseDto.from(excerptResponseDtoPage);
+        return ExcerptListResponseDto.from(excerptResponseDtoPage);
     }
 }
