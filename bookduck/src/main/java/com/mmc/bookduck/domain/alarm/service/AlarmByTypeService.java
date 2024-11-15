@@ -31,8 +31,8 @@ public class AlarmByTypeService {
     }
 
     // 한줄평 좋아요 알림 생성
-    public void createOneLineHeartAlarm(User sender, User receiver, Long bookInfoId) {
-        AlarmType alarmType = AlarmType.ONELINEHEART_ADDED;
+    public void createOneLineLikeAlarm(User sender, User receiver, Long bookInfoId) {
+        AlarmType alarmType = AlarmType.ONELINELIKE_ADDED;
         String message = MessageFormat.format(alarmType.getMessagePattern(), sender.getNickname());
 
         Alarm alarm = Alarm.builder()
@@ -57,19 +57,6 @@ public class AlarmByTypeService {
                 .message(message)
                 .resourceName("UserGrowth")
                 .resourceValue(level.toString())
-                .build();
-        alarmService.createAlarm(alarm, receiver);
-    }
-
-    // 아이템 잠금해제 알림 생성
-    public void createItemUnlockAlarm(User receiver) {
-        AlarmType alarmType = AlarmType.ITEM_UNLOCKED;
-
-        Alarm alarm = Alarm.builder()
-                .alarmType(alarmType)
-                .receiver(receiver)
-                .message(alarmType.getMessagePattern())
-                .resourceName("Item")
                 .build();
         alarmService.createAlarm(alarm, receiver);
     }
