@@ -7,7 +7,6 @@ import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -54,20 +53,11 @@ public class Review extends BaseTimeEntity {
         this.userBook = userBook;
     }
 
-    public void updateReviewTitle(String reviewTitle) {
+    public void updateReview(String reviewTitle, String reviewContent, String color, Visibility visibility) {
         this.reviewTitle = reviewTitle;
-    }
-
-    public void updateContent(String reviewContent) {
         this.reviewContent = reviewContent;
-    }
-
-    public void updateVisibility(Visibility visibility) {
-        this.visibility = visibility;
-    }
-
-    public void updateColor(String color) {
         this.color = color;
+        this.visibility = visibility;
     }
 
 }

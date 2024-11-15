@@ -89,7 +89,7 @@ public class FolderService {
         User user = userService.getCurrentUser();
 
         Folder folder = findFolderById(folderId);
-        UserBook userBook = userBookService.findUserBookById(userBookId);
+        UserBook userBook = userBookService.getUserBookById(userBookId);
 
         List<FolderBookUnitDto> folderBookList = new ArrayList<>();
 

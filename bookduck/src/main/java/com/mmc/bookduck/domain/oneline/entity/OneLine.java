@@ -3,6 +3,7 @@ package com.mmc.bookduck.domain.oneline.entity;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.onelineLike.entity.OneLineLike;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -19,7 +20,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class OneLine {
+public class OneLine extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
@@ -49,6 +50,10 @@ public class OneLine {
         this.user = user;
         this.userBook = userBook;
         this.oneLineLikes = new ArrayList<>();
+    }
+
+    public void updateOneLine(String oneLineContent){
+        this.oneLineContent = oneLineContent;
     }
 
     // OneLineLike 추가

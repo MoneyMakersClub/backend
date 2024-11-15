@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         try {
                             // 리프레시 토큰의 유효성을 검증
                             jwtUtil.validateRefreshToken(refreshToken);
-                            ErrorResponseUtil.writeErrorResponseWithLocationHeader(response, e.getErrorCode(), request.getRequestURI(), "/auth/refresh");
+                            ErrorResponseUtil.writeErrorResponse(response, e.getErrorCode(), request.getRequestURI());
                             return;
                         } catch (CustomTokenException ex) {
                             ErrorResponseUtil.writeErrorResponse(response, ex.getErrorCode(), request.getRequestURI());

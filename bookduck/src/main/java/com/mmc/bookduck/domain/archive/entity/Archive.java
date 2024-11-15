@@ -28,11 +28,16 @@ public class Archive {
         this.review = review;
     }
 
-    public void updateExcerpt(Excerpt excerpt) {
-        this.excerpt = excerpt;
+    public void updateArchive(Excerpt updatedExcerpt, Review updatedReview) {
+        this.excerpt = updatedExcerpt;
+        this.review = updatedReview;
     }
 
-    public void updateReview(Review review) {
-        this.review = review;
+    public void updateExcerpt(Excerpt newExcerpt) {
+        this.excerpt = newExcerpt;
+    }
+
+    public void updateReview(Review newReview) {
+        this.review = newReview;
     }
 }

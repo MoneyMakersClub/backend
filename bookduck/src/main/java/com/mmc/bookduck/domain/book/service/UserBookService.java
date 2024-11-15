@@ -1,6 +1,8 @@
 package com.mmc.bookduck.domain.book.service;
 
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.request.ExcerptCreateRequestDto;
+import com.mmc.bookduck.domain.archive.dto.request.ReviewCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.response.ExcerptResponseDto;
 import com.mmc.bookduck.domain.archive.dto.response.ReviewResponseDto;
 import com.mmc.bookduck.domain.archive.entity.ArchiveType;
@@ -8,6 +10,8 @@ import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
+import com.mmc.bookduck.domain.archive.service.ExcerptService;
+import com.mmc.bookduck.domain.archive.service.ReviewService;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
@@ -28,15 +32,17 @@ import com.mmc.bookduck.global.common.BaseTimeEntity;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -95,37 +101,26 @@ public class UserBookService {
         }
     }
 
-    // UserBook 정보 불러오거나 없으면 생성하기 (Archive에서 활용)
-    @Transactional(readOnly = true)
-    public UserBook getUserBookFromExcerptOrReview(Excerpt excerpt, Review review) {
-        if (excerpt != null) {
-            return excerpt.getUserBook();
-        } else if (review != null) {
-            return findUserBookById(review.getUserBook().getUserBookId());
+    public UserBook getUserBookOrAdd(ExcerptCreateRequestDto excerptDto, ReviewCreateRequestDto reviewDto, ArchiveCreateRequestDto archiveDto) {
+        // ExcerptDto 또는 ReviewDto에서 userBookId를 확인
+        Long userBookId = (excerptDto != null && excerptDto.getUserBookId() != null)
+                ? excerptDto.getUserBookId()
+                : (reviewDto != null ? reviewDto.getUserBookId() : null);
+        if (userBookId != null) {
+            return getUserBookById(userBookId);
+        }
+        if (archiveDto.getUserBook() != null) {
+            return addUserBookEntity(archiveDto.getUserBook());
+        } else if (archiveDto.getCustomBook() != null) {
+            return createCustomBookEntity(archiveDto.getCustomBook());
         } else {
             throw new CustomException(ErrorCode.USERBOOK_NOT_FOUND);
         }
     }
 
-    public UserBook getUserBookOrAdd(Excerpt excerpt, Review review, ArchiveCreateRequestDto requestDto) {
-        // Excerpt와 Review에서 UserBook을 가져오려 시도
-        try {
-            return getUserBookFromExcerptOrReview(excerpt, review);
-        } catch (CustomException e) {
-            // CustomException이 발생하면 UserBook 새로 생성
-            if (requestDto.getUserBook() != null) {
-                return addUserBookEntity(requestDto.getUserBook());
-            } else if (requestDto.getCustomBook() != null) {
-                return createCustomBookEntity(requestDto.getCustomBook());
-            } else {
-                throw new CustomException(ErrorCode.USERBOOK_NOT_FOUND);
-            }
-        }
-    }
-
     // 서재에서 책 삭제
     public String deleteUserBook(Long userBookId) {
-        UserBook userBook = findUserBookById(userBookId);
+        UserBook userBook = getUserBookById(userBookId);
         User user = userService.getCurrentUser();
 
         // 권한체크
@@ -153,7 +148,7 @@ public class UserBookService {
             throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
         }
 
-        UserBook userBook = findUserBookById(userBookId);
+        UserBook userBook = getUserBookById(userBookId);
 
         User user = userService.getCurrentUser();
 
@@ -168,7 +163,7 @@ public class UserBookService {
     }
 
     @Transactional(readOnly = true)
-    public UserBook findUserBookById(Long userBookId){
+    public UserBook getUserBookById(Long userBookId){
         UserBook userBook = userBookRepository.findById(userBookId)
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
         return userBook;
@@ -227,7 +222,7 @@ public class UserBookService {
     // 서재책 상세보기 - 기본정보
     @Transactional(readOnly = true)
     public BookInfoBasicResponseDto getUserBookInfoBasic(Long userBookId) {
-        UserBook userBook = findUserBookById(userBookId);
+        UserBook userBook = getUserBookById(userBookId);
 
         String koreanGenreName = genreService.genreNameToKorean(userBook.getBookInfo().getGenre());
         BookInfoDetailDto detailDto = BookInfoDetailDto.from(userBook.getBookInfo(), koreanGenreName);
@@ -248,7 +243,7 @@ public class UserBookService {
     // 서재 책 상세보기 - 추가정보
     @Transactional(readOnly = true)
     public BookInfoAdditionalResponseDto getUserBookInfoAdditional(Long userBookId) {
-        UserBook userBook = findUserBookById(userBookId);
+        UserBook userBook = getUserBookById(userBookId);
         List<UserBook> sameBookInfo_userBookList = findAllUserBookByBookInfo(userBook.getBookInfo());
 
         List<BookRatingUnitDto> oneLineList = new ArrayList<>();
@@ -306,7 +301,7 @@ public class UserBookService {
         if ((dto.rating() % 0.5) != 0.0){
             throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
         }
-        UserBook userBook = findUserBookById(userbookId);
+        UserBook userBook = getUserBookById(userbookId);
         userBook.changeRating(dto.rating());
 
         return RatingResponseDto.from(userBook);
@@ -314,7 +309,7 @@ public class UserBookService {
 
     @Transactional
     public RatingResponseDto deleteRating(Long userbookId) {
-        UserBook userBook = findUserBookById(userbookId);
+        UserBook userBook = getUserBookById(userbookId);
         userBook.changeRating(0.0);
 
         return RatingResponseDto.from(userBook);
@@ -322,7 +317,7 @@ public class UserBookService {
 
     @Transactional(readOnly = true)
     public UserBookReviewExcerptResponseDto getAllUserBookReviewExcerpt(Long userbookId) {
-        UserBook userBook = findUserBookById(userbookId);
+        UserBook userBook = getUserBookById(userbookId);
         List<Excerpt> excerpts = excerptRepository.findExcerptByUserBookOrderByCreatedTimeDesc(userBook);
         List<Review> reviews = reviewRepository.findReviewByUserBookOrderByCreatedTimeDesc(userBook);
 
@@ -400,5 +395,13 @@ public class UserBookService {
             coverList.add(BookCoverImageUnitDto.from(userBook));
         }
         return new BookListResponseDto<>(coverList);
+    }
+
+    @Transactional(readOnly = true)
+    public void validateUserBookOwner(UserBook userBook) {
+        User currentUser = userService.getCurrentUser();
+        if(!userBook.getUser().getUserId().equals(currentUser.getUserId())){
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+        }
     }
 }
