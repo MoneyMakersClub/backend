@@ -29,7 +29,7 @@ public class ExcerptService {
         User user = userService.getCurrentUser();
         UserBook userBook = userBookService.getUserBookById(requestDto.getUserBookId());
         Visibility visibility = requestDto.getVisibility() != null ? requestDto.getVisibility() : Visibility.PUBLIC;
-        Excerpt excerpt = requestDto.toEntity(user, userBook, false, visibility);
+        Excerpt excerpt = requestDto.toEntity(user, userBook, visibility);
         return excerptRepository.save(excerpt);
     }
 

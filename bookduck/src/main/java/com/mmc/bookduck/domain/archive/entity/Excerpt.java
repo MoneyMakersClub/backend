@@ -29,8 +29,6 @@ public class Excerpt extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
-    private boolean isMain;
-
     @NotNull
     private Long pageNumber;
 
@@ -47,10 +45,9 @@ public class Excerpt extends BaseTimeEntity {
     private UserBook userBook;
 
     @Builder
-    public Excerpt(String excerptContent, Visibility visibility, boolean isMain, Long pageNumber, User user, UserBook userBook) {
+    public Excerpt(String excerptContent, Visibility visibility, Long pageNumber, User user, UserBook userBook) {
         this.excerptContent = excerptContent;
         this.visibility = visibility;
-        this.isMain = isMain;
         this.pageNumber = pageNumber;
         this.user = user;
         this.userBook = userBook;
