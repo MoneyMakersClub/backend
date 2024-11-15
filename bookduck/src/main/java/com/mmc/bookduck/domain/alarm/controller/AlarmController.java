@@ -27,7 +27,7 @@ public class AlarmController {
     }
 
     @Operation(summary = "일반 알림 목록 조회 및 읽음 처리", description = "일반 알림 목록을 조회하고 읽음 처리합니다.")
-    @PatchMapping
+    @PatchMapping("/common")
     public ResponseEntity<?> getRecentAlarms() {
         return ResponseEntity.ok(alarmService.getAndReadRecentAlarms());
     }
