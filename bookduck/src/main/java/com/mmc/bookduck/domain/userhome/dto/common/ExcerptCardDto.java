@@ -6,7 +6,6 @@ public record ExcerptCardDto(
         Long homeCardId,
         Long cardIndex,
         CardType cardType,
-        Long resourceId1,
         String title,
         String author,
         Long pageNumber, // null일 수 있음

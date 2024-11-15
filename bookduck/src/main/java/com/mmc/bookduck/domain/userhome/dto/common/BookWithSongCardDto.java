@@ -6,8 +6,6 @@ public record BookWithSongCardDto(
         Long homeCardId,
         Long cardIndex,
         CardType cardType,
-        Long resourceId1,
-        Long resourceId2,
         String imgPath1,
         String imgPath2,
         String text1,

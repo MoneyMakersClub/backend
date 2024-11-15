@@ -6,7 +6,6 @@ public record OneLineCardDto(
         Long homeCardId,
         Long cardIndex,
         CardType cardType,
-        Long resourceId1,
         String title,
         String author,
         Double rating, // null일 수 있음
