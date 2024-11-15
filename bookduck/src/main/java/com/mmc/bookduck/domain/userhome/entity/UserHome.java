@@ -1,10 +1,13 @@
-package com.mmc.bookduck.domain.user.entity;
+package com.mmc.bookduck.domain.userhome.entity;
 
+import com.mmc.bookduck.domain.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -15,11 +18,7 @@ public class UserHome {
     @Column(updatable = false)
     private Long userHomeId;
 
-    @NotNull
-    private String bio;
-
-    @NotNull
-    private String aiTags;
+    private LocalDateTime lastModifiedAt;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", unique = true, updatable = false)
@@ -30,17 +29,9 @@ public class UserHome {
     @Builder
     public UserHome(User user) {
         this.user = user;
-        this.bio = "";
-        this.aiTags = "";
     }
 
-    // bio 변경
-    public void updateBio(String bio) {
-        this.bio = bio;
-    }
-
-    // aiTags 변경
-    public void updateAiTags(String aiTags) {
-        this.aiTags = aiTags;
+    public void updateLastModifiedAt() {
+        this.lastModifiedAt = LocalDateTime.now();
     }
 }

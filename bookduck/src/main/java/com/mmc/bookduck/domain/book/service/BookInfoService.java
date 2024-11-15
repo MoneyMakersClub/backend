@@ -430,7 +430,7 @@ public class BookInfoService {
             default:
                 throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
         }
-        Page<OneLineRatingUnitDto> dtoPage = oneLinePage.map(OneLineRatingUnitDto::fromEntity);
+        Page<OneLineRatingUnitDto> dtoPage = oneLinePage.map(OneLineRatingUnitDto::from);
         return OneLineRatingListResponseDto.from(dtoPage);
     }
 

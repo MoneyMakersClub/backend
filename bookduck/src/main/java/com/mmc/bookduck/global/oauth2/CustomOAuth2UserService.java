@@ -2,10 +2,10 @@ package com.mmc.bookduck.global.oauth2;
 
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.entity.UserGrowth;
-import com.mmc.bookduck.domain.user.entity.UserHome;
+import com.mmc.bookduck.domain.userhome.entity.UserHome;
 import com.mmc.bookduck.domain.user.entity.UserSetting;
 import com.mmc.bookduck.domain.user.repository.UserGrowthRepository;
-import com.mmc.bookduck.domain.user.repository.UserHomeRepository;
+import com.mmc.bookduck.domain.userhome.repository.UserHomeRepository;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
 import com.mmc.bookduck.domain.user.repository.UserSettingRepository;
 import com.mmc.bookduck.global.exception.CustomOAuth2AuthenticationException;

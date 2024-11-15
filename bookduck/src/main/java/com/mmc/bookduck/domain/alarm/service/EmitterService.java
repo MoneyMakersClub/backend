@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.alarm.service;
 
 import com.mmc.bookduck.domain.alarm.dto.ssedata.AlarmDefaultDataDto;
+import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
 import com.mmc.bookduck.domain.alarm.repository.EmitterRepository;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -36,7 +37,7 @@ public class EmitterService {
     }
 
     private void sendToClientIfNewAlarmExists(User user) {
-        Boolean isMissedAlarms = alarmRepository.existsByReceiverAndIsReadFalse(user);
+        Boolean isMissedAlarms = alarmRepository.existsByReceiverAndIsReadFalseAndAlarmTypeNot(user, AlarmType.ANNOUNCEMENT);
         if (isMissedAlarms.equals(true)) {
             sendToClient(user.getUserId(), AlarmDefaultDataDto.from(true), "new sse alarm exists");
         } else {

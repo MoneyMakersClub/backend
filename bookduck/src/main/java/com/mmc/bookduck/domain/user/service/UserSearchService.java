@@ -2,10 +2,9 @@ package com.mmc.bookduck.domain.user.service;
 
 import com.mmc.bookduck.domain.friend.service.FriendService;
 import com.mmc.bookduck.domain.item.dto.common.ItemEquippedUnitDto;
-import com.mmc.bookduck.domain.item.entity.UserItem;
 import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.dto.common.UserUnitDto;
-import com.mmc.bookduck.domain.user.dto.response.UserSearchResponseDto;
+import com.mmc.bookduck.domain.user.dto.response.UserListResponseDto;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class UserSearchService {
     private final FriendService friendService;
 
     // 유저 검색
-    public UserSearchResponseDto searchUsers(String keyword, Pageable pageable) {
+    public UserListResponseDto searchUsers(String keyword, Pageable pageable) {
         // 키워드의 이스케이프 처리
         String escapedWord = escapeSpecialCharacters(keyword);
         Page<User> userPage = getSearchedUserPage(escapedWord, pageable);
@@ -39,7 +38,7 @@ public class UserSearchService {
             boolean isFriend = friendService.isFriendWithCurrentUser(user);
             return UserUnitDto.from(user, userItems, isFriend);
         });
-        return UserSearchResponseDto.from(userUnitDtoPage);
+        return UserListResponseDto.from(userUnitDtoPage);
     }
 
     @Transactional(readOnly = true)
