@@ -41,13 +41,13 @@ public class OneLineService {
 
     // 수정
     public void updateOneLine(Long oneLineId, OneLineUpdateRequestDto requestDto){
-        OneLine oneLine = ValidateOneLineCreator(oneLineId);
+        OneLine oneLine = validateOneLineCreator(oneLineId);
         oneLine.updateOneLine(requestDto.oneLineContent());
     }
 
     // 삭제
     public void deleteOneLine(Long oneLineId){
-        OneLine oneLine = ValidateOneLineCreator(oneLineId);
+        OneLine oneLine = validateOneLineCreator(oneLineId);
         oneLineRepository.delete(oneLine);
         userHomeService.deleteHomeCardsByOneLine(oneLine);
     }
@@ -59,7 +59,7 @@ public class OneLineService {
     }
 
     @Transactional(readOnly = true)
-    public OneLine ValidateOneLineCreator(Long oneLineId){
+    public OneLine validateOneLineCreator(Long oneLineId){
         OneLine oneLine = getOneLineById(oneLineId);
         User currentUser = userService.getCurrentUser();
         if(!oneLine.getUser().getUserId().equals(currentUser.getUserId())){

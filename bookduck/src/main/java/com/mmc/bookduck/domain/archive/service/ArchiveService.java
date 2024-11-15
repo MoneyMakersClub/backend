@@ -7,21 +7,31 @@ import com.mmc.bookduck.domain.archive.dto.request.ReviewCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.response.ArchiveResponseDto;
 import com.mmc.bookduck.domain.archive.dto.response.ExcerptResponseDto;
 import com.mmc.bookduck.domain.archive.dto.response.ReviewResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.UserArchiveResponseDto;
 import com.mmc.bookduck.domain.archive.entity.Archive;
 import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ArchiveRepository;
+import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
+import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
+import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -29,11 +39,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 public class ArchiveService {
+    private final UserService userService;
     private final ExcerptService excerptService;
     private final ReviewService reviewService;
-    private final UserService userService;
     private final UserBookService userBookService;
     private final ArchiveRepository archiveRepository;
+    private final ExcerptRepository excerptRepository;
+    private final ReviewRepository reviewRepository;
 
     // 생성
     public ArchiveResponseDto createArchive(ArchiveCreateRequestDto requestDto) {
@@ -137,6 +149,49 @@ public class ArchiveService {
             // 변경된 내용 저장 (Archive가 삭제되지 않은 경우에만)
             archiveRepository.save(archive);
         }
+    }
+
+    // 기록 아카이브 조회
+    @Transactional(readOnly = true)
+    public UserArchiveResponseDto getUserArchive(Long userId, ArchiveType archiveType, Pageable pageable){
+        userService.getActiveUserByUserId(userId);
+        Long currentUserId = userService.getCurrentUser().getUserId();
+        List<UserArchiveResponseDto.ArchiveWithType> archiveList = new ArrayList<>();
+        // 발췌 조회
+        if (archiveType == ArchiveType.EXCERPT || archiveType == ArchiveType.ALL) {
+            List<Excerpt> excerpts = excerptRepository.findByUserId(userId);
+            for (Excerpt excerpt : excerpts) {
+                if (!userId.equals(currentUserId) && excerpt.getVisibility() != Visibility.PUBLIC) {
+                    continue;
+                }
+                archiveList.add(new UserArchiveResponseDto.ArchiveWithType("EXCERPT", ExcerptResponseDto.from(excerpt)));
+            }
+        }
+        // 리뷰 조회
+        if (archiveType == ArchiveType.REVIEW || archiveType == ArchiveType.ALL) {
+            List<Review> reviews = reviewRepository.findByUserId(userId);
+            for (Review review : reviews) {
+                if (!userId.equals(currentUserId) && review.getVisibility() != Visibility.PUBLIC) {
+                    continue;
+                }
+                archiveList.add(new UserArchiveResponseDto.ArchiveWithType("REVIEW", ReviewResponseDto.from(review)));
+            }
+        }
+        // 데이터 합친 후 최신순 정렬
+        archiveList.sort((a1, a2) -> {
+            LocalDateTime time1 = (a1.data() instanceof ExcerptResponseDto) ?
+                    ((ExcerptResponseDto) a1.data()).createdTime() :
+                    ((ReviewResponseDto) a1.data()).createdTime();
+            LocalDateTime time2 = (a2.data() instanceof ExcerptResponseDto) ?
+                    ((ExcerptResponseDto) a2.data()).createdTime() :
+                    ((ReviewResponseDto) a2.data()).createdTime();
+            return time2.compareTo(time1);
+        });
+        Page<UserArchiveResponseDto.ArchiveWithType> archivePage = new PageImpl<>(archiveList, pageable, archiveList.size());
+        Page<UserArchiveResponseDto.ArchiveWithType> dtoPage = archivePage.map(item ->
+                new UserArchiveResponseDto.ArchiveWithType(item.type(), item.data())
+        );
+        return UserArchiveResponseDto.from(dtoPage);
     }
 
     public ArchiveResponseDto createArchiveResponseDto(Archive archive, Excerpt excerpt, Review review, UserBook userBook) {

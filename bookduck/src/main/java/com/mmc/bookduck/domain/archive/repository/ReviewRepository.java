@@ -19,4 +19,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findReviewByUserBookOrderByCreatedTimeDesc(UserBook userBook);
 
     List<Review> findAllByUserAndCreatedTimeAfter(User user, LocalDateTime createdTime);
+
+    @Query("SELECT e FROM Review e WHERE e.user.id = :userId")
+    List<Review> findByUserId(@Param("userId") Long userId);
 }
