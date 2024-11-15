@@ -1,7 +1,5 @@
 package com.mmc.bookduck.global.security;
 
-import com.mmc.bookduck.global.exception.CustomTokenException;
-import com.mmc.bookduck.global.exception.ErrorCode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,15 +12,15 @@ public class CookieUtil {
 
     public String getCookieValue(HttpServletRequest request, String name){
         Cookie[] cookies = request.getCookies();
-        if(cookies == null){
-            throw new CustomTokenException(ErrorCode.NO_COOKIE);
+        if (cookies == null){
+            return null;
         }
         for(Cookie cookie : cookies){
             if(cookie.getName().equals(name)){
                 return cookie.getValue();
             }
         }
-        throw new CustomTokenException(ErrorCode.NO_COOKIE);
+        return null;
     }
 
     public void addCookie(HttpServletResponse response, String name, String value, int maxAge){
