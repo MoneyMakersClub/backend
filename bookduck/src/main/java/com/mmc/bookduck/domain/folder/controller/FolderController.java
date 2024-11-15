@@ -10,6 +10,7 @@ import com.mmc.bookduck.domain.folder.service.FolderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,10 +60,11 @@ public class FolderController {
 
     @Operation(summary = "폴더에 추가할 책 목록 조회", description = "폴더에 추가할 수 있는 서재 책 목록을 조회합니다.")
     @GetMapping("/{folderId}/books/candidates")
-    public ResponseEntity<CandidateFolderBookListResponseDto> getCandidateBooks(@PathVariable(name="folderId") final Long folderId){
+    public ResponseEntity<CandidateFolderBookListResponseDto> getCandidateBooks(@PathVariable(name="folderId") final Long folderId,
+                                                                                @RequestParam(name = "status", required = false) final List<String> statusList){
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(folderService.getCandidateBooks(folderId));
+                .body(folderService.getCandidateBooks(folderId, statusList));
     }
 
 
@@ -95,10 +97,10 @@ public class FolderController {
     @Operation(summary = "폴더별&상태별 책 목록 조회", description = "폴더에 포함된 책에서 특정 상태의 책 목록을 조회합니다.")
     @GetMapping("/{folderId}/books/filter")
     public ResponseEntity<FolderBookListResponseDto> getFolderBookListStatus(@PathVariable(name="folderId") final Long folderId,
-                                                                             @RequestParam(name="status") final String status){
+                                                                             @RequestParam(name = "status") final List<String> statusList){
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body((folderService.getFolderBookListStatus(folderId, status)));
+                .body((folderService.getFolderBookListStatus(folderId, statusList)));
     }
 
     @Operation(summary = "폴더 책 순서 변경", description = "폴더안의 책 순서를 변경합니다.")
