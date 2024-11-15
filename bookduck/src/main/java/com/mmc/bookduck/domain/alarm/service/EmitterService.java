@@ -36,7 +36,7 @@ public class EmitterService {
     }
 
     private void sendToClientIfNewAlarmExists(User user) {
-        Boolean isMissedAlarms = alarmRepository.existsByReceiverAndIsReadFalse(user);
+        Boolean isMissedAlarms = alarmRepository.existsByReceiverAndIsReadFalseAndNotAnnouncement(user);
         if (isMissedAlarms.equals(true)) {
             sendToClient(user.getUserId(), AlarmDefaultDataDto.from(true), "new sse alarm exists");
         } else {
