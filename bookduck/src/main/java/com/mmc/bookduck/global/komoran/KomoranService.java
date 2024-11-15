@@ -36,7 +36,7 @@ public class KomoranService {
         return result.getTokenList().stream()
                 .filter(token -> validPosList.contains(token.getPos()))
                 .map(Token::getMorph)
-                .filter(keyword -> !tooCommonWords.contains(keyword)) // 블랙리스트 단어 제외
+                .filter(keyword -> !tooCommonWords.contains(keyword))
                 .filter(keyword -> keyword.length() <= 5) // 5글자 이하만 필터링
                 .collect(Collectors.toList());
     }
