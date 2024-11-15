@@ -8,11 +8,14 @@ import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
 import com.mmc.bookduck.domain.book.service.BookInfoService;
+import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import org.springframework.data.domain.Pageable;
 
 @Tag(name = "BookInfo", description = "BookInfo 관련 API입니다.")
 @RestController
@@ -71,5 +74,12 @@ public class BookInfoController {
     public ResponseEntity<CustomBookResponseDto> updateCustomBookInfo(@PathVariable(name = "bookinfoId") final Long bookInfoId,
                                                                       @ModelAttribute final CustomBookUpdateDto dto){
         return ResponseEntity.ok(bookInfoService.updateCustomBookInfo(bookInfoId, dto));
+    }
+
+    @GetMapping("/{bookinfoId}/onelineratings")
+    @Operation(summary = "도서의 한줄평&별점 목록 조회", description = "도서의 한줄평&별점 목록을 조회합니다.")
+    public ResponseEntity<?> getOneLineList(@PathVariable("bookinfoId") Long bookInfoId, @RequestParam(name = "orderBy", defaultValue = "likes") String orderBy, Pageable pageable){
+        OneLineRatingListResponseDto responseDto = bookInfoService.getOneLineList(bookInfoId, orderBy, pageable);
+        return ResponseEntity.ok(responseDto);
     }
 }

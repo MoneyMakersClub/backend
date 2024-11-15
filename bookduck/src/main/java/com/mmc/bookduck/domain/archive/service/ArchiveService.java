@@ -12,10 +12,8 @@ import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ArchiveRepository;
-import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
-import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -64,16 +62,16 @@ public class ArchiveService {
     @Transactional(readOnly = true)
     public ArchiveResponseDto getArchive(Long id, ArchiveType archiveType) {
         Archive archive = findArchiveByType(id, archiveType);
-        UserBook userBook = getUserBookFromExcerptOrReview(archive.getExcerpt().getExcerptId(), archive.getReview().getReviewId());
+        UserBook userBook = getUserBookFromExcerptOrReview(archive);
         return createArchiveResponseDto(archive, archive.getExcerpt(), archive.getReview(), userBook);
     }
 
     // 수정
     public ArchiveResponseDto updateArchive(Long id, ArchiveType archiveType, ArchiveUpdateRequestDto requestDto) {
         Archive archive = findArchiveByType(id, archiveType);
-        UserBook userBook = getUserBookFromExcerptOrReview(archive.getExcerpt().getExcerptId(), archive.getReview().getReviewId());
+        UserBook userBook = getUserBookFromExcerptOrReview(archive);
         // 생성자 검증
-        userBookService.validateUserBookOwner(userBook.getUserBookId());
+        userBookService.validateUserBookOwner(userBook);
         // 발췌 수정 혹은 생성
         Excerpt updatedExcerpt = Optional.ofNullable(requestDto.excerpt())
                 .map(updateDto -> {
@@ -115,9 +113,9 @@ public class ArchiveService {
     // 삭제
     public void deleteArchive(Long archiveId, Long reviewId, Long excerptId) {
         Archive archive = getArchiveById(archiveId);
-        UserBook userBook = getUserBookFromExcerptOrReview(reviewId, excerptId);
+        UserBook userBook = getUserBookFromExcerptOrReview(archive);
         // 생성자 검증
-        userBookService.validateUserBookOwner(userBook.getUserBookId());
+        userBookService.validateUserBookOwner(userBook);
         if (excerptId != null && archive.getExcerpt() != null) {
             if (!archive.getExcerpt().getExcerptId().equals(excerptId)) {
                 throw new CustomException(ErrorCode.ARCHIVE_DOES_NOT_MATCH);
@@ -142,14 +140,18 @@ public class ArchiveService {
     }
 
     public ArchiveResponseDto createArchiveResponseDto(Archive archive, Excerpt excerpt, Review review, UserBook userBook) {
+        Long bookInfoId = userBook.getBookInfo().getBookInfoId();
         String title = userBook.getBookInfo().getTitle();
         String author = userBook.getBookInfo().getAuthor();
+        String imgPath = userBook.getBookInfo().getImgPath();
         return ArchiveResponseDto.from(
                 archive,
                 excerpt != null ? ExcerptResponseDto.from(excerpt) : null,
                 review != null ? ReviewResponseDto.from(review) : null,
+                bookInfoId,
                 title,
-                author
+                author,
+                imgPath
         );
     }
 
@@ -169,9 +171,11 @@ public class ArchiveService {
                 .orElseThrow(()-> new CustomException(ErrorCode.ARCHIVE_NOT_FOUND));
     }
 
-    // UserBook 정보 불러오거나 없으면 생성하기
+    // UserBook 정보 불러오기
     @Transactional(readOnly = true)
-    public UserBook getUserBookFromExcerptOrReview(Long excerptId, Long reviewId) {
+    public UserBook getUserBookFromExcerptOrReview(Archive archive) {
+        Long excerptId = (archive.getExcerpt() != null) ? archive.getExcerpt().getExcerptId() : null;
+        Long reviewId = (archive.getReview() != null) ? archive.getReview().getReviewId() : null;
         if (excerptId != null) {
             Excerpt excerpt = excerptService.getExcerptById(excerptId);
             return excerpt.getUserBook();

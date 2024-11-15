@@ -64,7 +64,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
                 "https://localhost:3000",
-                "http://localhost:3001")); // TODO: 추후 변경 필요
+                "http://localhost:3001",
+                "https://main.d2upl1xcgysyb.amplifyapp.com")); // TODO: 추후 변경 필요
 
         configuration.addAllowedMethod("*"); // TODO: 추후 확인 필요
         configuration.addAllowedHeader("*");

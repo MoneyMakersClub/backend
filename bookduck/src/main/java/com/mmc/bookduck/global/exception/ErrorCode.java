@@ -19,13 +19,12 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(400, "입력값이 잘못되었습니다."),
     MISSING_PARAMETER(400, "필수 파라미터가 누락되었습니다."),
     INVALID_UNLOCK_CONDITION(400, "해제 조건이 잘못되었습니다."),
-    ARCHIVE_DOES_NOT_MATCH(404, "발췌/리뷰Id와 archive에 등록된 Id가 일치하지않습니다."),
+    ARCHIVE_DOES_NOT_MATCH(400, "발췌/리뷰Id와 archive에 등록된 Id가 일치하지않습니다."),
     // enum 값이 잘못됨
     INVALID_ENUM_VALUE(400, "enum 값이 잘못되었습니다."),
     ITEMTYPE_MISMATCH(400,"ItemType이 맞지 않습니다."),
     USERITEM_BAD_REQUEST(400, "유저의 소유가 아닌 userItemId입니다."),
     BOOKINFO_BAD_REQUEST(400, "API 도서가 아닌 bookInfoId입니다."),
-
 
     // 401 Unauthorized
     // 로그인 상태여야 하는 요청
