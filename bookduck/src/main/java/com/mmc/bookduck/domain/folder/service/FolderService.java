@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.folder.service;
 
+import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.folder.dto.common.CandidateFolderBookDto;
@@ -180,16 +181,22 @@ public class FolderService {
 
     // 폴더별 & 상태별 도서 목록 조회
     @Transactional(readOnly = true)
-    public FolderBookListResponseDto getFolderBookListStatus(Long folderId, String status) {
+    public FolderBookListResponseDto getFolderBookListStatus(Long folderId, List<String> statusList) {
+
+        if(statusList.isEmpty()){
+            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
+        }
         User user = userService.getCurrentUser();
         Folder folder = findFolderById(folderId);
 
+        List<ReadStatus> readStatusList = userBookService.validateReadStatus(statusList);
         List<FolderBookUnitDto> folderBookList = new ArrayList<>();
-
         if(folder.getUser().equals(user)){
             for(FolderBook folderBook : folder.getFolderBooks()){
-                if(folderBook.getUserBook().getReadStatus().name().equals(status)){
-                    folderBookList.add(FolderBookUnitDto.from(folderBook));
+                for(ReadStatus readStatus : readStatusList){
+                    if(folderBook.getUserBook().getReadStatus().equals(readStatus)){
+                        folderBookList.add(FolderBookUnitDto.from(folderBook));
+                    }
                 }
             }
             return new FolderBookListResponseDto(folder, folderBookList);
@@ -199,7 +206,7 @@ public class FolderService {
     }
 
     @Transactional(readOnly = true)
-    public CandidateFolderBookListResponseDto getCandidateBooks(Long folderId) {
+    public CandidateFolderBookListResponseDto getCandidateBooks(Long folderId, List<String> statusList) {
         User user = userService.getCurrentUser();
         Folder folder = findFolderById(folderId);
 
@@ -211,8 +218,8 @@ public class FolderService {
         List<UserBook> userBooks = userBookService.findAllByUser(user);
 
         List<CandidateFolderBookDto> dtoList = new ArrayList<>();
-
         List<UserBook> candidateList = new ArrayList<>(userBooks);
+
         for(UserBook userBook: userBooks){
             for(FolderBook folderBook: folderBooks){
                 if(userBook.equals(folderBook.getUserBook())){
@@ -222,8 +229,20 @@ public class FolderService {
             }
         }
 
-        for(UserBook userBook: candidateList){
-            dtoList.add(CandidateFolderBookDto.from(userBook));
+        if(statusList == null || statusList.isEmpty()){
+            for(UserBook userBook: candidateList){
+                dtoList.add(CandidateFolderBookDto.from(userBook));
+            }
+        }
+        else{
+            List<ReadStatus> readStatusList = userBookService.validateReadStatus(statusList);
+            for(ReadStatus readStatus : readStatusList){
+                for(UserBook userBook: candidateList){
+                    if(userBook.getReadStatus().equals(readStatus)){
+                        dtoList.add(CandidateFolderBookDto.from(userBook));
+                    }
+                }
+            }
         }
         return new CandidateFolderBookListResponseDto(dtoList);
     }
