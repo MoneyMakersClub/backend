@@ -11,11 +11,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
-    Boolean existsByReceiverAndIsReadFalseAndNotAnnouncement(User user);
-    void deleteAllBySender(User user);
-    void deleteAllByReceiver(User user);
+    Boolean existsByReceiverAndIsReadFalseAndAlarmTypeNot(User receiver, AlarmType alarmType);
 
     @Query("SELECT a FROM Alarm a WHERE a.receiver = :user AND a.alarmType <> 'ANNOUNCEMENT' ORDER BY a.createdTime DESC")
     Page<Alarm> findByReceiverAndNotAnnouncementOrderByCreatedTimeDesc(@Param("user") User user, Pageable pageable);
+
     Page<Alarm> findByAlarmTypeOrderByCreatedTimeDesc(@NotNull AlarmType alarmType, Pageable pageable);
+
+    void deleteAllBySender(User user);
+    void deleteAllByReceiver(User user);
 }
