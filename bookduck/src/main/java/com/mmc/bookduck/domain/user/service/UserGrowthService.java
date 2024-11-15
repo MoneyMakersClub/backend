@@ -91,8 +91,4 @@ public class UserGrowthService {
             default -> throw new IllegalArgumentException("Unsupported experience type: " + experienceType);
         }
     }
-
-    public Object getUserKeywordAnalysis(Long userId) {
-        return null;
-    }
 }
