@@ -1,16 +1,13 @@
 package com.mmc.bookduck.domain.userhome.service;
 
-import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
-import com.mmc.bookduck.domain.archive.service.ArchiveService;
+import com.mmc.bookduck.domain.archive.service.ExcerptService;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.service.BookInfoService;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
-import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
+import com.mmc.bookduck.domain.oneline.service.OneLineService;
 import com.mmc.bookduck.domain.userhome.dto.common.*;
 import com.mmc.bookduck.domain.userhome.entity.HomeCard;
-import com.mmc.bookduck.global.exception.CustomException;
-import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +16,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class HomeCardConverter {
-    private final ArchiveService archiveService;
-    private final OneLineRepository oneLineRepository;
+    private final ExcerptService excerptService;
+    private final OneLineService oneLineService;
     private final BookInfoService bookInfoService;
 
     public HomeCardDto mapToHomeCardDto(HomeCard homeCard, String nickname) {
@@ -33,16 +30,15 @@ public class HomeCardConverter {
     }
 
     private ExcerptCardDto convertToExcerptCardDto(HomeCard homeCard) {
-        Excerpt excerpt = archiveService.findArchiveByType(homeCard.getResourceId1(), ArchiveType.EXCERPT).getExcerpt();
-        return new ExcerptCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), excerpt.getExcerptId(),
+        Excerpt excerpt = excerptService.getExcerptById(homeCard.getResourceId1());
+        return new ExcerptCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(), excerpt.getExcerptId(),
                 excerpt.getUserBook().getBookInfo().getTitle(), excerpt.getUserBook().getBookInfo().getAuthor(),
                 excerpt.getPageNumber(), excerpt.getExcerptContent());
     }
 
     private OneLineCardDto convertToOneLineCardDto(HomeCard homeCard) {
-        OneLine oneLine = oneLineRepository.findById(homeCard.getResourceId1())
-                .orElseThrow(() -> new CustomException(ErrorCode.ONELINE_NOT_FOUND));
-        return new OneLineCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), oneLine.getOneLineId(),
+        OneLine oneLine = oneLineService.getOneLineById(homeCard.getResourceId1());
+        return new OneLineCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(), oneLine.getOneLineId(),
                 oneLine.getUserBook().getBookInfo().getTitle(), oneLine.getUserBook().getBookInfo().getAuthor(),
                 oneLine.getUserBook().getRating(), oneLine.getOneLineContent());
     }
@@ -52,9 +48,9 @@ public class HomeCardConverter {
         BookInfo bookInfo2 = Optional.ofNullable(homeCard.getResourceId2())
                 .map(bookInfoService::getBookInfoById)
                 .orElse(null);
-        return new BookWithMemoCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), bookInfo1.getBookInfoId(),
+        return new BookWithMemoCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(), bookInfo1.getBookInfoId(),
                 bookInfo2 != null ? bookInfo2.getBookInfoId() : null, bookInfo1.getImgPath(),
-                bookInfo2 != null ? bookInfo2.getImgPath() : null, "MEMO", homeCard.getText1(), homeCard.getText2());
+                bookInfo2 != null ? bookInfo2.getImgPath() : null, homeCard.getText1());
     }
 
     private BookWithSongCardDto convertToBookWithSongCardDto(HomeCard homeCard, String nickname) {
@@ -62,8 +58,8 @@ public class HomeCardConverter {
         BookInfo bookInfo2 = Optional.ofNullable(homeCard.getResourceId2())
                 .map(bookInfoService::getBookInfoById)
                 .orElse(null);
-        return new BookWithSongCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), bookInfo1.getBookInfoId(),
+        return new BookWithSongCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(), bookInfo1.getBookInfoId(),
                 bookInfo2 != null ? bookInfo2.getBookInfoId() : null, bookInfo1.getImgPath(),
-                bookInfo2 != null ? bookInfo2.getImgPath() : null, "SONG", homeCard.getText1(), homeCard.getText2(), nickname);
+                bookInfo2 != null ? bookInfo2.getImgPath() : null, homeCard.getText1(), homeCard.getText2(), nickname);
     }
 }

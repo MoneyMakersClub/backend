@@ -1,8 +1,11 @@
 package com.mmc.bookduck.domain.userhome.dto.common;
 
+import com.mmc.bookduck.domain.userhome.entity.CardType;
+
 public record OneLineCardDto(
         Long homeCardId,
         Long cardIndex,
+        CardType cardType,
         Long resourceId1,
         String title,
         String author,

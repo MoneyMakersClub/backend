@@ -1,14 +1,15 @@
 package com.mmc.bookduck.domain.userhome.dto.common;
 
+import com.mmc.bookduck.domain.userhome.entity.CardType;
+
 public record BookWithMemoCardDto(
         Long homeCardId,
         Long cardIndex,
+        CardType cardType,
         Long resourceId1,
         Long resourceId2,
         String imgPath1,
         String imgPath2,
-        String textType,
-        String text1,
-        String text2
+        String text1
 ) implements HomeCardDto {
 }

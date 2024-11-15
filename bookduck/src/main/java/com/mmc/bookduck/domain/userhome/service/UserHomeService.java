@@ -1,8 +1,5 @@
 package com.mmc.bookduck.domain.userhome.service;
 
-import com.mmc.bookduck.domain.archive.service.ArchiveService;
-import com.mmc.bookduck.domain.book.service.BookInfoService;
-import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.domain.userhome.dto.common.*;
 import com.mmc.bookduck.domain.userhome.dto.request.ReadingSpaceUpdateRequestDto;
