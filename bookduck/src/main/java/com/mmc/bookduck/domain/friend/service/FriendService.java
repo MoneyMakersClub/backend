@@ -57,10 +57,13 @@ public class FriendService {
     @Transactional(readOnly = true)
     public FriendListResponseDto getFriendList() {
         User currentUser = userService.getCurrentUser();
-        List<FriendUnitDto> friendList = friendRepository.findAllByUser1UserId(currentUser.getUserId())
-                .stream()
+        List<Friend> friends = friendRepository.findAllByUser1UserIdOrUser2UserId(currentUser.getUserId(), currentUser.getUserId());
+        // 중복 제거
+        List<FriendUnitDto> friendList = friends.stream()
+                .filter(friend -> !friend.getUser1().getUserId().equals(currentUser.getUserId()))
                 .map(friend -> FriendUnitDto.from(friend, userItemService.getUserItemEquippedListOfUser(friend.getUser2())))
                 .collect(Collectors.toList());
+
         return FriendListResponseDto.from(friendList);
     }
 

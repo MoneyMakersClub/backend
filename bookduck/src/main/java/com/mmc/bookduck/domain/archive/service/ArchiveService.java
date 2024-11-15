@@ -197,10 +197,7 @@ public class ArchiveService {
                     ((ReviewResponseDto) a2.data()).createdTime();
             return time2.compareTo(time1);
         });
-        Page<UserArchiveResponseDto.ArchiveWithType> archivePage = new PageImpl<>(archiveList, pageable, archiveList.size());
-        Page<UserArchiveResponseDto.ArchiveWithType> dtoPage = archivePage.map(item ->
-                new UserArchiveResponseDto.ArchiveWithType(item.type(), item.data())
-        );
+        Page<UserArchiveResponseDto.ArchiveWithType> dtoPage = new PageImpl<>(archiveList, pageable, archiveList.size());
         return UserArchiveResponseDto.from(dtoPage);
     }
 
