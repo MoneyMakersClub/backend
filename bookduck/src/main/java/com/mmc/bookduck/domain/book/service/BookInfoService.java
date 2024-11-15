@@ -22,6 +22,8 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.BookInfoRepository;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
 import com.mmc.bookduck.domain.friend.service.FriendService;
+import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto;
+import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingUnitDto;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -30,8 +32,13 @@ import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.google.GoogleBooksApiService;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -401,4 +408,30 @@ public class BookInfoService {
                 .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
         return bookInfo;
     }
+
+    // 한줄평&별점 조회
+    @Transactional(readOnly = true)
+    public OneLineRatingListResponseDto getOneLineList(Long bookInfoId, String orderBy, Pageable pageable) {
+        BookInfo bookInfo = getBookInfoById(bookInfoId);
+        Page<OneLine> oneLinePage;
+        switch (orderBy) {
+            case "likes":
+                oneLinePage = oneLineRepository.findByBookInfoOrderByOneLineLikesDesc(bookInfo, pageable);
+                break;
+            case "latest":
+                oneLinePage = oneLineRepository.findByBookInfoOrderByCreatedTimeDesc(bookInfo, pageable);
+                break;
+            case "highest":
+                oneLinePage = oneLineRepository.findByBookInfoOrderByRatingDesc(bookInfo, pageable);
+                break;
+            case "lowest":
+                oneLinePage = oneLineRepository.findByBookInfoOrderByRatingAsc(bookInfo, pageable);
+                break;
+            default:
+                throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+        Page<OneLineRatingUnitDto> dtoPage = oneLinePage.map(OneLineRatingUnitDto::fromEntity);
+        return OneLineRatingListResponseDto.from(dtoPage);
+    }
+
 }

@@ -6,10 +6,12 @@ public record ArchiveResponseDto(
         Long archiveId,
         ExcerptResponseDto excerpt,
         ReviewResponseDto review,
+        Long bookInfoId,
         String title,
-        String author
+        String author,
+        String imgPath
 ) {
-    public static ArchiveResponseDto from(Archive archive, ExcerptResponseDto excerpt, ReviewResponseDto review, String title, String author) {
-        return new ArchiveResponseDto(archive.getArchiveId(), excerpt, review, title, author);
+    public static ArchiveResponseDto from(Archive archive, ExcerptResponseDto excerpt, ReviewResponseDto review, Long bookInfoId, String title, String author, String imgPath) {
+        return new ArchiveResponseDto(archive.getArchiveId(), excerpt, review, bookInfoId, title, author, imgPath);
     }
 }
