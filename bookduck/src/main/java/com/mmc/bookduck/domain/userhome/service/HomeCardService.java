@@ -30,7 +30,7 @@ public class HomeCardService {
 
     @Transactional(readOnly = true)
     public List<HomeCard> getAllHomeCardsOfUserHome(UserHome userHome) {
-        return homeCardRepository.findAllByUserHome(userHome);
+        return homeCardRepository.findAllByUserHomeOrderByCardIndexAsc(userHome);
     }
 
     public HomeCard addHomeCard(HomeCardRequestDto requestDto, UserHome userHome, long cardIndex) {
@@ -47,27 +47,25 @@ public class HomeCardService {
     }
 
     public void updateHomeCards(ReadingSpaceUpdateRequestDto requestDto, UserHome userHome) {
-
         Map<Long, HomeCard> currentHomeCardsMap = getAllHomeCardsOfUserHome(userHome).stream()
                 .collect(Collectors.toMap(HomeCard::getHomeCardId, homeCard -> homeCard));
 
         List<HomeCard> cardsToUpdate = new ArrayList<>();
 
         // 업데이트할 카드 목록 처리
-        for (HomeCardUpdateUnitDto cardDto : requestDto.homeCardUpdateUnitDtos()) {
-            HomeCard existingCard = currentHomeCardsMap.get(cardDto.homeCardId());
+        for (HomeCardUpdateUnitDto cardDto : requestDto.updatedCardList()) {
+            HomeCard existingCard = currentHomeCardsMap.get(cardDto.cardId());
 
             if (existingCard != null) {
                 existingCard.updateCardIndex(cardDto.cardIndex());
                 cardsToUpdate.add(existingCard);
-                currentHomeCardsMap.remove(cardDto.homeCardId());
+                currentHomeCardsMap.remove(cardDto.cardId());
             } else {
                 throw new CustomException(ErrorCode.HOMECARD_NOT_FOUND);
             }
         }
 
         List<HomeCard> cardsToDelete = new ArrayList<>(currentHomeCardsMap.values());
-        userHome.updateLastModifiedAt();
 
         // 삭제할 카드와 업데이트할 카드를 처리
         homeCardRepository.deleteAll(cardsToDelete);

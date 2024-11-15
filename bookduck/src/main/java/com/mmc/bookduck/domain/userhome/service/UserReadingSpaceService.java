@@ -43,6 +43,7 @@ public class UserReadingSpaceService {
         User user = userService.getCurrentUser();
         UserHome userHome = userHomeService.getUserHomeOfUser(user);
         List<HomeCard> homeCards = homeCardService.getAllHomeCardsOfUserHome(userHome);
+        userHome.updateLastModifiedAt();
 
         // 새로운 HomeCard를 추가하고 HomeCardDto로 변환
         HomeCard homeCard = homeCardService.addHomeCard(requestDto, userHome, homeCards.size());
@@ -53,5 +54,6 @@ public class UserReadingSpaceService {
         User user = userService.getCurrentUser();
         UserHome userHome = userHomeService.getUserHomeOfUser(user);
         homeCardService.updateHomeCards(requestDto, userHome);
+        userHome.updateLastModifiedAt();
     }
 }
