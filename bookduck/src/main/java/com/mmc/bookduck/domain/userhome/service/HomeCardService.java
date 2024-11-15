@@ -10,7 +10,6 @@ import com.mmc.bookduck.domain.userhome.entity.CardType;
 import com.mmc.bookduck.domain.userhome.entity.HomeCard;
 import com.mmc.bookduck.domain.userhome.entity.UserHome;
 import com.mmc.bookduck.domain.userhome.repository.HomeCardRepository;
-import com.mmc.bookduck.domain.userhome.repository.UserHomeRepository;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;

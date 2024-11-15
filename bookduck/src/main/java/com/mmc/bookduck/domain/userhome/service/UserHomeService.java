@@ -3,12 +3,6 @@ package com.mmc.bookduck.domain.userhome.service;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
-import com.mmc.bookduck.domain.user.service.UserService;
-import com.mmc.bookduck.domain.userhome.dto.common.*;
-import com.mmc.bookduck.domain.userhome.dto.request.ReadingSpaceUpdateRequestDto;
-import com.mmc.bookduck.domain.userhome.dto.request.HomeCardRequestDto;
-import com.mmc.bookduck.domain.userhome.dto.response.ReadingSpaceResponseDto;
-import com.mmc.bookduck.domain.userhome.entity.HomeCard;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.userhome.entity.UserHome;
 import com.mmc.bookduck.domain.userhome.repository.UserHomeRepository;
@@ -22,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class UserHomeService {
-    private final UserService userService;
     private final UserHomeRepository userHomeRepository;
     private final HomeCardService homeCardService;
 

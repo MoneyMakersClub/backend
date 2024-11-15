@@ -8,7 +8,6 @@ import com.mmc.bookduck.domain.userhome.dto.request.ReadingSpaceUpdateRequestDto
 import com.mmc.bookduck.domain.userhome.dto.response.ReadingSpaceResponseDto;
 import com.mmc.bookduck.domain.userhome.entity.HomeCard;
 import com.mmc.bookduck.domain.userhome.entity.UserHome;
-import com.mmc.bookduck.domain.userhome.repository.UserHomeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +20,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserReadingSpaceService {
     private final UserService userService;
-    private final UserHomeRepository userHomeRepository;
     private final HomeCardService homeCardService;
     private final UserHomeService userHomeService;
-    private final HomeCardConverter homeCardConverter;  // HomeCardConverter 주입
+    private final HomeCardConverter homeCardConverter;
 
     @Transactional(readOnly = true)
     public ReadingSpaceResponseDto getUserReadingSpace(Long userId) {

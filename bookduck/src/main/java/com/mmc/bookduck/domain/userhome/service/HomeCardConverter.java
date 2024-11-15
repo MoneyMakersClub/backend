@@ -2,9 +2,7 @@ package com.mmc.bookduck.domain.userhome.service;
 
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.service.ExcerptService;
-import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.UserBook;
-import com.mmc.bookduck.domain.book.service.BookInfoService;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.service.OneLineService;
