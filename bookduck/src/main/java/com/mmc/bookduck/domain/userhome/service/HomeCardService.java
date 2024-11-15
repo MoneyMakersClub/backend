@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -68,7 +67,7 @@ public class HomeCardService {
         }
 
         List<HomeCard> cardsToDelete = new ArrayList<>(currentHomeCardsMap.values());
-        userHome.updateLastModifiedAt(LocalDateTime.now());
+        userHome.updateLastModifiedAt();
 
         // 삭제할 카드와 업데이트할 카드를 처리
         homeCardRepository.deleteAll(cardsToDelete);

@@ -27,16 +27,19 @@ public class UserHomeService {
 
     public void deleteHomeCardsByExcerpt(Excerpt excerpt) {
         UserHome userHome = getUserHomeOfUser(excerpt.getUser());
+        userHome.updateLastModifiedAt();
         homeCardService.deleteHomeCardsByExcerpt(userHome, excerpt);
     }
 
     public void deleteHomeCardsByOneLine(OneLine oneLine) {
         UserHome userHome = getUserHomeOfUser(oneLine.getUser());
+        userHome.updateLastModifiedAt();
         homeCardService.deleteHomeCardsByOneLine(userHome, oneLine);
     }
 
     public void deleteHomeCardsByUserBook(UserBook userBook) {
         UserHome userHome = getUserHomeOfUser(userBook.getUser());
+        userHome.updateLastModifiedAt();
         homeCardService.deleteHomeCardsByUserBook(userHome, userBook);
     }
 }

@@ -31,7 +31,7 @@ public class UserHome {
         this.user = user;
     }
 
-    public void updateLastModifiedAt(LocalDateTime lastModifiedAt) {
-        this.lastModifiedAt = lastModifiedAt;
+    public void updateLastModifiedAt() {
+        this.lastModifiedAt = LocalDateTime.now();
     }
 }
