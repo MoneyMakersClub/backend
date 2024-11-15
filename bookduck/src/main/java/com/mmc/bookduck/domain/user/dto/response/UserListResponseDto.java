@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-public record UserSearchResponseDto(
+public record UserListResponseDto(
     int currentPage,
     int pageSize,
     long totalElements,
@@ -13,8 +13,8 @@ public record UserSearchResponseDto(
     List<UserUnitDto> userList
 ) {
 
-    public static UserSearchResponseDto from(Page<UserUnitDto> userUnitDtoPage) {
-        return new UserSearchResponseDto(
+    public static UserListResponseDto from(Page<UserUnitDto> userUnitDtoPage) {
+        return new UserListResponseDto(
                 userUnitDtoPage.getNumber(),
                 userUnitDtoPage.getSize(),
                 userUnitDtoPage.getTotalElements(),
