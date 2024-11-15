@@ -25,10 +25,13 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
 
     @Query("SELECT e FROM Excerpt e " +
             "JOIN e.userBook ub " +
-            "WHERE e.excerptContent LIKE %:keyword% " +
+            "WHERE (e.excerptContent LIKE %:keyword% " +
             "OR ub.bookInfo.title LIKE %:keyword% " +
-            "OR ub.bookInfo.author LIKE %:keyword% " +
+            "OR ub.bookInfo.author LIKE %:keyword%) " +
+            "AND e.user = :user " +
             "ORDER BY e.createdTime DESC")
-    Page<Excerpt> searchAllByExcerptContentOrBookInfoTitleOrAuthorByCreatedTimeDesc(@Param("keyword") String keyword,
-                                                                                    Pageable pageable);
+    Page<Excerpt> searchAllByExcerptContentOrBookInfoTitleOrAuthorByCreatedTimeDescAndUser(
+            @Param("keyword") String keyword,
+            @Param("user") User user,
+            Pageable pageable);
 }

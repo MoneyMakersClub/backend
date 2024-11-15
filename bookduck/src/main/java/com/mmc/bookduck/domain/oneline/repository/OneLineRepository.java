@@ -36,10 +36,13 @@ public interface OneLineRepository extends JpaRepository<OneLine, Long> {
 
     @Query("SELECT o FROM OneLine o " +
             "JOIN o.userBook ub " +
-            "WHERE o.oneLineContent LIKE %:keyword% " +
+            "WHERE (o.oneLineContent LIKE %:keyword% " +
             "OR ub.bookInfo.title LIKE %:keyword% " +
-            "OR ub.bookInfo.author LIKE %:keyword% " +
+            "OR ub.bookInfo.author LIKE %:keyword%) " +
+            "AND o.user = :user " +
             "ORDER BY o.createdTime DESC")
-    Page<OneLine> searchAllByOneLineContentOrBookInfoTitleOrAuthorByCreatedTimeDesc(@Param("keyword") String keyword,
-                                                                                    Pageable pageable);
+    Page<OneLine> searchAllByOneLineContentOrBookInfoTitleOrAuthorByCreatedTimeDescAndUser(
+            @Param("keyword") String keyword,
+            @Param("user") User user,
+            Pageable pageable);
 }

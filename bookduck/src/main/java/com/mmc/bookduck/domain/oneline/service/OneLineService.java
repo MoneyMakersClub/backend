@@ -70,8 +70,9 @@ public class OneLineService {
 
     @Transactional(readOnly = true)
     public OneLineRatingListResponseDto searchOneLines(String keyword, Pageable pageable) {
+        User user = userService.getCurrentUser();
         String escapedWord = escapeSpecialCharacters(keyword);
-        Page<OneLine> oneLinePage = oneLineRepository.searchAllByOneLineContentOrBookInfoTitleOrAuthorByCreatedTimeDesc(escapedWord, pageable);
+        Page<OneLine> oneLinePage = oneLineRepository.searchAllByOneLineContentOrBookInfoTitleOrAuthorByCreatedTimeDescAndUser(escapedWord, user, pageable);
         Page<OneLineRatingUnitDto> oneLineRatingUnitDtoPage = oneLinePage.map(OneLineRatingUnitDto::from);
         return OneLineRatingListResponseDto.from(oneLineRatingUnitDtoPage);
     }
