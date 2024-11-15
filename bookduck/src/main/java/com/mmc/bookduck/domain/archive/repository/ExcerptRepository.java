@@ -5,6 +5,9 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.entity.User;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,4 +22,13 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
     List<Excerpt> findExcerptByUserBookOrderByCreatedTimeDesc(UserBook userBook);
 
     List<Excerpt> findAllByUserAndCreatedTimeAfter(User user, LocalDateTime createdTime);
+
+    @Query("SELECT e FROM Excerpt e " +
+            "JOIN e.userBook ub " +
+            "WHERE e.excerptContent LIKE %:keyword% " +
+            "OR ub.bookInfo.title LIKE %:keyword% " +
+            "OR ub.bookInfo.author LIKE %:keyword% " +
+            "ORDER BY e.createdTime DESC")
+    Page<Excerpt> searchAllByExcerptContentOrBookInfoTitleOrAuthorByCreatedTimeDesc(@Param("keyword") String keyword,
+                                                                                    Pageable pageable);
 }

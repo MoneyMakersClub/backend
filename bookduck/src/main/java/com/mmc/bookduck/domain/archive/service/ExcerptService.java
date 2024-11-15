@@ -2,7 +2,7 @@ package com.mmc.bookduck.domain.archive.service;
 
 import com.mmc.bookduck.domain.archive.dto.request.ExcerptCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.request.ExcerptUpdateRequestDto;
-import com.mmc.bookduck.domain.archive.entity.Archive;
+import com.mmc.bookduck.domain.archive.dto.response.ExcerptResponseDto;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
@@ -10,12 +10,17 @@ import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
+import com.mmc.bookduck.domain.archive.dto.response.ExcerptSearchResponseDto;
 import com.mmc.bookduck.domain.userhome.service.UserHomeService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.mmc.bookduck.global.common.EscapeSpecialCharactersService.escapeSpecialCharacters;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +62,11 @@ public class ExcerptService {
                 .orElseThrow(() -> new CustomException(ErrorCode.EXCERPT_NOT_FOUND));
     }
 
-
-
-
+    @Transactional(readOnly = true)
+    public ExcerptSearchResponseDto searchExcerpts(String keyword, Pageable pageable) {
+        String escapedWord = escapeSpecialCharacters(keyword);
+        Page<Excerpt> excerptPage = excerptRepository.searchAllByExcerptContentOrBookInfoTitleOrAuthorByCreatedTimeDesc(escapedWord, pageable);
+        Page<ExcerptResponseDto> excerptResponseDtoPage = excerptPage.map(ExcerptResponseDto::from);
+        return ExcerptSearchResponseDto.from(excerptResponseDtoPage);
+    }
 }

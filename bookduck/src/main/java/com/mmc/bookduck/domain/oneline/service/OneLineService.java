@@ -4,6 +4,8 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.oneline.dto.request.OneLineCreateRequestDto;
 import com.mmc.bookduck.domain.oneline.dto.request.OneLineUpdateRequestDto;
+import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto;
+import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingUnitDto;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -12,8 +14,12 @@ import com.mmc.bookduck.domain.userhome.service.UserHomeService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.mmc.bookduck.global.common.EscapeSpecialCharactersService.escapeSpecialCharacters;
 
 @Service
 @RequiredArgsConstructor
@@ -62,4 +68,11 @@ public class OneLineService {
         return oneLine;
     }
 
+    @Transactional(readOnly = true)
+    public OneLineRatingListResponseDto searchOneLines(String keyword, Pageable pageable) {
+        String escapedWord = escapeSpecialCharacters(keyword);
+        Page<OneLine> oneLinePage = oneLineRepository.searchAllByOneLineContentOrBookInfoTitleOrAuthorByCreatedTimeDesc(escapedWord, pageable);
+        Page<OneLineRatingUnitDto> oneLineRatingUnitDtoPage = oneLinePage.map(OneLineRatingUnitDto::from);
+        return OneLineRatingListResponseDto.from(oneLineRatingUnitDtoPage);
+    }
 }
