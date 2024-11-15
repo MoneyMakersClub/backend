@@ -31,7 +31,7 @@ public class HomeCardConverter {
 
     private ExcerptCardDto convertToExcerptCardDto(HomeCard homeCard) {
         Excerpt excerpt = excerptService.getExcerptById(homeCard.getResourceId1());
-        return new ExcerptCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType()
+        return new ExcerptCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(),
                 excerpt.getUserBook().getBookInfo().getTitle(), excerpt.getUserBook().getBookInfo().getAuthor(),
                 excerpt.getPageNumber(), excerpt.getExcerptContent());
     }
