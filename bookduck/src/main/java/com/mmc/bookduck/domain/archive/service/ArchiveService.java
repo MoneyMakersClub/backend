@@ -18,6 +18,8 @@ import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.common.Visibility;
+import com.mmc.bookduck.domain.friend.entity.Friend;
+import com.mmc.bookduck.domain.friend.repository.FriendRepository;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -46,6 +48,7 @@ public class ArchiveService {
     private final ArchiveRepository archiveRepository;
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
+    private final FriendRepository friendRepository;
 
     // 생성
     public ArchiveResponseDto createArchive(ArchiveCreateRequestDto requestDto) {
@@ -156,6 +159,13 @@ public class ArchiveService {
     public UserArchiveResponseDto getUserArchive(Long userId, ArchiveType archiveType, Pageable pageable){
         userService.getActiveUserByUserId(userId);
         Long currentUserId = userService.getCurrentUser().getUserId();
+        // currentUserId가 userId와 다르면 친구인지 확인
+        if (!userId.equals(currentUserId)) {
+            Optional<Friend> friend = friendRepository.findFriendBetweenUsers(currentUserId, userId);
+            if (!friend.isPresent()) {
+                return new UserArchiveResponseDto(0, 0, 0, 0, new ArrayList<>());
+            }
+        }
         List<UserArchiveResponseDto.ArchiveWithType> archiveList = new ArrayList<>();
         // 발췌 조회
         if (archiveType == ArchiveType.EXCERPT || archiveType == ArchiveType.ALL) {
