@@ -53,8 +53,6 @@ public class AuthService {
         String newAccessToken = jwtUtil.generateAccessToken(authentication);
         String newRefreshToken = jwtUtil.generateRefreshToken(authentication); // Redis에 저장
 
-        // 기존 쿠키 삭제
-        cookieUtil.deleteCookie(response, "refreshToken");
         // 새 리프레시 토큰을 HttpOnly 쿠키에 저장
         cookieUtil.addCookie(response, "refreshToken", newRefreshToken, jwtUtil.getRefreshTokenMaxAge());
 
