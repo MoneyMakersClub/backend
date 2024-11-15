@@ -163,7 +163,7 @@ public class ArchiveService {
         if (!userId.equals(currentUserId)) {
             Optional<Friend> friend = friendRepository.findFriendBetweenUsers(currentUserId, userId);
             if (!friend.isPresent()) {
-                return new UserArchiveResponseDto(0, 0, 0, 0, new ArrayList<>());
+                throw new CustomException(ErrorCode.FRIENDSHIP_REQUIRED);
             }
         }
         List<UserArchiveResponseDto.ArchiveWithType> archiveList = new ArrayList<>();
