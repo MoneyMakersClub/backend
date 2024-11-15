@@ -10,6 +10,7 @@ import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
+import com.mmc.bookduck.domain.userhome.service.UserHomeService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class ExcerptService {
     private final ExcerptRepository excerptRepository;
     private final UserService userService;
     private final UserBookService userBookService;
+    private final UserHomeService userHomeService;
 
     // 생성
     public Excerpt createExcerpt(ExcerptCreateRequestDto requestDto){
@@ -46,6 +48,7 @@ public class ExcerptService {
         // 생성자 검증 archiveService.deleteArchive에서 하고 있으므로 생략
         Excerpt excerpt = getExcerptById(excerptId);
         excerptRepository.delete(excerpt);
+        userHomeService.deleteHomeCardsByExcerpt(excerpt);
     }
 
     @Transactional(readOnly = true)

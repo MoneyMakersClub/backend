@@ -4,6 +4,7 @@ import com.mmc.bookduck.domain.userhome.dto.common.HomeCardDto;
 import com.mmc.bookduck.domain.userhome.dto.request.HomeCardRequestDto;
 import com.mmc.bookduck.domain.userhome.dto.request.ReadingSpaceUpdateRequestDto;
 import com.mmc.bookduck.domain.userhome.service.UserHomeService;
+import com.mmc.bookduck.domain.userhome.service.UserReadingSpaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -16,19 +17,19 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/readingspace")
 public class UserHomeController {
-    private final UserHomeService userHomeService;
+    private final UserReadingSpaceService readingSpaceService;
 
     @Operation(summary = "내 리딩스페이스에 카드 추가", description = "내 리딩스페이스에 카드를 추가합니다.")
     @PostMapping
     public ResponseEntity<?> addHomeCardToReadingSpace(@RequestBody @Valid HomeCardRequestDto requestDto) {
-        HomeCardDto homeCardDto = userHomeService.addHomeCardToReadingSpace(requestDto);
+        HomeCardDto homeCardDto = readingSpaceService.addHomeCardToReadingSpace(requestDto);
         return ResponseEntity.ok().body(homeCardDto);
     }
 
     @Operation(summary = "내 리딩스페이스 편집", description = "내 리딩스페이스를 편집합니다.")
     @PatchMapping
     public ResponseEntity<?> updateReadingSpace(@RequestBody @Valid ReadingSpaceUpdateRequestDto requestDto) {
-        userHomeService.updateReadingSpace(requestDto);
+        readingSpaceService.updateReadingSpace(requestDto);
         return ResponseEntity.ok().build();
     }
 }

@@ -3,7 +3,9 @@ package com.mmc.bookduck.domain.userhome.service;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.service.ExcerptService;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
+import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.BookInfoService;
+import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.service.OneLineService;
 import com.mmc.bookduck.domain.userhome.dto.common.*;
@@ -18,7 +20,7 @@ import java.util.Optional;
 public class HomeCardConverter {
     private final ExcerptService excerptService;
     private final OneLineService oneLineService;
-    private final BookInfoService bookInfoService;
+    private final UserBookService userBookService;
 
     public HomeCardDto mapToHomeCardDto(HomeCard homeCard, String nickname) {
         return switch (homeCard.getCardType()) {
@@ -44,20 +46,20 @@ public class HomeCardConverter {
     }
 
     private BookWithMemoCardDto convertToBookWithMemoCardDto(HomeCard homeCard) {
-        BookInfo bookInfo1 = bookInfoService.getBookInfoById(homeCard.getResourceId1());
-        BookInfo bookInfo2 = Optional.ofNullable(homeCard.getResourceId2())
-                .map(bookInfoService::getBookInfoById)
+        UserBook userBook1 = userBookService.getUserBookById(homeCard.getResourceId1());
+        UserBook userBook2 = Optional.ofNullable(homeCard.getResourceId2())
+                .map(userBookService::getUserBookById)
                 .orElse(null);
         return new BookWithMemoCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(),
-                bookInfo1.getImgPath(), bookInfo2 != null ? bookInfo2.getImgPath() : null, homeCard.getText1());
+                userBook1.getBookInfo().getImgPath(), userBook2 != null ? userBook2.getBookInfo().getImgPath() : null, homeCard.getText1());
     }
 
     private BookWithSongCardDto convertToBookWithSongCardDto(HomeCard homeCard, String nickname) {
-        BookInfo bookInfo1 = bookInfoService.getBookInfoById(homeCard.getResourceId1());
-        BookInfo bookInfo2 = Optional.ofNullable(homeCard.getResourceId2())
-                .map(bookInfoService::getBookInfoById)
+        UserBook userBook1 = userBookService.getUserBookById(homeCard.getResourceId1());
+        UserBook userBook2 = Optional.ofNullable(homeCard.getResourceId2())
+                .map(userBookService::getUserBookById)
                 .orElse(null);
         return new BookWithSongCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(),
-                bookInfo1.getImgPath(), bookInfo2 != null ? bookInfo2.getImgPath() : null, homeCard.getText1(), homeCard.getText2(), nickname);
+                userBook1.getBookInfo().getImgPath(), userBook2 != null ? userBook2.getBookInfo().getImgPath() : null, homeCard.getText1(), homeCard.getText2(), nickname);
     }
 }

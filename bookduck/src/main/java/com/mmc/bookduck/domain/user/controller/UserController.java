@@ -2,7 +2,7 @@ package com.mmc.bookduck.domain.user.controller;
 
 import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.service.*;
-import com.mmc.bookduck.domain.userhome.service.UserHomeService;
+import com.mmc.bookduck.domain.userhome.service.UserReadingSpaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class UserController {
     private final UserItemService userItemService;
     private final UserSearchService userSearchService;
     private final UserReadingReportService userReadingReportService;
-    private final UserHomeService userHomeService;
+    private final UserReadingSpaceService userReadingSpaceService;
 
     @Operation(summary = "유저 검색", description = "유저를 검색합니다.")
     @GetMapping("/search")
@@ -63,6 +63,6 @@ public class UserController {
     @Operation(summary = "유저 리딩스페이스 조회", description = "유저 리딩스페이스를 조회합니다.")
     @GetMapping("/{userId}/readingspace")
     public ResponseEntity<?> getUserReadingSpace(@PathVariable final Long userId) {
-        return ResponseEntity.ok().body(userHomeService.getUserReadingSpace(userId));
+        return ResponseEntity.ok().body(userReadingSpaceService.getUserReadingSpace(userId));
     }
 }
