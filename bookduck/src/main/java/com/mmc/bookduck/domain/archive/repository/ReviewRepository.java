@@ -18,5 +18,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     List<Review> findReviewByUserBookOrderByCreatedTimeDesc(UserBook userBook);
 
+    @Query("SELECT r FROM Review r WHERE r.userBook = :userBook AND (r.visibility = 'PUBLIC' OR r.visibility = 'FRIEND_ONLY') ORDER BY r.createdTime DESC")
+    List<Review> findReviewsByUserBookWithPublicOrFriendOnly(@Param("userBook") UserBook userBook);
+
     List<Review> findAllByUserAndCreatedTimeAfter(User user, LocalDateTime createdTime);
 }
