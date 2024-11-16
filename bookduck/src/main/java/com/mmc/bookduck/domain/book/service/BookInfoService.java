@@ -477,7 +477,7 @@ public class BookInfoService {
         User bookUser = userService.getActiveUserByUserId(userId);
 
         if(!friendService.isFriendWithCurrentUser(bookUser)){
-            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+            throw new CustomException(ErrorCode.FRIENDSHIP_REQUIRED);
         }
         BookInfo bookInfo = getBookInfoById(bookInfoId);
         UserBook userBook  = getUserBookByUserAndBookInfo(bookInfo, bookUser);
