@@ -8,6 +8,7 @@ import com.mmc.bookduck.domain.folder.entity.FolderBook;
 import com.mmc.bookduck.domain.folder.repository.FolderBookRepository;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +24,17 @@ public class FolderBookService {
     private final FolderBookRepository folderBookRepository;
 
     // folderBook 생성
-    public FolderBook createFolderBook(UserBook userBook, Folder folder){
-        FolderBook folderBook = new FolderBook(userBook, folder);
-        return folderBookRepository.save(folderBook);
+    public List<FolderBook> createFolderBooks(List<UserBook> userBooks, Folder folder){
+        List<FolderBook> folderBookList = new ArrayList<>();
+
+        int i = 1;
+        for(UserBook userBook : userBooks){
+            FolderBook folderBook = new FolderBook(userBook, folder, i);
+            i++;
+
+            folderBookList.add(folderBookRepository.save(folderBook));
+        }
+        return folderBookList;
     }
 
     // 폴더삭제 시 folderBook 모두 삭제
@@ -50,9 +59,9 @@ public class FolderBookService {
     }
 
     @Transactional
-    public void incrementOrderFolderBooks(Folder folder){
+    public void incrementOrderFolderBooks(Folder folder, int size){
         List<FolderBook> existingBooks = folder.getFolderBooks();
-        existingBooks.forEach(fb -> fb.setBookOrder(fb.getBookOrder()+1));
+        existingBooks.forEach(fb -> fb.setBookOrder(fb.getBookOrder()+size));
     }
 
     @Transactional

@@ -190,15 +190,7 @@ public class UserBookService {
         if(statusList.isEmpty()){
             throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
         }
-
-        List<ReadStatus> readStatusList = new ArrayList<>();
-        try {
-            for(String status : statusList){
-                readStatusList.add(ReadStatus.valueOf(status));
-            }
-        } catch (IllegalArgumentException e) {
-            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
-        }
+        List<ReadStatus> readStatusList = validateReadStatus(statusList);
 
         User user = userService.getCurrentUser();
         List<UserBook> sorteduserBookList = sortUserBook(user, sort);
@@ -361,5 +353,17 @@ public class UserBookService {
         if(!userBook.getUser().getUserId().equals(currentUser.getUserId())){
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
+    }
+
+    public List<ReadStatus> validateReadStatus(List<String> statusList){
+        List<ReadStatus> readStatusList = new ArrayList<>();
+        try {
+            for(String status : statusList){
+                readStatusList.add(ReadStatus.valueOf(status));
+            }
+        } catch (IllegalArgumentException e) {
+            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
+        }
+        return readStatusList;
     }
 }

@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.folder.service;
 
+import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.folder.dto.common.CandidateFolderBookDto;
@@ -86,55 +87,69 @@ public class FolderService {
 
 
     // 폴더에 책 추가
-    public FolderBookListResponseDto addFolderBook(Long folderId, Long userBookId) {
+    public FolderBookListResponseDto addFolderBooks(Long folderId, List<Long> userBookIds) {
+
         User user = userService.getCurrentUser();
-
         Folder folder = findFolderById(folderId);
-        UserBook userBook = userBookService.getUserBookById(userBookId);
 
-        List<FolderBookUnitDto> folderBookList = new ArrayList<>();
-
-        // 권한확인
-        if(folder.getUser().equals(user) && userBook.getUser().equals(user)){
-            if(folderBookService.existsByUserBookAndFolder(userBook, folder)){
+        List<UserBook> userBookList = new ArrayList<>();
+        for (Long userBookId : userBookIds) {
+            UserBook userBook = userBookService.getUserBookById(userBookId);
+            if (!userBook.getUser().equals(user)) {
+                throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+            }
+            if (folderBookService.existsByUserBookAndFolder(userBook, folder)) {
                 // 이미 folderBook 있을 때,
                 throw new CustomException(ErrorCode.FOLDERBOOK_ALREADY_EXISTS);
             }
-            folderBookService.incrementOrderFolderBooks(folder);
-            FolderBook newFolderBook = folderBookService.createFolderBook(userBook, folder);
-            folder.addFolderBook(newFolderBook);
-
-            List<FolderBook> folderBooks = folderBookService.orderFolderBooks(folder);
-            for(FolderBook folderBook : folderBooks){
-                folderBookList.add(FolderBookUnitDto.from(folderBook));
-            }
-            return new FolderBookListResponseDto(folder, folderBookList);
-        }else{
-            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+            userBookList.add(userBookService.getUserBookById(userBookId));
         }
-    }
-
-    // 폴더에서 책 삭제
-    public FolderBookListResponseDto deleteFolderBook(Long folderId, Long folderBookId) {
-        User user = userService.getCurrentUser();
-        Folder folder = findFolderById(folderId);
-        FolderBook folderBook = folderBookService.findFolderBookById(folderBookId);
 
         List<FolderBookUnitDto> folderBookList = new ArrayList<>();
 
-        // 권한확인
-        if(folder.getUser().equals(user) && folderBook.getUserBook().getUser().equals(user)){
+        folderBookService.incrementOrderFolderBooks(folder, userBookList.size());
+        List<FolderBook> newFolderBookList = folderBookService.createFolderBooks(userBookList, folder);
+        for(FolderBook folderBook : newFolderBookList){
+            folder.addFolderBook(folderBook);
+        }
+        List<FolderBook> folderBooks = folderBookService.orderFolderBooks(folder);
+
+        for (FolderBook folderBook : folderBooks) {
+            folderBookList.add(FolderBookUnitDto.from(folderBook));
+        }
+        return new FolderBookListResponseDto(folder, folderBookList);
+    }
+
+    // 폴더에서 책 삭제
+    public FolderBookListResponseDto deleteFolderBooks(Long folderId, List<Long> folderBookIds) {
+        User user = userService.getCurrentUser();
+        Folder folder = findFolderById(folderId);
+        if(!folder.getUser().equals(user)){
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+        }
+
+        List<FolderBook> folderBookList = new ArrayList<>();
+        for(Long folderBookId : folderBookIds){
+            FolderBook folderBook = folderBookService.findFolderBookById(folderBookId);
+            if(!folderBook.getFolder().equals(folder)){
+                throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+            }
+            folderBookList.add(folderBook);
+        }
+
+        for(FolderBook folderBook : folderBookList){
             folder.removeFolderBook(folderBook);
             folderBookService.deleteOneFolderBook(folderBook);
             folderBookService.decrementOrderFolderBooks(folder, folderBook.getBookOrder());
-
-            for(FolderBook book : folder.getFolderBooks()){
-                folderBookList.add(FolderBookUnitDto.from(book));
-            }
-            return new FolderBookListResponseDto(folder, folderBookList);
-        }else{
-            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
+
+        List<FolderBook> orderedFolderBooks = folderBookService.orderFolderBooks(folder);
+        List<FolderBookUnitDto> dtoList = new ArrayList<>();
+        for(FolderBook book : orderedFolderBooks){
+            dtoList.add(FolderBookUnitDto.from(book));
+        }
+        return new FolderBookListResponseDto(folder, dtoList);
+
     }
 
     // 폴더 별 도서 목록 조회
@@ -180,16 +195,22 @@ public class FolderService {
 
     // 폴더별 & 상태별 도서 목록 조회
     @Transactional(readOnly = true)
-    public FolderBookListResponseDto getFolderBookListStatus(Long folderId, String status) {
+    public FolderBookListResponseDto getFolderBookListStatus(Long folderId, List<String> statusList) {
+
+        if(statusList.isEmpty()){
+            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
+        }
         User user = userService.getCurrentUser();
         Folder folder = findFolderById(folderId);
 
+        List<ReadStatus> readStatusList = userBookService.validateReadStatus(statusList);
         List<FolderBookUnitDto> folderBookList = new ArrayList<>();
-
         if(folder.getUser().equals(user)){
             for(FolderBook folderBook : folder.getFolderBooks()){
-                if(folderBook.getUserBook().getReadStatus().name().equals(status)){
-                    folderBookList.add(FolderBookUnitDto.from(folderBook));
+                for(ReadStatus readStatus : readStatusList){
+                    if(folderBook.getUserBook().getReadStatus().equals(readStatus)){
+                        folderBookList.add(FolderBookUnitDto.from(folderBook));
+                    }
                 }
             }
             return new FolderBookListResponseDto(folder, folderBookList);
@@ -199,7 +220,7 @@ public class FolderService {
     }
 
     @Transactional(readOnly = true)
-    public CandidateFolderBookListResponseDto getCandidateBooks(Long folderId) {
+    public CandidateFolderBookListResponseDto getCandidateBooks(Long folderId, List<String> statusList) {
         User user = userService.getCurrentUser();
         Folder folder = findFolderById(folderId);
 
@@ -211,8 +232,8 @@ public class FolderService {
         List<UserBook> userBooks = userBookService.findAllByUser(user);
 
         List<CandidateFolderBookDto> dtoList = new ArrayList<>();
-
         List<UserBook> candidateList = new ArrayList<>(userBooks);
+
         for(UserBook userBook: userBooks){
             for(FolderBook folderBook: folderBooks){
                 if(userBook.equals(folderBook.getUserBook())){
@@ -222,8 +243,20 @@ public class FolderService {
             }
         }
 
-        for(UserBook userBook: candidateList){
-            dtoList.add(CandidateFolderBookDto.from(userBook));
+        if(statusList == null || statusList.isEmpty()){
+            for(UserBook userBook: candidateList){
+                dtoList.add(CandidateFolderBookDto.from(userBook));
+            }
+        }
+        else{
+            List<ReadStatus> readStatusList = userBookService.validateReadStatus(statusList);
+            for(ReadStatus readStatus : readStatusList){
+                for(UserBook userBook: candidateList){
+                    if(userBook.getReadStatus().equals(readStatus)){
+                        dtoList.add(CandidateFolderBookDto.from(userBook));
+                    }
+                }
+            }
         }
         return new CandidateFolderBookListResponseDto(dtoList);
     }
