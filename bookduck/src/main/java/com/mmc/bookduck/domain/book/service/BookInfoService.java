@@ -474,7 +474,7 @@ public class BookInfoService {
     }
 
     @Transactional(readOnly = true)
-    public UserBookReviewExcerptResponseDto getAllUserBookReviewExcerpt(Long bookInfoId, Long userId) {
+    public UserBookReviewExcerptResponseDto getAllUserBookArchive(Long bookInfoId, Long userId) {
         User bookUser = userService.getActiveUserByUserId(userId);
 
         if(!friendService.isFriendWithCurrentUser(bookUser)){

@@ -107,6 +107,6 @@ public class BookInfoController {
     public ResponseEntity<UserBookReviewExcerptResponseDto> getAllUserBookReviewExcerpt(@PathVariable(name = "bookinfoId") final Long bookInfoId,
                                                                                         @PathVariable(name = "userId") final Long userId){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(bookInfoService.getAllUserBookReviewExcerpt(bookInfoId, userId));
+                .body(bookInfoService.getAllUserBookArchive(bookInfoId, userId));
     }
 }
