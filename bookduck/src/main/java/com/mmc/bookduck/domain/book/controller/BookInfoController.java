@@ -5,12 +5,13 @@ import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.AddUserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
 import com.mmc.bookduck.domain.book.dto.response.AddUserBookResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.common.CustomBookUnitDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
+import com.mmc.bookduck.domain.book.dto.common.BookUnitDto;
 import com.mmc.bookduck.domain.book.service.BookInfoService;
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,8 +35,8 @@ public class BookInfoController {
     @Operation(summary = "API 도서 목록 검색", description = "구글 API에서 특정 키워드에 해당하는 도서 목록을 검색합니다.")
     @GetMapping("/search")
     public ResponseEntity<BookListResponseDto<BookUnitResponseDto>> searchBookList(@RequestParam(name = "keyword") final String keyword,
-                                                                                   @RequestParam final Long page,
-                                                                                   @RequestParam final Long size){
+                                                                                       @RequestParam final Long page,
+                                                                                       @RequestParam final Long size){
 
         return ResponseEntity.ok(bookInfoService.searchBookList(keyword, page, size));
     }
