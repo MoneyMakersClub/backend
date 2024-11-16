@@ -322,8 +322,7 @@ public class BookInfoService {
         if(bookInfo.getCreatedUserId() == null){
             throw new CustomException(ErrorCode.CUSTOM_BOOKINFO_NOT_FOUND);
         }
-        UserBook userBook = userBookRepository.findByUserAndBookInfo(user, bookInfo)
-                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
+        UserBook userBook = getUserBookByUserAndBookInfo(bookInfo, user);
 
         User bookInfoCreaterUser = userService.getActiveUserByUserId(bookInfo.getCreatedUserId());
 
@@ -481,8 +480,7 @@ public class BookInfoService {
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
         BookInfo bookInfo = getBookInfoById(bookInfoId);
-        UserBook userBook  = userBookRepository.findByUserAndBookInfo(bookUser, bookInfo)
-                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
+        UserBook userBook  = getUserBookByUserAndBookInfo(bookInfo, bookUser);
 
         List<Excerpt> excerpts = excerptRepository.findExcerptsByUserBookWithPublic(userBook);
         List<Review> reviews = reviewRepository.findReviewsByUserBookWithPublic(userBook);
@@ -495,9 +493,8 @@ public class BookInfoService {
     @Transactional(readOnly = true)
     public UserBookReviewExcerptResponseDto getAllMyBookArchive(Long bookInfoId) {
         User user = userService.getCurrentUser();
-        BookInfo bookInfo = bookInfoRepository.getReferenceById(bookInfoId);
-        UserBook userBook  = userBookRepository.findByUserAndBookInfo(user, bookInfo)
-                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
+        BookInfo bookInfo = getBookInfoById(bookInfoId);
+        UserBook userBook  = getUserBookByUserAndBookInfo(bookInfo, user);
 
         List<Excerpt> excerpts = excerptRepository.findExcerptByUserBookOrderByCreatedTimeDesc(userBook);
         List<Review> reviews = reviewRepository.findReviewByUserBookOrderByCreatedTimeDesc(userBook);
@@ -541,5 +538,11 @@ public class BookInfoService {
             dtoList.add(ReviewExcerptUnitDto.from(reviewResponseDto));
         }
         return dtoList;
+    }
+
+    @Transactional(readOnly = true)
+    public UserBook getUserBookByUserAndBookInfo(BookInfo bookInfo, User user){
+        return userBookRepository.findByUserAndBookInfo(user, bookInfo)
+                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
     }
 }
