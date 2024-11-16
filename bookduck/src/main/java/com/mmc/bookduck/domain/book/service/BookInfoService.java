@@ -448,7 +448,7 @@ public class BookInfoService {
         return OneLineRatingListResponseDto.from(dtoPage);
     }
 
-
+    @Transactional(readOnly = true)
     public BookListResponseDto<BookCoverImageUnitDto> getMostReadBooks() {
         LocalDateTime monthsAgo = LocalDateTime.now().minusMonths(3);
         List<UserBook> userBookList = userBookRepository.findAllByCreatedTimeAfter(monthsAgo);
@@ -467,8 +467,7 @@ public class BookInfoService {
 
         List<BookCoverImageUnitDto> coverList = new ArrayList<>();
         for(Long bookInfoId : bookInfoIdList){
-            BookInfo bookInfo = bookInfoRepository.findById(bookInfoId)
-                            .orElseThrow(()-> new CustomException(ErrorCode.BOOKINFO_NOT_FOUND));
+            BookInfo bookInfo = getBookInfoById(bookInfoId);
             coverList.add(BookCoverImageUnitDto.from(bookInfo));
         }
         return new BookListResponseDto<>(coverList);
