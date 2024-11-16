@@ -33,10 +33,10 @@ public class FolderBook {
     private UserBook userBook;
 
     @Builder
-    public FolderBook(UserBook userBook, Folder folder) {
+    public FolderBook(UserBook userBook, Folder folder, int bookOrder) {
         this.folder = folder;
         this.userBook = userBook;
-        this.bookOrder = 1;
+        this.bookOrder = bookOrder;
     }
 
     public void setFolder(Folder folder) {
