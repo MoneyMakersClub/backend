@@ -32,6 +32,8 @@ public class Review extends BaseTimeEntity {
 
     private String color;
 
+    private boolean isSystemGenerated;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", updatable = false)
     @NotNull
@@ -61,5 +63,11 @@ public class Review extends BaseTimeEntity {
         this.color = color;
         this.visibility = visibility;
     }
+
+    public void setReviewTitle(String reviewTitle) {this.reviewTitle = reviewTitle;}
+
+    public void setIsSystemGenerated(boolean isSystemGenerated) {this.isSystemGenerated = isSystemGenerated;}
+
+
 
 }

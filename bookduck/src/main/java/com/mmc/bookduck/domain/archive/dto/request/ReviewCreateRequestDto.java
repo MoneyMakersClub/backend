@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReviewCreateRequestDto {
-    @NotNull private String reviewTitle;
+    private String reviewTitle;
     @NotNull private String reviewContent;
     private String color;
     private Visibility visibility;
