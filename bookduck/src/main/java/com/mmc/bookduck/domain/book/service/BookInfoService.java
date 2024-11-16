@@ -2,10 +2,18 @@ package com.mmc.bookduck.domain.book.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mmc.bookduck.domain.archive.dto.response.ExcerptResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.ReviewResponseDto;
+import com.mmc.bookduck.domain.archive.entity.ArchiveType;
+import com.mmc.bookduck.domain.archive.entity.Excerpt;
+import com.mmc.bookduck.domain.archive.entity.Review;
+import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
+import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookUnitParseDto;
 import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineReadStatusDto;
+import com.mmc.bookduck.domain.book.dto.common.ReviewExcerptUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
@@ -16,6 +24,7 @@ import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.common.CustomBookUnitDto;
+import com.mmc.bookduck.domain.book.dto.response.UserBookReviewExcerptResponseDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.Genre;
 import com.mmc.bookduck.domain.book.entity.GenreName;
@@ -54,6 +63,8 @@ import java.util.List;
 public class BookInfoService {
     private final BookInfoRepository bookInfoRepository;
     private final UserBookRepository userBookRepository;
+    private final ReviewRepository reviewRepository;
+    private final ExcerptRepository excerptRepository;
     private final GenreService genreService;
     private final GoogleBooksApiService googleBooksApiService;
     private final UserService userService;
@@ -461,5 +472,75 @@ public class BookInfoService {
             coverList.add(BookCoverImageUnitDto.from(bookInfo));
         }
         return new BookListResponseDto<>(coverList);
+    }
+
+    @Transactional(readOnly = true)
+    public UserBookReviewExcerptResponseDto getAllUserBookReviewExcerpt(Long bookInfoId, Long userId) {
+        User bookUser = userService.getActiveUserByUserId(userId);
+
+        if(!friendService.isFriendWithCurrentUser(bookUser)){
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+        }
+        BookInfo bookInfo = getBookInfoById(bookInfoId);
+        UserBook userBook  = userBookRepository.findByUserAndBookInfo(bookUser, bookInfo)
+                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
+
+        List<Excerpt> excerpts = excerptRepository.findExcerptsByUserBookWithPublicOrFriendOnly(userBook);
+        List<Review> reviews = reviewRepository.findReviewsByUserBookWithPublicOrFriendOnly(userBook);
+
+        List<ReviewExcerptUnitDto> dtoList = fromReviewExcerptToDto(reviews, excerpts);
+        UserBookReviewExcerptResponseDto dto = new UserBookReviewExcerptResponseDto(bookInfoId, userBook.getUserBookId(), dtoList);
+        return sortByCreatedTime(dto);
+    }
+
+    @Transactional(readOnly = true)
+    public UserBookReviewExcerptResponseDto getAllMyBookReviewExcerpt(Long bookInfoId) {
+        User user = userService.getCurrentUser();
+        BookInfo bookInfo = bookInfoRepository.getReferenceById(bookInfoId);
+        UserBook userBook  = userBookRepository.findByUserAndBookInfo(user, bookInfo)
+                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
+
+        List<Excerpt> excerpts = excerptRepository.findExcerptByUserBookOrderByCreatedTimeDesc(userBook);
+        List<Review> reviews = reviewRepository.findReviewByUserBookOrderByCreatedTimeDesc(userBook);
+
+        List<ReviewExcerptUnitDto> dtoList = fromReviewExcerptToDto(reviews, excerpts);
+        UserBookReviewExcerptResponseDto dto = new UserBookReviewExcerptResponseDto(bookInfoId, userBook.getUserBookId(), dtoList);
+        return sortByCreatedTime(dto);
+    }
+
+    // UserBookReviewExcerptResponseDto를 최신순으로 정렬
+    public UserBookReviewExcerptResponseDto sortByCreatedTime(UserBookReviewExcerptResponseDto dto) {
+        List<ReviewExcerptUnitDto> sortedList = dto.archiveList().stream()
+                .sorted((unit1, unit2) -> {
+                    LocalDateTime createdTime1 = getCreatedTime(unit1);
+                    LocalDateTime createdTime2 = getCreatedTime(unit2);
+                    return createdTime2.compareTo(createdTime1); // 최신순 정렬
+                })
+                .collect(Collectors.toList());
+
+        return new UserBookReviewExcerptResponseDto(dto.bookInfoId(), dto.userBookId(), sortedList);
+    }
+
+    private LocalDateTime getCreatedTime(ReviewExcerptUnitDto unit) {
+        if (unit.archiveType() == ArchiveType.EXCERPT) {
+            return unit.excerpt().createdTime();
+        }
+        else{
+            return unit.review().createdTime();
+        }
+    }
+
+    public List<ReviewExcerptUnitDto> fromReviewExcerptToDto (List<Review> reviews, List<Excerpt> excerpts){
+        List<ReviewExcerptUnitDto> dtoList = new ArrayList<>();
+
+        for (Excerpt excerpt : excerpts) {
+            ExcerptResponseDto excerptResponseDto = ExcerptResponseDto.from(excerpt);
+            dtoList.add(ReviewExcerptUnitDto.from(excerptResponseDto));
+        }
+        for (Review review : reviews) {
+            ReviewResponseDto reviewResponseDto = ReviewResponseDto.from(review);
+            dtoList.add(ReviewExcerptUnitDto.from(reviewResponseDto));
+        }
+        return dtoList;
     }
 }

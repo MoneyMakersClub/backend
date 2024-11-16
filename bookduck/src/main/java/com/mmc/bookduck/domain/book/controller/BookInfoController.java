@@ -8,6 +8,7 @@ import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.UserBookReviewExcerptResponseDto;
 import com.mmc.bookduck.domain.book.service.BookInfoService;
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -90,5 +91,22 @@ public class BookInfoController {
     public ResponseEntity<BookListResponseDto<BookCoverImageUnitDto>> getMostReadBooks(){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(bookInfoService.getMostReadBooks());
+    }
+
+    //나의 기록과 발췌 통합 조회
+    @Operation(summary = "나의 기록 전체 기록 조회", description = "책의 나의 전체 기록을 조회합니다.(감상평+발췌)")
+    @GetMapping("/{bookinfoId}/archives/users/me")
+    public ResponseEntity<UserBookReviewExcerptResponseDto> getAllUserBookReviewExcerpt(@PathVariable(name = "bookinfoId") final Long bookInfoId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(bookInfoService.getAllMyBookReviewExcerpt(bookInfoId));
+    }
+
+    //친구의 기록과 발췌 통합 조회
+    @Operation(summary = "친구의 전체 기록 조회", description = "책의 친구의 기록을 조회합니다.(감상평+발췌)")
+    @GetMapping("/{bookinfoId}/archives/users/{userId}")
+    public ResponseEntity<UserBookReviewExcerptResponseDto> getAllUserBookReviewExcerpt(@PathVariable(name = "bookinfoId") final Long bookInfoId,
+                                                                                        @PathVariable(name = "userId") final Long userId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(bookInfoService.getAllUserBookReviewExcerpt(bookInfoId, userId));
     }
 }
