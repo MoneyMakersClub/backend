@@ -6,6 +6,7 @@ import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -19,10 +20,11 @@ public class Review extends BaseTimeEntity {
     @Column(updatable = false)
     private Long reviewId;
 
-    @NotNull
+    @Size(max = 25, message = "리뷰 제목은 최대 25자까지 입력할 수 있습니다.")
     private String reviewTitle;
 
     @NotNull
+    @Size(max = 1000, message = "리뷰 내용은 최대 1000자까지 입력할 수 있습니다.")
     private String reviewContent;
 
     @Enumerated(EnumType.STRING)
