@@ -10,8 +10,6 @@ import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
-import com.mmc.bookduck.domain.archive.service.ExcerptService;
-import com.mmc.bookduck.domain.archive.service.ReviewService;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
@@ -28,6 +26,7 @@ import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
+import com.mmc.bookduck.domain.userhome.service.UserHomeService;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -55,6 +54,7 @@ public class UserBookService {
     private final OneLineRepository oneLineRepository;
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
+    private final UserHomeService userHomeService;
 
     //customBook 추가
     public UserBook createCustomBookEntity(CustomBookRequestDto requestDto) {
@@ -134,6 +134,7 @@ public class UserBookService {
             if(createdUserId != null && createdUserId.equals(user.getUserId())){
                 bookInfoService.deleteCustomBookInfo(bookInfo.getBookInfoId());
             }
+            userHomeService.deleteHomeCardsByUserBook(userBook);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }

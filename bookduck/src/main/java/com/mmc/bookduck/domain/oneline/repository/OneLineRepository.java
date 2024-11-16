@@ -33,4 +33,16 @@ public interface OneLineRepository extends JpaRepository<OneLine, Long> {
     // 별점 낮은 순 정렬, null은 마지막
     @Query("SELECT o FROM OneLine o WHERE o.userBook.bookInfo = :bookInfo ORDER BY o.userBook.rating ASC NULLS LAST")
     Page<OneLine> findByBookInfoOrderByRatingAsc(@Param("bookInfo") BookInfo bookInfo, Pageable pageable);
+
+    @Query("SELECT o FROM OneLine o " +
+            "JOIN o.userBook ub " +
+            "WHERE (o.oneLineContent LIKE %:keyword% " +
+            "OR ub.bookInfo.title LIKE %:keyword% " +
+            "OR ub.bookInfo.author LIKE %:keyword%) " +
+            "AND o.user = :user " +
+            "ORDER BY o.createdTime DESC")
+    Page<OneLine> searchAllByOneLineContentOrBookInfoTitleOrAuthorByUserAndCreatedTimeDesc(
+            @Param("keyword") String keyword,
+            @Param("user") User user,
+            Pageable pageable);
 }

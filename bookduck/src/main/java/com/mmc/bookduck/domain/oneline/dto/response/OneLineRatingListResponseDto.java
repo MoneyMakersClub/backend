@@ -4,18 +4,18 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public record OneLineRatingListResponseDto(
-        int totalPages,
         int currentPage,
-        int PageSize,
+        int pageSize,
         long totalElements,
+        int totalPages,
         List<OneLineRatingUnitDto> oneLineRatingList
 ) {
     public static OneLineRatingListResponseDto from(Page<OneLineRatingUnitDto> oneLineRatingPage) {
         return new OneLineRatingListResponseDto(
-                oneLineRatingPage.getTotalPages(),
-                oneLineRatingPage.getNumber() + 1,
+                oneLineRatingPage.getNumber(),
                 oneLineRatingPage.getSize(),
                 oneLineRatingPage.getTotalElements(),
+                oneLineRatingPage.getTotalPages(),
                 oneLineRatingPage.getContent()
         );
     }
