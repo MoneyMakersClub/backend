@@ -14,8 +14,10 @@ import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookUnitParseDto;
 import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineReadStatusDto;
+import com.mmc.bookduck.domain.book.dto.request.AddUserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
+import com.mmc.bookduck.domain.book.dto.response.AddUserBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
@@ -27,6 +29,7 @@ import com.mmc.bookduck.domain.book.dto.common.CustomBookUnitDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.Genre;
 import com.mmc.bookduck.domain.book.entity.GenreName;
+import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.BookInfoRepository;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
@@ -403,14 +406,14 @@ public class BookInfoService {
         UserBook userBook = userBookRepository.findByUserAndBookInfo(user, bookInfo)
                 .orElse(null);
         if (userBook == null) {
-            return new MyRatingOneLineReadStatusDto(null, null, null);
+            return MyRatingOneLineReadStatusDto.defaultInstance();
         } else {
             OneLine oneLineRating = oneLineRepository.findByUserBook(userBook)
                     .orElse(null);
             if (oneLineRating == null) {
-                return new MyRatingOneLineReadStatusDto(userBook.getRating(), null, userBook.getReadStatus());
+                return MyRatingOneLineReadStatusDto.from(userBook);
             } else {
-                return new MyRatingOneLineReadStatusDto(userBook.getRating(), oneLineRating.getOneLineContent(), userBook.getReadStatus());
+                return MyRatingOneLineReadStatusDto.from(userBook, oneLineRating.getOneLineContent());
             }
         }
     }
@@ -543,5 +546,28 @@ public class BookInfoService {
     public UserBook getUserBookByUserAndBookInfo(BookInfo bookInfo, User user){
         return userBookRepository.findByUserAndBookInfo(user, bookInfo)
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
+    }
+
+    public AddUserBookResponseDto addBookByProviderId(String providerId, AddUserBookRequestDto requestDto) {
+        User user = userService.getCurrentUser();
+        Optional<BookInfo> bookInfo = findBookInfoByProviderId(providerId);
+
+        UserBook savedUserBook;
+        if(bookInfo.isPresent()){
+            UserBook userBook = new UserBook(ReadStatus.NOT_STARTED, user, bookInfo.get());
+            savedUserBook = userBookRepository.save(userBook);
+        }
+        else{
+            String responseBody = googleBooksApiService.searchOneBook(providerId);
+            BookInfoDetailDto additional = parseBookDetail(responseBody);
+            Genre genre = genreService.matchGenre(additional.category());
+
+            BookInfo newBookInfo = additional.toEntity(providerId, requestDto, genre);
+            bookInfoRepository.save(newBookInfo);
+
+            UserBook userBook = requestDto.toEntity(user, newBookInfo, ReadStatus.valueOf(requestDto.readStatus()));
+            savedUserBook = userBookRepository.save(userBook);
+        }
+        return AddUserBookResponseDto.from(savedUserBook);
     }
 }

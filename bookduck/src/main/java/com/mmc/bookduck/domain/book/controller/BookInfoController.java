@@ -2,7 +2,9 @@ package com.mmc.bookduck.domain.book.controller;
 
 import com.mmc.bookduck.domain.archive.dto.response.UserArchiveResponseDto;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
+import com.mmc.bookduck.domain.book.dto.request.AddUserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
+import com.mmc.bookduck.domain.book.dto.response.AddUserBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.common.CustomBookUnitDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
@@ -13,6 +15,7 @@ import com.mmc.bookduck.domain.book.service.BookInfoService;
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -48,6 +51,13 @@ public class BookInfoController {
     @GetMapping("/external/{providerId}")
     public ResponseEntity<BookInfoBasicResponseDto> getApiBookBasicByProviderId(@PathVariable(name = "providerId") final String providerId){
         return ResponseEntity.ok(bookInfoService.getApiBookBasicByProviderId(providerId));
+    }
+
+    @Operation(summary = "검색 목록에서 서재에 책 추가", description = "책 검색 목록에서 providerId로 책을 서재에 추가합니다.")
+    @PostMapping("/{providerId}/add")
+    public ResponseEntity<AddUserBookResponseDto> addBookByProviderId(@PathVariable(name = "providerId") final String providerId,
+                                                                      @Valid @RequestBody final AddUserBookRequestDto requestDto){
+        return ResponseEntity.ok(bookInfoService.addBookByProviderId(providerId, requestDto));
     }
 
 

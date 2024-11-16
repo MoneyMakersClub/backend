@@ -9,6 +9,7 @@ import java.util.List;
 public record BookUnitResponseDto(
         String providerId,
         Long bookInfoId,
+        Long userbookId,
         @NotNull String title,
         List<String> author,
         String imgPath,
@@ -19,6 +20,7 @@ public record BookUnitResponseDto(
         return new BookUnitResponseDto(
                 infoDto.providerId(),
                 bookInfoId,
+                ratingDto.userbookId(),
                 infoDto.title(),
                 infoDto.author(),
                 infoDto.imgPath(),
@@ -29,6 +31,7 @@ public record BookUnitResponseDto(
     public static BookUnitResponseDto from(BookUnitParseDto infoDto){
         return new BookUnitResponseDto(
                 infoDto.providerId(),
+                null,
                 null,
                 infoDto.title(),
                 infoDto.author(),
