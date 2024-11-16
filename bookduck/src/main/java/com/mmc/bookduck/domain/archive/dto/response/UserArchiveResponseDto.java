@@ -12,7 +12,9 @@ public record UserArchiveResponseDto(
 ) {
     public record ArchiveWithType(
             String type, // EXCERPT, REVIEW
-            Object data  // ExcerptResponseDto, ReviewResponseDto
+            Object data, // ExcerptResponseDto, ReviewResponseDto
+            String title,
+            String author
     ) {}
     public static UserArchiveResponseDto from(Page<ArchiveWithType> archivePage) {
         return new UserArchiveResponseDto(

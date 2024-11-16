@@ -174,7 +174,9 @@ public class ArchiveService {
                 if (!userId.equals(currentUserId) && excerpt.getVisibility() != Visibility.PUBLIC) {
                     continue;
                 }
-                archiveList.add(new UserArchiveResponseDto.ArchiveWithType("EXCERPT", ExcerptResponseDto.from(excerpt)));
+                String title = excerpt.getUserBook().getBookInfo().getTitle();
+                String author = excerpt.getUserBook().getBookInfo().getAuthor();
+                archiveList.add(new UserArchiveResponseDto.ArchiveWithType("EXCERPT", ExcerptResponseDto.from(excerpt), title, author));
             }
         }
         // 리뷰 조회
@@ -184,7 +186,9 @@ public class ArchiveService {
                 if (!userId.equals(currentUserId) && review.getVisibility() != Visibility.PUBLIC) {
                     continue;
                 }
-                archiveList.add(new UserArchiveResponseDto.ArchiveWithType("REVIEW", ReviewResponseDto.from(review)));
+                String title = review.getUserBook().getBookInfo().getTitle();
+                String author = review.getUserBook().getBookInfo().getAuthor();
+                archiveList.add(new UserArchiveResponseDto.ArchiveWithType("REVIEW", ReviewResponseDto.from(review), title, author));
             }
         }
         // 데이터 합친 후 최신순 정렬
