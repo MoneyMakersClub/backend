@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.user.service;
 
+import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
@@ -9,15 +10,14 @@ import com.mmc.bookduck.domain.user.dto.common.MonthlyBookCountUnitDto;
 import com.mmc.bookduck.domain.user.dto.common.MostReadGenreUnitDto;
 import com.mmc.bookduck.domain.user.dto.response.UserStatisticsResponseDto;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.global.komoran.KomoranService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +28,7 @@ public class UserReadingReportService {
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
     private final UserService userService;
+    private final KomoranService komoranService;
 
     public UserStatisticsResponseDto getUserStatistics(Long userId) {
         User user = userService.getActiveUserByUserId(userId);
@@ -92,7 +93,25 @@ public class UserReadingReportService {
         );
     }
 
-//    public Object getUserKeywordAnalysis(Long userId) {
-//        User user = userService.getUserByUserId(userId);
-//    }
+    public List<String> getUserKeywordAnalysis(Long userId) {
+        User user = userService.getActiveUserByUserId(userId);
+        List<Review> reviews = reviewRepository.findTop30ByUserOrderByCreatedTimeDesc(user);
+
+        // reviewCount를 토큰화하여 명사와 형용사만 추출
+        List<String> tokens = new ArrayList<>();
+        for (Review review : reviews) {
+            tokens.addAll(komoranService.extractNounsAndAdjectives(review.getReviewContent()));
+        }
+
+        // 빈도수 계산
+        Map<String, Long> frequencyMap = tokens.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        // Top 6 뽑기
+        return frequencyMap.entrySet().stream()
+                .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()))
+                .limit(6)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+    }
 }
