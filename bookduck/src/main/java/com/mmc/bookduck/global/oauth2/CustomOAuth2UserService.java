@@ -1,5 +1,7 @@
 package com.mmc.bookduck.global.oauth2;
 
+import com.mmc.bookduck.domain.friend.entity.Friend;
+import com.mmc.bookduck.domain.friend.repository.FriendRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.entity.UserGrowth;
 import com.mmc.bookduck.domain.userhome.entity.UserHome;
@@ -8,10 +10,12 @@ import com.mmc.bookduck.domain.user.repository.UserGrowthRepository;
 import com.mmc.bookduck.domain.userhome.repository.UserHomeRepository;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
 import com.mmc.bookduck.domain.user.repository.UserSettingRepository;
+import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.CustomOAuth2AuthenticationException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -30,6 +34,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserSettingRepository userSettingRepository;
     private final UserHomeRepository userHomeRepository;
     private final UserGrowthRepository userGrowthRepository;
+    private final FriendRepository friendRepository;
+
+    @Value("${official.account.email}")
+    private String officialAccountEmail;
 
     @Override
     @Transactional
@@ -77,6 +85,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             // 새로운 User를 먼저 저장
             newUser = userRepository.save(newUser);
+
+            // 공식계정 친구 추가
+            User officialAccount = userRepository.findByEmail(officialAccountEmail)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            Friend friend = Friend.builder()
+                    .user1(officialAccount)
+                    .user2(newUser)
+                    .build();
+            friendRepository.save(friend);
 
             // 새로운 User의 UserSetting, UserHome, UserGrowth 생성
             UserSetting userSetting = UserSetting.builder().user(newUser).build();
