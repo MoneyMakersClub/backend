@@ -29,8 +29,6 @@ public enum ErrorCode {
     // 401 Unauthorized
     // 로그인 상태여야 하는 요청
     NOT_AUTHENTICATED(401, "로그인 상태가 아닙니다."),
-    // 권한이 없는 요청을 보냄
-    UNAUTHORIZED_REQUEST(401,"권한이 없습니다."),
     // 소셜 로그인이 정상적으로 이루어지지 않음
     OAUTH2_LOGIN_FAILED(401, "소셜 로그인에 실패했습니다."),
     // 유효하지 않은 토큰
@@ -44,6 +42,11 @@ public enum ErrorCode {
     // 쿠키에 리프레시 토큰이 들어있지 않은 경우
     NO_COOKIE(401, "쿠키에 리프레시 토큰이 존재하지 않습니다."),
     USER_STATUS_IS_NOT_ACTIVE(401, "계정이 활성 상태가 아닙니다."),
+
+    // 403 Forbidden
+    FRIENDSHIP_REQUIRED(403, "친구 관계가 필요합니다."),
+    // 권한이 없는 요청을 보냄
+    UNAUTHORIZED_REQUEST(403,"권한이 없습니다."),
 
     // 404 Not Found
     // 각 리소스를 찾지 못함

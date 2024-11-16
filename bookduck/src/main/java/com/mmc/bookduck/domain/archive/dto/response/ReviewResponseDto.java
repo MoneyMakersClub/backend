@@ -6,7 +6,7 @@ import com.mmc.bookduck.domain.common.Visibility;
 import java.time.LocalDateTime;
 
 public record ReviewResponseDto(
-        Long ReviewId,
+        Long reviewId,
         String reviewTitle,
         String reviewContent,
         String color,
