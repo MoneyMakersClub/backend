@@ -96,15 +96,15 @@ public class BookInfoController {
     //나의 기록과 발췌 통합 조회
     @Operation(summary = "나의 기록 전체 기록 조회", description = "책의 나의 전체 기록을 조회합니다.(감상평+발췌)")
     @GetMapping("/{bookinfoId}/archives/users/me")
-    public ResponseEntity<UserBookReviewExcerptResponseDto> getAllUserBookReviewExcerpt(@PathVariable(name = "bookinfoId") final Long bookInfoId){
+    public ResponseEntity<UserBookReviewExcerptResponseDto> getAllMyBookArchive(@PathVariable(name = "bookinfoId") final Long bookInfoId){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(bookInfoService.getAllMyBookReviewExcerpt(bookInfoId));
+                .body(bookInfoService.getAllMyBookArchive(bookInfoId));
     }
 
     //친구의 기록과 발췌 통합 조회
     @Operation(summary = "친구의 전체 기록 조회", description = "책의 친구의 기록을 조회합니다.(감상평+발췌)")
     @GetMapping("/{bookinfoId}/archives/users/{userId}")
-    public ResponseEntity<UserBookReviewExcerptResponseDto> getAllUserBookReviewExcerpt(@PathVariable(name = "bookinfoId") final Long bookInfoId,
+    public ResponseEntity<UserBookReviewExcerptResponseDto> getAllUserBookArchive(@PathVariable(name = "bookinfoId") final Long bookInfoId,
                                                                                         @PathVariable(name = "userId") final Long userId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(bookInfoService.getAllUserBookArchive(bookInfoId, userId));

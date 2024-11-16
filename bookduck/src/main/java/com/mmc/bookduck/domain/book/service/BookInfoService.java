@@ -493,7 +493,7 @@ public class BookInfoService {
     }
 
     @Transactional(readOnly = true)
-    public UserBookReviewExcerptResponseDto getAllMyBookReviewExcerpt(Long bookInfoId) {
+    public UserBookReviewExcerptResponseDto getAllMyBookArchive(Long bookInfoId) {
         User user = userService.getCurrentUser();
         BookInfo bookInfo = bookInfoRepository.getReferenceById(bookInfoId);
         UserBook userBook  = userBookRepository.findByUserAndBookInfo(user, bookInfo)
