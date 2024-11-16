@@ -112,10 +112,10 @@ public class UserReadingReportService {
         Map<String, Long> frequencyMap = tokens.stream()
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-        // Top 10 뽑기
+        // Top 6 뽑기
         return frequencyMap.entrySet().stream()
                 .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue())) // Descending order
-                .limit(3)
+                .limit(6)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }
