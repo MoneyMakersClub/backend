@@ -34,4 +34,9 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
             @Param("keyword") String keyword,
             @Param("user") User user,
             Pageable pageable);
+
+
+    @Query("SELECT e FROM Excerpt e WHERE e.user.id = :userId")
+    List<Excerpt> findByUserId(@Param("userId") Long userId);
+
 }

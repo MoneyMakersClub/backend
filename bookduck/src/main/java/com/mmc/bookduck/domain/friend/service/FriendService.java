@@ -8,6 +8,7 @@ import com.mmc.bookduck.domain.friend.entity.FriendRequest;
 import com.mmc.bookduck.domain.friend.entity.FriendRequestStatus;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
 import com.mmc.bookduck.domain.friend.repository.FriendRequestRepository;
+import com.mmc.bookduck.domain.item.dto.common.ItemEquippedUnitDto;
 import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -57,9 +58,13 @@ public class FriendService {
     @Transactional(readOnly = true)
     public FriendListResponseDto getFriendList() {
         User currentUser = userService.getCurrentUser();
-        List<FriendUnitDto> friendList = friendRepository.findAllByUser1UserId(currentUser.getUserId())
-                .stream()
-                .map(friend -> FriendUnitDto.from(friend, userItemService.getUserItemEquippedListOfUser(friend.getUser2())))
+        List<Friend> friends = friendRepository.findAllByUser1UserIdOrUser2UserId(currentUser.getUserId(), currentUser.getUserId());
+        List<FriendUnitDto> friendList = friends.stream()
+                .map(friend -> {
+                    User friendUser = getFriendUser(friend, currentUser);
+                    List<ItemEquippedUnitDto> userItemEquipped = userItemService.getUserItemEquippedListOfUser(friendUser);
+                    return FriendUnitDto.from(friend, friendUser, userItemEquipped);
+                })
                 .collect(Collectors.toList());
         return FriendListResponseDto.from(friendList);
     }
@@ -93,5 +98,10 @@ public class FriendService {
     public boolean isFriendWithCurrentUser(User otherUser) {
         User currentUser = userService.getCurrentUser();
         return friendRepository.findFriendBetweenUsers(currentUser.getUserId(), otherUser.getUserId()).isPresent();
+    }
+
+    @Transactional(readOnly = true)
+    public User getFriendUser(Friend friend, User currentUser) {
+        return friend.getUser1().equals(currentUser) ? friend.getUser2() : friend.getUser1();
     }
 }

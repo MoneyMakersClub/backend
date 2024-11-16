@@ -1,5 +1,8 @@
 package com.mmc.bookduck.domain.user.controller;
 
+import com.mmc.bookduck.domain.archive.dto.response.UserArchiveResponseDto;
+import com.mmc.bookduck.domain.archive.entity.ArchiveType;
+import com.mmc.bookduck.domain.archive.service.ArchiveService;
 import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.service.*;
 import com.mmc.bookduck.domain.userhome.service.UserReadingSpaceService;
@@ -21,6 +24,7 @@ public class UserController {
     private final UserSearchService userSearchService;
     private final UserReadingReportService userReadingReportService;
     private final UserReadingSpaceService userReadingSpaceService;
+    private final ArchiveService archiveService;
 
     @Operation(summary = "유저 검색", description = "유저를 검색합니다.")
     @GetMapping("/search")
@@ -64,5 +68,13 @@ public class UserController {
     @GetMapping("/{userId}/readingspace")
     public ResponseEntity<?> getUserReadingSpace(@PathVariable final Long userId) {
         return ResponseEntity.ok().body(userReadingSpaceService.getUserReadingSpace(userId));
+    }
+
+    @Operation(summary = "유저 기록 아카이브 조회", description = "유저의 기록 아카이브를 조회합니다.")
+    @GetMapping("{userId}/archives")
+    public ResponseEntity<?> getUserArchive(@PathVariable("userId") final Long userId, @RequestParam("type") final ArchiveType archiveType,
+                                            Pageable pageable){
+        UserArchiveResponseDto responseDto = archiveService.getUserArchive(userId, archiveType, pageable);
+        return ResponseEntity.ok(responseDto);
     }
 }
