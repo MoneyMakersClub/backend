@@ -484,8 +484,8 @@ public class BookInfoService {
         UserBook userBook  = userBookRepository.findByUserAndBookInfo(bookUser, bookInfo)
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
 
-        List<Excerpt> excerpts = excerptRepository.findExcerptsByUserBookWithPublicOrFriendOnly(userBook);
-        List<Review> reviews = reviewRepository.findReviewsByUserBookWithPublicOrFriendOnly(userBook);
+        List<Excerpt> excerpts = excerptRepository.findExcerptsByUserBookWithPublic(userBook);
+        List<Review> reviews = reviewRepository.findReviewsByUserBookWithPublic(userBook);
 
         List<ReviewExcerptUnitDto> dtoList = fromReviewExcerptToDto(reviews, excerpts);
         UserBookReviewExcerptResponseDto dto = new UserBookReviewExcerptResponseDto(bookInfoId, userBook.getUserBookId(), dtoList);
