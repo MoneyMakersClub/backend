@@ -1,13 +1,12 @@
 package com.mmc.bookduck.domain.folder.controller;
 
+import com.mmc.bookduck.domain.folder.dto.request.FolderBookOrderRequestDto;
 import com.mmc.bookduck.domain.folder.dto.request.FolderRequestDto;
 import com.mmc.bookduck.domain.folder.dto.response.AllFolderListResponseDto;
 import com.mmc.bookduck.domain.folder.dto.response.CandidateFolderBookListResponseDto;
 import com.mmc.bookduck.domain.folder.dto.response.FolderBookListResponseDto;
 import com.mmc.bookduck.domain.folder.dto.response.FolderResponseDto;
 import com.mmc.bookduck.domain.folder.service.FolderService;
-import com.mmc.bookduck.global.exception.CustomException;
-import com.mmc.bookduck.global.exception.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -102,4 +101,11 @@ public class FolderController {
                 .body((folderService.getFolderBookListStatus(folderId, status)));
     }
 
+    @Operation(summary = "폴더 책 순서 변경", description = "폴더안의 책 순서를 변경합니다.")
+    @PatchMapping("/{folderId}/books/order")
+    public ResponseEntity<FolderBookListResponseDto> updateFolderBookOrder(@PathVariable(name="folderId") final Long folderId,
+                                                                           @RequestBody final FolderBookOrderRequestDto requestDto){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body((folderService.updateFolderBookOrder(folderId, requestDto)));
+    }
 }

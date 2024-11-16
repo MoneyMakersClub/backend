@@ -8,7 +8,7 @@ public record OneLineRatingUnitDto(
         int oneLineLikes,
         String userNickName
 ) {
-    public static OneLineRatingUnitDto fromEntity(OneLine oneLine) {
+    public static OneLineRatingUnitDto from(OneLine oneLine) {
         return new OneLineRatingUnitDto(
                 oneLine.getOneLineContent(),
                 oneLine.getUserBook().getRating(),
