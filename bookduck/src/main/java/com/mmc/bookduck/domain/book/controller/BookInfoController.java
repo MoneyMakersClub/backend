@@ -116,11 +116,10 @@ public class BookInfoController {
 
     //친구의 기록과 발췌 통합 조회
     @Operation(summary = "친구의 전체 기록 조회", description = "책의 친구의 기록을 조회합니다.(감상평+발췌)")
-    @GetMapping("/{bookinfoId}/archives/users/{userId}")
-    public ResponseEntity<UserArchiveResponseDto> getAllUserBookArchive(@PathVariable(name = "bookinfoId") final Long bookInfoId,
-                                                                        @PathVariable(name = "userId") final Long userId,
+    @GetMapping("/{userbookId}/archives/users/friend")
+    public ResponseEntity<UserArchiveResponseDto> getAllUserBookArchive(@PathVariable(name = "userbookId") final Long userbookId,
                                                                         @PageableDefault(size = 20) final Pageable pageable){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(bookInfoService.getAllUserBookArchive(bookInfoId, userId, pageable));
+                .body(bookInfoService.getAllUserBookArchive(userbookId, pageable));
     }
 }

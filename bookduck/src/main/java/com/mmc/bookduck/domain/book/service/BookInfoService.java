@@ -507,14 +507,14 @@ public class BookInfoService {
     }
 
     @Transactional(readOnly = true)
-    public UserArchiveResponseDto getAllUserBookArchive(Long bookInfoId, Long userId, Pageable pageable) {
-        User bookUser = userService.getActiveUserByUserId(userId);
+    public UserArchiveResponseDto getAllUserBookArchive(Long userbookId, Pageable pageable) {
+        UserBook userBook = userBookRepository.findById(userbookId)
+                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
 
+        User bookUser = userBook.getUser();
         if(!friendService.isFriendWithCurrentUser(bookUser)){
             throw new CustomException(ErrorCode.FRIENDSHIP_REQUIRED);
         }
-        BookInfo bookInfo = getBookInfoById(bookInfoId);
-        UserBook userBook  = getUserBookByUserAndBookInfo(bookInfo, bookUser);
 
         List<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> archiveList = new ArrayList<>();
 

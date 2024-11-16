@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 public record MyRatingOneLineReadStatusDto(Long userbookId, Double myRating, String myOneLine, ReadStatus readStatus) {
 
     public static MyRatingOneLineReadStatusDto defaultInstance() {
-        return new MyRatingOneLineReadStatusDto(null, null, null, null);
+        return new MyRatingOneLineReadStatusDto(null, 0.0, null, null);
     }
 
     public static MyRatingOneLineReadStatusDto from(UserBook userBook){
