@@ -11,7 +11,6 @@ import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.RatingResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.UserBookResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.UserBookReviewExcerptResponseDto;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -97,15 +96,6 @@ public class UserBookController {
     public ResponseEntity<CustomBookResponseDto> createCustomBook(@Valid @ModelAttribute final CustomBookRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body((userBookService.createCustomBook(requestDto)));
-    }
-
-
-    //userBook의 기록과 발췌 통합 조회
-    @Operation(summary = "서재책/Custom책 전체 기록 조회", description = "사용자의 서재책/Custom책의 전체 기록을 조회합니다.(감상평+발췌)")
-    @GetMapping("/{userbookId}/reviewexcerpt")
-    public ResponseEntity<UserBookReviewExcerptResponseDto> getAllUserBookReviewExcerpt(@PathVariable(name = "userbookId") final Long userbookId){
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(userBookService.getAllUserBookReviewExcerpt(userbookId));
     }
 
 
