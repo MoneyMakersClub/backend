@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mmc.bookduck.domain.archive.dto.response.ExcerptResponseDto;
 import com.mmc.bookduck.domain.archive.dto.response.ReviewResponseDto;
-import com.mmc.bookduck.domain.archive.entity.ArchiveType;
+import com.mmc.bookduck.domain.archive.dto.response.UserArchiveResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.UserArchiveResponseDto.ArchiveWithType;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
@@ -47,6 +48,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -473,7 +475,7 @@ public class BookInfoService {
     }
 
     @Transactional(readOnly = true)
-    public UserBookReviewExcerptResponseDto getAllUserBookArchive(Long bookInfoId, Long userId) {
+    public UserArchiveResponseDto getAllUserBookArchive(Long bookInfoId, Long userId, Pageable pageable) {
         User bookUser = userService.getActiveUserByUserId(userId);
 
         if(!friendService.isFriendWithCurrentUser(bookUser)){
@@ -482,47 +484,60 @@ public class BookInfoService {
         BookInfo bookInfo = getBookInfoById(bookInfoId);
         UserBook userBook  = getUserBookByUserAndBookInfo(bookInfo, bookUser);
 
+        List<UserArchiveResponseDto.ArchiveWithType> archiveList = new ArrayList<>();
+
         List<Excerpt> excerpts = excerptRepository.findExcerptsByUserBookWithPublic(userBook);
         List<Review> reviews = reviewRepository.findReviewsByUserBookWithPublic(userBook);
+        for(Excerpt excerpt : excerpts){
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithType("EXCERPT", ExcerptResponseDto.from(excerpt), null, null));
+        }
+        for(Review review : reviews){
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithType("REVIEW", ReviewResponseDto.from(review), null, null));
+        }
 
-        List<ReviewExcerptUnitDto> dtoList = fromReviewExcerptToDto(reviews, excerpts);
-        UserBookReviewExcerptResponseDto dto = new UserBookReviewExcerptResponseDto(bookInfoId, userBook.getUserBookId(), dtoList);
-        return sortByCreatedTime(dto);
+        List<UserArchiveResponseDto.ArchiveWithType> sortedArchiveList = sortByCreatedTime(archiveList);
+        Page<UserArchiveResponseDto.ArchiveWithType> dtoPage = new PageImpl<>(sortedArchiveList, pageable, sortedArchiveList.size());
+        return UserArchiveResponseDto.from(dtoPage);
     }
 
     @Transactional(readOnly = true)
-    public UserBookReviewExcerptResponseDto getAllMyBookArchive(Long bookInfoId) {
+    public UserArchiveResponseDto getAllMyBookArchive(Long bookInfoId, Pageable pageable) {
         User user = userService.getCurrentUser();
         BookInfo bookInfo = getBookInfoById(bookInfoId);
         UserBook userBook  = getUserBookByUserAndBookInfo(bookInfo, user);
 
+        List<UserArchiveResponseDto.ArchiveWithType> archiveList = new ArrayList<>();
+
         List<Excerpt> excerpts = excerptRepository.findExcerptByUserBookOrderByCreatedTimeDesc(userBook);
         List<Review> reviews = reviewRepository.findReviewByUserBookOrderByCreatedTimeDesc(userBook);
+        for(Excerpt excerpt : excerpts){
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithType("EXCERPT", ExcerptResponseDto.from(excerpt), null, null));
+        }
+        for(Review review : reviews){
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithType("REVIEW", ReviewResponseDto.from(review), null, null));
+        }
 
-        List<ReviewExcerptUnitDto> dtoList = fromReviewExcerptToDto(reviews, excerpts);
-        UserBookReviewExcerptResponseDto dto = new UserBookReviewExcerptResponseDto(bookInfoId, userBook.getUserBookId(), dtoList);
-        return sortByCreatedTime(dto);
+        List<UserArchiveResponseDto.ArchiveWithType> sortedArchiveList = sortByCreatedTime(archiveList);
+        Page<UserArchiveResponseDto.ArchiveWithType> dtoPage = new PageImpl<>(sortedArchiveList, pageable, sortedArchiveList.size());
+        return UserArchiveResponseDto.from(dtoPage);
     }
 
-    // UserBookReviewExcerptResponseDto를 최신순으로 정렬
-    public UserBookReviewExcerptResponseDto sortByCreatedTime(UserBookReviewExcerptResponseDto dto) {
-        List<ReviewExcerptUnitDto> sortedList = dto.archiveList().stream()
-                .sorted((unit1, unit2) -> {
-                    LocalDateTime createdTime1 = getCreatedTime(unit1);
-                    LocalDateTime createdTime2 = getCreatedTime(unit2);
+    // Archive 최신순으로 정렬
+    public List<UserArchiveResponseDto.ArchiveWithType> sortByCreatedTime(List<UserArchiveResponseDto.ArchiveWithType> archiveList) {
+        archiveList.sort((a1, a2) -> {
+                    LocalDateTime createdTime1 = getCreatedTime(a1);
+                    LocalDateTime createdTime2 = getCreatedTime(a2);
                     return createdTime2.compareTo(createdTime1); // 최신순 정렬
-                })
-                .collect(Collectors.toList());
-
-        return new UserBookReviewExcerptResponseDto(dto.bookInfoId(), dto.userBookId(), sortedList);
+                });
+        return archiveList;
     }
 
-    private LocalDateTime getCreatedTime(ReviewExcerptUnitDto unit) {
-        if (unit.archiveType() == ArchiveType.EXCERPT) {
-            return unit.excerpt().createdTime();
+    private LocalDateTime getCreatedTime(ArchiveWithType a) {
+        if (a.data() instanceof ExcerptResponseDto) {
+            return ((ExcerptResponseDto) a.data()).createdTime();
         }
         else{
-            return unit.review().createdTime();
+            return ((ReviewResponseDto) a.data()).createdTime();
         }
     }
 

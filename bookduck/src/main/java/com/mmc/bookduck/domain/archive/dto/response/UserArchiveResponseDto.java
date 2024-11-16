@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.archive.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import org.springframework.data.domain.Page;
 
@@ -10,6 +11,7 @@ public record UserArchiveResponseDto(
         int totalPages,
         List<ArchiveWithType> archiveList
 ) {
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record ArchiveWithType(
             String type, // EXCERPT, REVIEW
             Object data, // ExcerptResponseDto, ReviewResponseDto
@@ -26,6 +28,3 @@ public record UserArchiveResponseDto(
         );
     }
 }
-
-
-
