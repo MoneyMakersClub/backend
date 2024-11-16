@@ -1,5 +1,7 @@
 package com.mmc.bookduck.domain.book.controller;
 
+import com.mmc.bookduck.domain.archive.dto.response.UserArchiveResponseDto;
+import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.common.CustomBookUnitDto;
@@ -12,6 +14,8 @@ import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -81,5 +85,31 @@ public class BookInfoController {
     public ResponseEntity<?> getOneLineList(@PathVariable("bookinfoId") Long bookInfoId, @RequestParam(name = "orderBy", defaultValue = "likes") String orderBy, Pageable pageable){
         OneLineRatingListResponseDto responseDto = bookInfoService.getOneLineList(bookInfoId, orderBy, pageable);
         return ResponseEntity.ok(responseDto);
+    }
+
+    @Operation(summary = "요즘 많이 읽는 책 목록 조회", description = "최근 많이 읽는 책 목록을 조회합니다.")
+    @GetMapping("/most")
+    public ResponseEntity<BookListResponseDto<BookCoverImageUnitDto>> getMostReadBooks(){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(bookInfoService.getMostReadBooks());
+    }
+
+    //나의 기록과 발췌 통합 조회
+    @Operation(summary = "나의 기록 전체 기록 조회", description = "책의 나의 전체 기록을 조회합니다.(감상평+발췌)")
+    @GetMapping("/{bookinfoId}/archives/users/me")
+    public ResponseEntity<UserArchiveResponseDto> getAllMyBookArchive(@PathVariable(name = "bookinfoId") final Long bookInfoId,
+                                                                      @PageableDefault(size = 20) final Pageable pageable){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(bookInfoService.getAllMyBookArchive(bookInfoId, pageable));
+    }
+
+    //친구의 기록과 발췌 통합 조회
+    @Operation(summary = "친구의 전체 기록 조회", description = "책의 친구의 기록을 조회합니다.(감상평+발췌)")
+    @GetMapping("/{bookinfoId}/archives/users/{userId}")
+    public ResponseEntity<UserArchiveResponseDto> getAllUserBookArchive(@PathVariable(name = "bookinfoId") final Long bookInfoId,
+                                                                        @PathVariable(name = "userId") final Long userId,
+                                                                        @PageableDefault(size = 20) final Pageable pageable){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(bookInfoService.getAllUserBookArchive(bookInfoId, userId, pageable));
     }
 }

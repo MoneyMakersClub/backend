@@ -21,6 +21,9 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
 
     List<Excerpt> findExcerptByUserBookOrderByCreatedTimeDesc(UserBook userBook);
 
+    @Query("SELECT e FROM Excerpt e WHERE e.userBook = :userBook AND (e.visibility = 'PUBLIC') ORDER BY e.createdTime DESC")
+    List<Excerpt> findExcerptsByUserBookWithPublic(@Param("userBook") UserBook userBook);
+
     List<Excerpt> findAllByUserAndCreatedTimeAfter(User user, LocalDateTime createdTime);
 
     @Query("SELECT e FROM Excerpt e " +
