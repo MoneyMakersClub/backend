@@ -49,12 +49,12 @@ public class FolderController {
     }
 
 
-    @Operation(summary = "폴더에 책 추가", description = "폴더에 책을 추가합니다.")
-    @PostMapping("/{folderId}/books/{userbookId}")
-    public ResponseEntity<FolderBookListResponseDto> addFolderBook(@PathVariable(name="folderId") final Long folderId,
-                                                                   @PathVariable(name="userbookId") final Long userBookId){
+    @Operation(summary = "폴더에 책 여러 개 추가", description = "폴더에 여러 개의 책을 추가합니다.")
+    @PostMapping("/{folderId}/books")
+    public ResponseEntity<FolderBookListResponseDto> addFolderBooks(@PathVariable(name="folderId") final Long folderId,
+                                                                    @RequestBody List<Long> userBookIds){
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(folderService.addFolderBook(folderId, userBookId));
+                .body(folderService.addFolderBooks(folderId, userBookIds));
     }
 
 
@@ -68,12 +68,12 @@ public class FolderController {
     }
 
 
-    @Operation(summary = "폴더에서 책 삭제", description = "폴더에서 책을 삭제합니다.")
-    @DeleteMapping("/{folderId}/books/{folderbookId}")
-    public ResponseEntity<FolderBookListResponseDto> deleteFolderBook(@PathVariable(name="folderId") final Long folderId,
-                                                                      @PathVariable(name="folderbookId") final Long folderBookId){
+    @Operation(summary = "폴더에서 책 여러 개 삭제", description = "폴더에서 여러 개의 책을 삭제합니다.")
+    @DeleteMapping("/{folderId}/books")
+    public ResponseEntity<FolderBookListResponseDto> deleteFolderBooks(@PathVariable(name="folderId") final Long folderId,
+                                                                       @RequestBody List<Long> folderBookIds){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(folderService.deleteFolderBook(folderId, folderBookId));
+                .body(folderService.deleteFolderBooks(folderId, folderBookIds));
     }
 
     @Operation(summary = "전체 폴더 목록 조회", description = "현재 사용자의 전체 폴더 목록을 조회합니다.")

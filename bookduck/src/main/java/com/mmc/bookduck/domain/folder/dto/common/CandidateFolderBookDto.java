@@ -8,6 +8,7 @@ public record CandidateFolderBookDto(
         String title,
         String author,
         String imgPath,
+        double rating,
         ReadStatus readStatus
 ) {
     public static CandidateFolderBookDto from(UserBook userBook) {
@@ -16,6 +17,7 @@ public record CandidateFolderBookDto(
                 userBook.getBookInfo().getTitle(),
                 userBook.getBookInfo().getAuthor(),
                 userBook.getBookInfo().getImgPath(),
+                userBook.getRating(),
                 userBook.getReadStatus()
         );
     }
