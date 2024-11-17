@@ -1,4 +1,4 @@
-package com.mmc.bookduck.domain.userhome.entity;
+package com.mmc.bookduck.domain.homecard.entity;
 
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.book.entity.UserBook;
