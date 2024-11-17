@@ -9,6 +9,6 @@ public record OneLineCardDto(
         String title,
         String author,
         Double rating, // null일 수 있음
-        String content
+        String oneLineContent
 ) implements HomeCardDto {
 }
