@@ -100,8 +100,11 @@ public class FriendService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isFriendWithCurrentUser(User otherUser) {
-        User currentUser = userService.getCurrentUser();
+    public boolean isFriendWithCurrentUserOrNull(User otherUser) {
+        User currentUser = userService.getCurrentUserOrNull();
+        if (currentUser == null) {
+            return false;
+        }
         return friendRepository.findFriendBetweenUsers(currentUser.getUserId(), otherUser.getUserId()).isPresent();
     }
 

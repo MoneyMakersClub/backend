@@ -28,9 +28,9 @@ public class UserReadingSpaceService {
     @Transactional(readOnly = true)
     public ReadingSpaceResponseDto getUserReadingSpace(Long userId) {
         User user = userService.getActiveUserByUserId(userId);
-        User currentUser = userService.getCurrentUser();
+        User loginedUser = userService.getCurrentUserOrNull();
 
-        boolean isCurrentUser = currentUser.getUserId().equals(user.getUserId());
+        boolean isCurrentUser = loginedUser != null && loginedUser.getUserId().equals(user.getUserId());
         String nickname = user.getNickname();
 
         List<HomeCardDto> homeCardDtos = homeCardService.getAllHomeCardsOfUser(user).stream()
