@@ -1,4 +1,4 @@
-package com.mmc.bookduck.domain.userhome.service;
+package com.mmc.bookduck.domain.homecard.service;
 
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.service.ExcerptService;
@@ -6,8 +6,8 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.service.OneLineService;
-import com.mmc.bookduck.domain.userhome.dto.common.*;
-import com.mmc.bookduck.domain.userhome.entity.HomeCard;
+import com.mmc.bookduck.domain.homecard.dto.common.*;
+import com.mmc.bookduck.domain.homecard.entity.HomeCard;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -58,6 +58,6 @@ public class HomeCardConverter {
                 .map(userBookService::getUserBookById)
                 .orElse(null);
         return new BookWithSongCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(),
-                userBook1.getBookInfo().getImgPath(), userBook2 != null ? userBook2.getBookInfo().getImgPath() : null, homeCard.getText1(), homeCard.getText2(), nickname);
+                userBook1.getBookInfo().getImgPath(), userBook2 != null ? userBook2.getBookInfo().getImgPath() : null, homeCard.getText1(), homeCard.getText2(), homeCard.getText3(), nickname);
     }
 }

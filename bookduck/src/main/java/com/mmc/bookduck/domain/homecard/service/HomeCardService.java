@@ -1,15 +1,16 @@
-package com.mmc.bookduck.domain.userhome.service;
+package com.mmc.bookduck.domain.homecard.service;
 
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.book.entity.UserBook;
+import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
-import com.mmc.bookduck.domain.userhome.dto.common.HomeCardUpdateUnitDto;
-import com.mmc.bookduck.domain.userhome.dto.request.HomeCardRequestDto;
-import com.mmc.bookduck.domain.userhome.dto.request.ReadingSpaceUpdateRequestDto;
-import com.mmc.bookduck.domain.userhome.entity.CardType;
-import com.mmc.bookduck.domain.userhome.entity.HomeCard;
-import com.mmc.bookduck.domain.userhome.entity.UserHome;
-import com.mmc.bookduck.domain.userhome.repository.HomeCardRepository;
+import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.homecard.dto.common.HomeCardUpdateUnitDto;
+import com.mmc.bookduck.domain.homecard.dto.request.HomeCardRequestDto;
+import com.mmc.bookduck.domain.homecard.dto.request.ReadingSpaceUpdateRequestDto;
+import com.mmc.bookduck.domain.homecard.entity.CardType;
+import com.mmc.bookduck.domain.homecard.entity.HomeCard;
+import com.mmc.bookduck.domain.homecard.repository.HomeCardRepository;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +30,16 @@ public class HomeCardService {
     private final HomeCardRepository homeCardRepository;
 
     @Transactional(readOnly = true)
-    public List<HomeCard> getAllHomeCardsOfUserHome(UserHome userHome) {
-        return homeCardRepository.findAllByUserHomeOrderByCardIndexAsc(userHome);
+    public List<HomeCard> getAllHomeCardsOfUser(User user) {
+        return homeCardRepository.findAllByUserOrderByCardIndexAsc(user);
     }
 
-    public HomeCard addHomeCard(HomeCardRequestDto requestDto, UserHome userHome, long cardIndex) {
+    @Transactional(readOnly = true)
+    public List<HomeCard> getPublicHomeCardsOfUser(User user) {
+        return homeCardRepository.findAllByUserAndVisibilityByCardIndexAsc(user, Visibility.PUBLIC);
+    }
+
+    public HomeCard addHomeCard(HomeCardRequestDto requestDto, User user, long cardIndex) {
         HomeCard homeCard = HomeCard.builder()
                 .cardType(requestDto.cardType())
                 .cardIndex(cardIndex)
@@ -41,13 +47,14 @@ public class HomeCardService {
                 .resourceId2(requestDto.resourceId2())
                 .text1(requestDto.text1())
                 .text2(requestDto.text2())
-                .userHome(userHome)
+                .text3(requestDto.text3())
+                .user(user)
                 .build();
         return homeCardRepository.save(homeCard);
     }
 
-    public void updateHomeCards(ReadingSpaceUpdateRequestDto requestDto, UserHome userHome) {
-        Map<Long, HomeCard> currentHomeCardsMap = getAllHomeCardsOfUserHome(userHome).stream()
+    public void updateHomeCards(ReadingSpaceUpdateRequestDto requestDto, User user) {
+        Map<Long, HomeCard> currentHomeCardsMap = getAllHomeCardsOfUser(user).stream()
                 .collect(Collectors.toMap(HomeCard::getHomeCardId, homeCard -> homeCard));
 
         List<HomeCard> cardsToUpdate = new ArrayList<>();
@@ -73,21 +80,21 @@ public class HomeCardService {
     }
 
     // Excerpt 카드 삭제
-    public void deleteHomeCardsByExcerpt(UserHome userHome, Excerpt excerpt) {
-        List<HomeCard> cards = homeCardRepository.findAllByUserHomeAndCardTypeAndResourceId1(userHome, CardType.EXCERPT, excerpt.getExcerptId());
+    public void deleteHomeCardsByExcerpt(Excerpt excerpt) {
+        List<HomeCard> cards = homeCardRepository.findAllByCardTypeAndResourceId1(CardType.EXCERPT, excerpt.getExcerptId());
         homeCardRepository.deleteAll(cards);
     }
 
     // OneLine 카드 삭제
-    public void deleteHomeCardsByOneLine(UserHome userHome, OneLine oneLine) {
-        List<HomeCard> cards = homeCardRepository.findAllByUserHomeAndCardTypeAndResourceId1(userHome, CardType.ONELINE, oneLine.getOneLineId());
+    public void deleteHomeCardsByOneLine(OneLine oneLine) {
+        List<HomeCard> cards = homeCardRepository.findAllByCardTypeAndResourceId1(CardType.ONELINE, oneLine.getOneLineId());
         homeCardRepository.deleteAll(cards);
     }
 
     // UserBook 카드 삭제
-    public void deleteHomeCardsByUserBook(UserHome userHome, UserBook userBook) {
+    public void deleteHomeCardsByUserBook(UserBook userBook) {
         List<CardType> cardTypes = Arrays.asList(CardType.BOOK_WITH_MEMO, CardType.BOOK_WITH_SONG);
-        List<HomeCard> cards = homeCardRepository.findAllByUserHomeAndCardTypesAndResourceId1Or2(userHome, cardTypes, userBook.getUserBookId());
+        List<HomeCard> cards = homeCardRepository.findAllByCardTypesAndResourceId1Or2(cardTypes, userBook.getUserBookId());
         homeCardRepository.deleteAll(cards);
     }
 }

@@ -1,13 +1,12 @@
-package com.mmc.bookduck.domain.userhome.service;
+package com.mmc.bookduck.domain.homecard.service;
 
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
-import com.mmc.bookduck.domain.userhome.dto.common.HomeCardDto;
-import com.mmc.bookduck.domain.userhome.dto.request.HomeCardRequestDto;
-import com.mmc.bookduck.domain.userhome.dto.request.ReadingSpaceUpdateRequestDto;
-import com.mmc.bookduck.domain.userhome.dto.response.ReadingSpaceResponseDto;
-import com.mmc.bookduck.domain.userhome.entity.HomeCard;
-import com.mmc.bookduck.domain.userhome.entity.UserHome;
+import com.mmc.bookduck.domain.homecard.dto.common.HomeCardDto;
+import com.mmc.bookduck.domain.homecard.dto.request.HomeCardRequestDto;
+import com.mmc.bookduck.domain.homecard.dto.request.ReadingSpaceUpdateRequestDto;
+import com.mmc.bookduck.domain.homecard.dto.response.ReadingSpaceResponseDto;
+import com.mmc.bookduck.domain.homecard.entity.HomeCard;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,14 +20,21 @@ import java.util.stream.Collectors;
 public class UserReadingSpaceService {
     private final UserService userService;
     private final HomeCardService homeCardService;
-    private final UserHomeService userHomeService;
     private final HomeCardConverter homeCardConverter;
 
     @Transactional(readOnly = true)
     public ReadingSpaceResponseDto getUserReadingSpace(Long userId) {
         User user = userService.getActiveUserByUserId(userId);
-        UserHome userHome = userHomeService.getUserHomeOfUser(user);
-        List<HomeCard> homeCards = homeCardService.getAllHomeCardsOfUserHome(userHome);
+        User currentUser = userService.getCurrentUser();
+        List<HomeCard> homeCards;
+
+        if (user.equals(currentUser)) {
+            // 자신일 경우 visibility 무관하게 모든 HomeCard 가져오기
+            homeCards = homeCardService.getAllHomeCardsOfUser(user);
+        } else {
+            // 다른 사용자일 경우 PUBLIC HomeCard만 가져오기
+            homeCards = homeCardService.getPublicHomeCardsOfUser(user);
+        }
         String nickname = user.getNickname();
 
         // HomeCardConverter를 사용하여 HomeCard를 HomeCardDto로 변환
@@ -41,19 +47,15 @@ public class UserReadingSpaceService {
 
     public HomeCardDto addHomeCardToReadingSpace(HomeCardRequestDto requestDto) {
         User user = userService.getCurrentUser();
-        UserHome userHome = userHomeService.getUserHomeOfUser(user);
-        List<HomeCard> homeCards = homeCardService.getAllHomeCardsOfUserHome(userHome);
-        userHome.updateLastModifiedAt();
+        List<HomeCard> homeCards = homeCardService.getAllHomeCardsOfUser(user);
 
         // 새로운 HomeCard를 추가하고 HomeCardDto로 변환
-        HomeCard homeCard = homeCardService.addHomeCard(requestDto, userHome, homeCards.size());
+        HomeCard homeCard = homeCardService.addHomeCard(requestDto, user, homeCards.size());
         return homeCardConverter.mapToHomeCardDto(homeCard, user.getNickname());
     }
 
     public void updateReadingSpace(ReadingSpaceUpdateRequestDto requestDto) {
         User user = userService.getCurrentUser();
-        UserHome userHome = userHomeService.getUserHomeOfUser(user);
-        homeCardService.updateHomeCards(requestDto, userHome);
-        userHome.updateLastModifiedAt();
+        homeCardService.updateHomeCards(requestDto, user);
     }
 }

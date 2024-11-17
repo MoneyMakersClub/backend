@@ -22,7 +22,7 @@ import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
-import com.mmc.bookduck.domain.userhome.service.UserHomeService;
+import com.mmc.bookduck.domain.homecard.service.HomeCardService;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -41,7 +41,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 public class UserBookService {
-
     private final BookInfoService bookInfoService;
     private final UserBookRepository userBookRepository;
     private final GenreService genreService;
@@ -49,7 +48,7 @@ public class UserBookService {
     private final OneLineRepository oneLineRepository;
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
-    private final UserHomeService userHomeService;
+    private final HomeCardService homeCardService;
 
     //customBook 추가
     public UserBook createCustomBookEntity(CustomBookRequestDto requestDto) {
@@ -129,7 +128,7 @@ public class UserBookService {
             if(createdUserId != null && createdUserId.equals(user.getUserId())){
                 bookInfoService.deleteCustomBookInfo(bookInfo.getBookInfoId());
             }
-            userHomeService.deleteHomeCardsByUserBook(userBook);
+            homeCardService.deleteHomeCardsByUserBook(userBook);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }

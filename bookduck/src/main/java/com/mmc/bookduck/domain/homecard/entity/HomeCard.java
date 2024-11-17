@@ -1,5 +1,6 @@
-package com.mmc.bookduck.domain.userhome.entity;
+package com.mmc.bookduck.domain.homecard.entity;
 
+import com.mmc.bookduck.domain.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -33,22 +34,24 @@ public class HomeCard {
 
     private String text2;
 
+    private String text3;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_home_id", updatable = false)
+    @JoinColumn(name = "user_id", updatable = false)
     @NotNull
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserHome userHome;
+    private User user;
 
     @Builder
     public HomeCard(CardType cardType, long cardIndex, Long resourceId1, Long resourceId2,
-                    String text1, String text2, UserHome userHome) {
+                    String text1, String text2, String text3, User user) {
         this.cardType = cardType;
         this.cardIndex = cardIndex;
         this.resourceId1 = resourceId1;
         this.resourceId2 = resourceId2;
         this.text1 = text1;
         this.text2 = text2;
-        this.userHome = userHome;
+        this.text3 = text3;
     }
 
     public void updateCardIndex(long cardIndex) {

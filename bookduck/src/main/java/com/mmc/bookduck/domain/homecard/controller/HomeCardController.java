@@ -1,12 +1,11 @@
-package com.mmc.bookduck.domain.userhome.controller;
+package com.mmc.bookduck.domain.homecard.controller;
 
 import com.mmc.bookduck.domain.archive.service.ExcerptService;
 import com.mmc.bookduck.domain.oneline.service.OneLineService;
-import com.mmc.bookduck.domain.userhome.dto.common.HomeCardDto;
-import com.mmc.bookduck.domain.userhome.dto.request.HomeCardRequestDto;
-import com.mmc.bookduck.domain.userhome.dto.request.ReadingSpaceUpdateRequestDto;
-import com.mmc.bookduck.domain.userhome.service.UserHomeService;
-import com.mmc.bookduck.domain.userhome.service.UserReadingSpaceService;
+import com.mmc.bookduck.domain.homecard.dto.common.HomeCardDto;
+import com.mmc.bookduck.domain.homecard.dto.request.HomeCardRequestDto;
+import com.mmc.bookduck.domain.homecard.dto.request.ReadingSpaceUpdateRequestDto;
+import com.mmc.bookduck.domain.homecard.service.UserReadingSpaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/readingspace")
-public class UserHomeController {
+public class HomeCardController {
     private final UserReadingSpaceService readingSpaceService;
     private final ExcerptService excerptService;
     private final OneLineService oneLineService;
