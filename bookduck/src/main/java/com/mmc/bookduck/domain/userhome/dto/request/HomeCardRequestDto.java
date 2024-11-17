@@ -8,6 +8,7 @@ public record HomeCardRequestDto(
         @NotNull Long resourceId1,
         Long resourceId2,
         String text1,
-        String text2
+        String text2,
+        String text3
 ) {
 }

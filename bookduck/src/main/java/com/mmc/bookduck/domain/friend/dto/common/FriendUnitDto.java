@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.friend.dto.common;
 
 import com.mmc.bookduck.domain.friend.entity.Friend;
 import com.mmc.bookduck.domain.item.dto.common.ItemEquippedUnitDto;
+import com.mmc.bookduck.domain.user.entity.User;
 
 import java.util.List;
 
@@ -11,11 +12,11 @@ public record FriendUnitDto(
         String nickname,
         List<ItemEquippedUnitDto> userItemEquipped
 ) {
-    public static FriendUnitDto from(Friend friend, List<ItemEquippedUnitDto> userItemEquipped) {
+    public static FriendUnitDto from(Friend friend, User friendUser, List<ItemEquippedUnitDto> userItemEquipped) {
         return new FriendUnitDto(
                 friend.getFriendId(),
-                friend.getUser2().getUserId(),
-                friend.getUser2().getNickname(),
+                friendUser.getUserId(),
+                friendUser.getNickname(),
                 userItemEquipped
         );
     }

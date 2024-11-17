@@ -3,16 +3,19 @@ package com.mmc.bookduck.domain.folder.dto.common;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.folder.entity.FolderBook;
 
-public record FolderBookUnitDto(Long folderBookId, Long userBookId, String title, String author, String imgPath, ReadStatus readStatus, int folderBookOrder) {
-    public static FolderBookUnitDto from(FolderBook folderBook) {
+public record FolderBookUnitDto(Long folderBookId, Long bookinfoId, Long userBookId, String title, String author, String imgPath, double rating, ReadStatus readStatus, int folderBookOrder, boolean isCustom) {
+    public static FolderBookUnitDto from(FolderBook folderBook, boolean isCustom) {
         return new FolderBookUnitDto(
                 folderBook.getFolderBookId(),
+                folderBook.getUserBook().getBookInfo().getBookInfoId(),
                 folderBook.getUserBook().getUserBookId(),
                 folderBook.getUserBook().getBookInfo().getTitle(),
                 folderBook.getUserBook().getBookInfo().getAuthor(),
                 folderBook.getUserBook().getBookInfo().getImgPath(),
+                folderBook.getUserBook().getRating(),
                 folderBook.getUserBook().getReadStatus(),
-                folderBook.getBookOrder()
+                folderBook.getBookOrder(),
+                isCustom
         );
     }
 }

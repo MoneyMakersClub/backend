@@ -7,6 +7,7 @@ import com.mmc.bookduck.domain.item.entity.UserItem;
 public record ItemClosetUnitDto (
         Long itemId,
         ItemType itemType,
+        String itemName,
         Boolean isOwned,
         Long userItemId,
         Boolean isEquipped
@@ -19,6 +20,7 @@ public record ItemClosetUnitDto (
         return new ItemClosetUnitDto(
                 item.getItemId(),
                 item.getItemType(),
+                item.getItemName(),
                 isOwned,
                 userItemId,
                 isEquipped

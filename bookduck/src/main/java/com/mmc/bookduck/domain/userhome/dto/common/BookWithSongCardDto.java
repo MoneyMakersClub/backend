@@ -10,6 +10,7 @@ public record BookWithSongCardDto(
         String imgPath2,
         String text1,
         String text2,
+        String text3,
         String nickname
 ) implements HomeCardDto {
 }

@@ -21,6 +21,9 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
 
     List<Excerpt> findExcerptByUserBookOrderByCreatedTimeDesc(UserBook userBook);
 
+    @Query("SELECT e FROM Excerpt e WHERE e.userBook = :userBook AND (e.visibility = 'PUBLIC') ORDER BY e.createdTime DESC")
+    List<Excerpt> findExcerptsByUserBookWithPublic(@Param("userBook") UserBook userBook);
+
     List<Excerpt> findAllByUserAndCreatedTimeAfter(User user, LocalDateTime createdTime);
 
     @Query("SELECT e FROM Excerpt e " +
@@ -34,4 +37,10 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
             @Param("keyword") String keyword,
             @Param("user") User user,
             Pageable pageable);
+
+
+    @Query("SELECT e FROM Excerpt e WHERE e.user.userId = :userId")
+    List<Excerpt> findByUserId(@Param("userId") Long userId);
+
+    List<Excerpt> findTop30ByUserOrderByCreatedTimeDesc(User user);
 }

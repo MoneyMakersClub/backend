@@ -8,15 +8,19 @@ public record CandidateFolderBookDto(
         String title,
         String author,
         String imgPath,
-        ReadStatus readStatus
+        double rating,
+        ReadStatus readStatus,
+        boolean isCustom
 ) {
-    public static CandidateFolderBookDto from(UserBook userBook) {
+    public static CandidateFolderBookDto from(UserBook userBook, boolean isCustom) {
         return new CandidateFolderBookDto(
                 userBook.getUserBookId(),
                 userBook.getBookInfo().getTitle(),
                 userBook.getBookInfo().getAuthor(),
                 userBook.getBookInfo().getImgPath(),
-                userBook.getReadStatus()
+                userBook.getRating(),
+                userBook.getReadStatus(),
+                isCustom
         );
     }
 }

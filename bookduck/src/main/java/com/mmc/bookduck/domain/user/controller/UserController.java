@@ -1,5 +1,8 @@
 package com.mmc.bookduck.domain.user.controller;
 
+import com.mmc.bookduck.domain.archive.dto.response.UserArchiveResponseDto;
+import com.mmc.bookduck.domain.archive.entity.ArchiveType;
+import com.mmc.bookduck.domain.archive.service.ArchiveService;
 import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.service.*;
 import com.mmc.bookduck.domain.userhome.service.UserReadingSpaceService;
@@ -21,6 +24,7 @@ public class UserController {
     private final UserSearchService userSearchService;
     private final UserReadingReportService userReadingReportService;
     private final UserReadingSpaceService userReadingSpaceService;
+    private final ArchiveService archiveService;
 
     @Operation(summary = "유저 검색", description = "유저를 검색합니다.")
     @GetMapping("/search")
@@ -54,15 +58,23 @@ public class UserController {
         return ResponseEntity.ok().body(userReadingReportService.getUserStatistics(userId));
     }
 
-    @Operation(summary = "유저 독서 리포트 조회 - AI", description = "유저의 독서 리포트 중 AI부분을 조회합니다.")
-    @GetMapping("/{userId}/ai")
+    @Operation(summary = "유저 독서 리포트 조회 - 키워드", description = "유저의 독서 리포트 중 키워드 부분을 조회합니다.")
+    @GetMapping("/{userId}/keywords")
     public ResponseEntity<?> getUserKeywordAnalysis(@PathVariable final Long userId) {
-        return ResponseEntity.ok().body(userGrowthService.getUserKeywordAnalysis(userId));
+        return ResponseEntity.ok().body(userReadingReportService.getUserKeywordAnalysis(userId));
     }
 
     @Operation(summary = "유저 리딩스페이스 조회", description = "유저 리딩스페이스를 조회합니다.")
     @GetMapping("/{userId}/readingspace")
     public ResponseEntity<?> getUserReadingSpace(@PathVariable final Long userId) {
         return ResponseEntity.ok().body(userReadingSpaceService.getUserReadingSpace(userId));
+    }
+
+    @Operation(summary = "유저 기록 아카이브 조회", description = "유저의 기록 아카이브를 조회합니다.")
+    @GetMapping("{userId}/archives")
+    public ResponseEntity<?> getUserArchive(@PathVariable("userId") final Long userId, @RequestParam("type") final ArchiveType archiveType,
+                                            Pageable pageable){
+        UserArchiveResponseDto responseDto = archiveService.getUserArchive(userId, archiveType, pageable);
+        return ResponseEntity.ok(responseDto);
     }
 }

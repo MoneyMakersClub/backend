@@ -5,6 +5,7 @@ import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.entity.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,7 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
 
     List<UserBook> findByUserAndReadStatus(User user, ReadStatus readStatus);
 
+    long countByUser(User user);
     long countByUserAndReadStatus(User user, ReadStatus readStatus);
 
     // userbook 테이블과 bookinfo 테이블 조인해서 userbook의 user에 해당하는 bookinfo 정보 검색
@@ -64,17 +66,17 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
             "ORDER BY bookCount DESC")
     List<Object[]> findMostReadAuthorByUser(@Param("user") User user);
 
-    // BookInfo의 작가명으로 UserBook 찾기
-    List<UserBook> findAllByBookInfo_Author(String author);
+    // BookInfo의 작가명으로 UserBook top3찾기
+    List<UserBook> findTop3ByBookInfo_AuthorOrderByCreatedTimeDesc(String author);
 
     // 유저의 UserBook들 올해 상반기/하반기별로 조회
     @Query("SELECT ub FROM UserBook ub WHERE ub.user = :user AND " +
             "((:isFirstHalf = true AND MONTH(ub.createdTime) BETWEEN 1 AND 6) OR " +
-            "(:isFirstHalf = false AND MONTH(ub.createdTime) BETWEEN 7 AND 12)) AND " +
-            "ub.readStatus = :readStatus")
-    List<UserBook> findAllByUserAndCreatedInHalfWithReadStatus(@Param("user") User user,
-                                                               @Param("isFirstHalf") boolean isFirstHalf,
-                                                               @Param("readStatus") ReadStatus readStatus);
+            "(:isFirstHalf = false AND MONTH(ub.createdTime) BETWEEN 7 AND 12))")
+    List<UserBook> findAllByUserAndCreatedInHalf(@Param("user") User user,
+                                                               @Param("isFirstHalf") boolean isFirstHalf);
 
     List<UserBook> findAllByBookInfoOrderByRatingDesc(BookInfo bookInfo);
+
+    List<UserBook> findAllByCreatedTimeAfter(LocalDateTime createdTime);
 }

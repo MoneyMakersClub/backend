@@ -25,12 +25,13 @@ public enum ErrorCode {
     ITEMTYPE_MISMATCH(400,"ItemType이 맞지 않습니다."),
     USERITEM_BAD_REQUEST(400, "유저의 소유가 아닌 userItemId입니다."),
     BOOKINFO_BAD_REQUEST(400, "API 도서가 아닌 bookInfoId입니다."),
+    HOMECARD_BAD_REQUEST(400, "현재 카드 7개가 다 찼습니다."),
+    READINGREPORT_NOT_VIEWABLE(400, "서재에 책이 없어 독서리포트를 볼 수 없습니다."),
+    KEYWORD_NOT_VIEWABLE(400, "분석 가능한 키워드 갯수가 충분하지 않습니다."),
 
     // 401 Unauthorized
     // 로그인 상태여야 하는 요청
     NOT_AUTHENTICATED(401, "로그인 상태가 아닙니다."),
-    // 권한이 없는 요청을 보냄
-    UNAUTHORIZED_REQUEST(401,"권한이 없습니다."),
     // 소셜 로그인이 정상적으로 이루어지지 않음
     OAUTH2_LOGIN_FAILED(401, "소셜 로그인에 실패했습니다."),
     // 유효하지 않은 토큰
@@ -45,12 +46,16 @@ public enum ErrorCode {
     NO_COOKIE(401, "쿠키에 리프레시 토큰이 존재하지 않습니다."),
     USER_STATUS_IS_NOT_ACTIVE(401, "계정이 활성 상태가 아닙니다."),
 
+    // 403 Forbidden
+    FRIENDSHIP_REQUIRED(403, "친구 관계가 필요합니다."),
+    // 권한이 없는 요청을 보냄
+    UNAUTHORIZED_REQUEST(403,"권한이 없습니다."),
+
     // 404 Not Found
     // 각 리소스를 찾지 못함
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
     USERSETTING_NOT_FOUND(404, "사용자 설정을 찾을 수 없습니다."),
     USERGROWTH_NOT_FOUND(404, "사용자 성장상태를 찾을 수 없습니다."),
-    USERHOME_NOT_FOUND(404, "유저 홈을 찾을 수 없습니다."),
     HOMECARD_NOT_FOUND(404, "카드를 찾을 수 없습니다."),
     FRIEND_REQUEST_NOT_FOUND(404, "친구 요청을 찾을 수 없습니다."),
     FRIEND_NOT_FOUND(404, "친구를 찾을 수 없습니다."),

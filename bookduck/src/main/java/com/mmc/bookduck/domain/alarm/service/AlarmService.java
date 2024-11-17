@@ -45,7 +45,10 @@ public class AlarmService {
 
         // 푸시알림 전송
         if (alarm.getAlarmType().isSendPush()) {
-            fcmService.sendPushMessage(receiver.getFcmToken(), PushAlarmFormat.valueOf(alarm.getAlarmType().name()));
+            String fcmToken = receiver.getFcmToken();
+            if (fcmToken != null) {
+                fcmService.sendPushMessage(fcmToken, PushAlarmFormat.valueOf(alarm.getAlarmType().name()));
+            }
         }
     }
 
@@ -61,7 +64,7 @@ public class AlarmService {
         Page<Alarm> alarmPage = alarmRepository.findByReceiverAndNotAnnouncementOrderByCreatedTimeDesc(currentUser, pageable);
         if (alarmPage != null && alarmPage.hasContent()) {
             for (Alarm alarm : alarmPage) {
-                alarmUnitDtoList.add(AlarmUnitDto.from(alarm));
+                alarmUnitDtoList.add(new AlarmUnitDto(alarm));
                 alarm.readAlarm();
             }
             alarmRepository.saveAll(alarmPage);
@@ -73,6 +76,6 @@ public class AlarmService {
         Pageable pageable = PageRequest.of(0, 30);
         // Announcement 유형만 가져오기
         Page<Alarm> announcementPage = alarmRepository.findByAlarmTypeOrderByCreatedTimeDesc(AlarmType.ANNOUNCEMENT, pageable);
-        return announcementPage.stream().map(AlarmUnitDto::from).collect(Collectors.toList());
+        return announcementPage.stream().map(AlarmUnitDto::new).collect(Collectors.toList());
     }
 }
