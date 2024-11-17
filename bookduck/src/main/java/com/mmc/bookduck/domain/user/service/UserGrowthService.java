@@ -3,6 +3,7 @@ package com.mmc.bookduck.domain.user.service;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
+import com.mmc.bookduck.domain.friend.service.FriendService;
 import com.mmc.bookduck.domain.user.dto.response.UserGrowthInfoResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserInfoResponseDto;
 import com.mmc.bookduck.domain.user.entity.Role;
@@ -25,6 +26,7 @@ public class UserGrowthService {
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
     private final UserService userService;
+    private final FriendService friendService;
 
     @Transactional(readOnly = true)
     public UserGrowth getUserGrowthByUserId(Long userId)
@@ -42,7 +44,9 @@ public class UserGrowthService {
         long excerptCount = excerptRepository.countByUserAndCreatedTimeThisYear(user, currentYear);
         long bookCount = (reviewCount + excerptCount);
         boolean isOfficial = (user.getRole() == Role.ROLE_ADMIN);
-        return new UserInfoResponseDto(user.getNickname(), bookCount, isOfficial);
+
+        boolean isFriend = friendService.isFriendWithCurrentUserOrNull(user);
+        return new UserInfoResponseDto(user.getNickname(), bookCount, isOfficial, isFriend);
     }
 
     @Transactional(readOnly = true)

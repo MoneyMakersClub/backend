@@ -36,6 +36,12 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public User getCurrentUserOrNull() throws CustomException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userRepository.findByEmail(authentication.getName()).orElse(null);
+    }
+
+    @Transactional(readOnly = true)
     public User getActiveUserByEmail(String email) throws CustomException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

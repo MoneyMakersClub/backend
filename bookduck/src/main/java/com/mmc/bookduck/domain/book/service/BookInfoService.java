@@ -376,7 +376,7 @@ public class BookInfoService {
         if(bookInfo.getCreatedUserId().equals(user.getUserId())){ // 내 customBook
             MyRatingOneLineReadStatusDto myRatingOneLine = getMyRatingOneLineReadStatus(bookInfo, user);
             return CustomBookResponseDto.from(userBook, myRatingOneLine.myRating(),myRatingOneLine.oneLineId(), myRatingOneLine.myOneLine(), true);
-        }else if(friendService.isFriendWithCurrentUser(bookInfoCreaterUser)){ //친구 customBook
+        }else if(friendService.isFriendWithCurrentUserOrNull(bookInfoCreaterUser)){ //친구 customBook
             return CustomBookResponseDto.from(userBook, false);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST); //내것도 아니고 친구것도 아닌 경우
@@ -528,7 +528,7 @@ public class BookInfoService {
     public UserArchiveResponseDto getAllUserBookArchive(Long bookInfoId, Long userId, Pageable pageable) {
         User bookUser = userService.getActiveUserByUserId(userId);
 
-        if(!friendService.isFriendWithCurrentUser(bookUser)){
+        if(!friendService.isFriendWithCurrentUserOrNull(bookUser)){
             throw new CustomException(ErrorCode.FRIENDSHIP_REQUIRED);
         }
         BookInfo bookInfo = getBookInfoById(bookInfoId);
