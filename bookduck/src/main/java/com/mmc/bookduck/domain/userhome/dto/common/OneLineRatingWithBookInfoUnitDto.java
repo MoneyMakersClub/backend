@@ -1,6 +1,5 @@
-package com.mmc.bookduck.domain.homecard.dto.common;
+package com.mmc.bookduck.domain.userhome.dto.common;
 
-import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 
 public record OneLineRatingWithBookInfoUnitDto (

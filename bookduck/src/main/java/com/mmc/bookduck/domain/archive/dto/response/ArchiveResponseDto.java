@@ -4,6 +4,7 @@ import com.mmc.bookduck.domain.archive.entity.Archive;
 
 public record ArchiveResponseDto(
         Long archiveId,
+        Long creatorUserId,
         ExcerptResponseDto excerpt,
         ReviewResponseDto review,
         Long bookInfoId,
@@ -11,7 +12,7 @@ public record ArchiveResponseDto(
         String author,
         String imgPath
 ) {
-    public static ArchiveResponseDto from(Archive archive, ExcerptResponseDto excerpt, ReviewResponseDto review, Long bookInfoId, String title, String author, String imgPath) {
-        return new ArchiveResponseDto(archive.getArchiveId(), excerpt, review, bookInfoId, title, author, imgPath);
+    public static ArchiveResponseDto from(Archive archive, Long creatorUserId, ExcerptResponseDto excerpt, ReviewResponseDto review, Long bookInfoId, String title, String author, String imgPath) {
+        return new ArchiveResponseDto(archive.getArchiveId(), creatorUserId, excerpt, review, bookInfoId, title, author, imgPath);
     }
 }

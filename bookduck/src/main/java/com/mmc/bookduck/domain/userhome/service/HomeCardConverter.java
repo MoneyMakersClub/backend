@@ -1,10 +1,10 @@
-package com.mmc.bookduck.domain.homecard.service;
+package com.mmc.bookduck.domain.userhome.service;
 
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
-import com.mmc.bookduck.domain.homecard.dto.common.*;
-import com.mmc.bookduck.domain.homecard.entity.HomeCard;
+import com.mmc.bookduck.domain.userhome.dto.common.*;
+import com.mmc.bookduck.domain.userhome.entity.HomeCard;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

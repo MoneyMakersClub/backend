@@ -1,8 +1,7 @@
-package com.mmc.bookduck.domain.homecard.entity;
+package com.mmc.bookduck.domain.userhome.entity;
 
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.book.entity.UserBook;
-import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.user.entity.User;
 import jakarta.persistence.*;
