@@ -1,13 +1,13 @@
-package com.mmc.bookduck.domain.homecard.service;
+package com.mmc.bookduck.domain.userhome.service;
 
 import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
-import com.mmc.bookduck.domain.homecard.dto.common.HomeCardDto;
-import com.mmc.bookduck.domain.homecard.dto.request.HomeCardRequestDto;
-import com.mmc.bookduck.domain.homecard.dto.request.ReadingSpaceUpdateRequestDto;
-import com.mmc.bookduck.domain.homecard.dto.response.ReadingSpaceResponseDto;
-import com.mmc.bookduck.domain.homecard.entity.HomeCard;
+import com.mmc.bookduck.domain.userhome.dto.common.HomeCardDto;
+import com.mmc.bookduck.domain.userhome.dto.request.HomeCardRequestDto;
+import com.mmc.bookduck.domain.userhome.dto.request.ReadingSpaceUpdateRequestDto;
+import com.mmc.bookduck.domain.userhome.dto.response.ReadingSpaceResponseDto;
+import com.mmc.bookduck.domain.userhome.entity.HomeCard;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserReadingSpaceService {
     private final UserService userService;
-    private final HomeCardService homeCardService;
+    private final UserHomeService homeCardService;
     private final HomeCardConverter homeCardConverter;
 
     @Transactional(readOnly = true)
