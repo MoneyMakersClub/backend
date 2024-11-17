@@ -16,7 +16,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "UserHome", description = "UserHome 관련 API입니다.")
+@Tag(name = "HomeCard", description = "HomeCard 관련 API입니다.")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/readingspace")

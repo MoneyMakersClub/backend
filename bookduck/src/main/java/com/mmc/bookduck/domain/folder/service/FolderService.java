@@ -70,16 +70,14 @@ public class FolderService {
     }
 
     // 폴더 삭제
-    public String deleteFolder(Long folderId) {
+    public void deleteFolder(Long folderId) {
         User user = userService.getCurrentUser();
         Folder folder = findFolderById(folderId);
 
-        // 권한확인
         if(folder.getUser().equals(user)){
             // 폴더 책들을 다 삭제
             folderBookService.deleteFolderBookList(folder);
             folderRepository.delete(folder);
-            return "폴더를 삭제했습니다.";
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
@@ -115,7 +113,8 @@ public class FolderService {
         List<FolderBook> folderBooks = folderBookService.orderFolderBooks(folder);
 
         for (FolderBook folderBook : folderBooks) {
-            folderBookList.add(FolderBookUnitDto.from(folderBook));
+            boolean isCustom = checkIsCustom(folderBook.getUserBook());
+            folderBookList.add(FolderBookUnitDto.from(folderBook, isCustom));
         }
         return new FolderBookListResponseDto(folder, folderBookList);
     }
@@ -146,7 +145,8 @@ public class FolderService {
         List<FolderBook> orderedFolderBooks = folderBookService.orderFolderBooks(folder);
         List<FolderBookUnitDto> dtoList = new ArrayList<>();
         for(FolderBook book : orderedFolderBooks){
-            dtoList.add(FolderBookUnitDto.from(book));
+            boolean isCustom = checkIsCustom(book.getUserBook());
+            dtoList.add(FolderBookUnitDto.from(book, isCustom));
         }
         return new FolderBookListResponseDto(folder, dtoList);
 
@@ -162,7 +162,8 @@ public class FolderService {
 
         if(folder.getUser().equals(user)){
             for(FolderBook folderBook : folder.getFolderBooks()){
-                folderBookList.add(FolderBookUnitDto.from(folderBook));
+                boolean isCustom = checkIsCustom(folderBook.getUserBook());
+                folderBookList.add(FolderBookUnitDto.from(folderBook, isCustom));
             }
             return new FolderBookListResponseDto(folder, folderBookList);
         }else{
@@ -209,7 +210,8 @@ public class FolderService {
             for(FolderBook folderBook : folder.getFolderBooks()){
                 for(ReadStatus readStatus : readStatusList){
                     if(folderBook.getUserBook().getReadStatus().equals(readStatus)){
-                        folderBookList.add(FolderBookUnitDto.from(folderBook));
+                        boolean isCustom = checkIsCustom(folderBook.getUserBook());
+                        folderBookList.add(FolderBookUnitDto.from(folderBook, isCustom));
                     }
                 }
             }
@@ -245,7 +247,8 @@ public class FolderService {
 
         if(statusList == null || statusList.isEmpty()){
             for(UserBook userBook: candidateList){
-                dtoList.add(CandidateFolderBookDto.from(userBook));
+                boolean isCustom = checkIsCustom(userBook);
+                dtoList.add(CandidateFolderBookDto.from(userBook, isCustom));
             }
         }
         else{
@@ -253,12 +256,13 @@ public class FolderService {
             for(ReadStatus readStatus : readStatusList){
                 for(UserBook userBook: candidateList){
                     if(userBook.getReadStatus().equals(readStatus)){
-                        dtoList.add(CandidateFolderBookDto.from(userBook));
+                        boolean isCustom = checkIsCustom(userBook);
+                        dtoList.add(CandidateFolderBookDto.from(userBook, isCustom));
                     }
                 }
             }
         }
-        return new CandidateFolderBookListResponseDto(dtoList);
+        return CandidateFolderBookListResponseDto.from(dtoList);
     }
 
     public FolderBookListResponseDto updateFolderBookOrder(Long folderId, FolderBookOrderRequestDto requestDto) {
@@ -268,8 +272,18 @@ public class FolderService {
         List<FolderBookUnitDto> folderBookList = new ArrayList<>();
         List<FolderBook> folderBooks = folderBookService.orderFolderBooks(folder);
         for (FolderBook folderBook : folderBooks) {
-            folderBookList.add(FolderBookUnitDto.from(folderBook));
+            boolean isCustom = checkIsCustom(folderBook.getUserBook());
+            folderBookList.add(FolderBookUnitDto.from(folderBook, isCustom));
         }
         return new FolderBookListResponseDto(folder, folderBookList);
+    }
+
+    public boolean checkIsCustom(UserBook userBook){
+        if(userBook.getBookInfo().getCreatedUserId() == null){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 }
