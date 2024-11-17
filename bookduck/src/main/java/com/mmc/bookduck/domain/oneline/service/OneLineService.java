@@ -2,7 +2,7 @@ package com.mmc.bookduck.domain.oneline.service;
 
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
-import com.mmc.bookduck.domain.userhome.dto.common.OneLineRatingWithBookInfoUnitDto;
+import com.mmc.bookduck.domain.homecard.dto.common.OneLineRatingWithBookInfoUnitDto;
 import com.mmc.bookduck.domain.oneline.dto.request.OneLineCreateRequestDto;
 import com.mmc.bookduck.domain.oneline.dto.request.OneLineUpdateRequestDto;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
