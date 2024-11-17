@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    List<Review> findByUserAndReviewTitleStartingWith(User user, String reviewTitle);;
+    List<Review> findByUserAndReviewTitleStartingWith(User user, String reviewTitle);
 
     long countByUser(User user);
 
