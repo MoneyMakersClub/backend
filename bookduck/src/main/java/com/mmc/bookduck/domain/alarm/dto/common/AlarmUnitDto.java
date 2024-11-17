@@ -14,17 +14,12 @@ public record AlarmUnitDto(
         String resourceName,
         Long resourceId
 ) {
-    public static AlarmUnitDto from(Alarm alarm) {
-        String boldText = null;
-        if (alarm.getSender() != null)
-            boldText = alarm.getSender().getNickname();
-        else if (alarm.getResourceValue() != null)
-            boldText = alarm.getResourceValue();
-        return new AlarmUnitDto(
+    public AlarmUnitDto(Alarm alarm) {
+        this(
                 alarm.isRead(),
                 alarm.getAlarmType(),
                 alarm.getCreatedTime(),
-                boldText,
+                alarm.getSender() != null ? alarm.getSender().getNickname() : alarm.getResourceValue(),
                 alarm.getResourceName(),
                 alarm.getResourceId()
         );
