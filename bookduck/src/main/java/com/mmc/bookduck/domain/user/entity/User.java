@@ -36,12 +36,12 @@ public class User extends BaseTimeEntity {
     private String fcmToken;
 
     @Builder
-    public User(Long userId, String email, LoginType loginType, String nickname) {
+    public User(Long userId, String email, LoginType loginType, Role role, String nickname) {
         this.userId = userId;
         this.email = email;
         this.loginType = loginType;
         this.nickname = nickname;
-        this.role = Role.ROLE_USER;
+        this.role = role != null ? role : Role.ROLE_USER;
         this.userStatus = UserStatus.ACTIVE;
     }
 
@@ -54,4 +54,5 @@ public class User extends BaseTimeEntity {
     public void setFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
     }
+
 }

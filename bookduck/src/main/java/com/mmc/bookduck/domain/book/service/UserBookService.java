@@ -10,6 +10,7 @@ import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
+import com.mmc.bookduck.domain.book.dto.common.BookUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
@@ -203,6 +204,7 @@ public class UserBookService {
     }
 
 
+    /*
     // 서재책 상세보기 - 기본정보
     @Transactional(readOnly = true)
     public BookInfoBasicResponseDto getUserBookInfoBasic(Long userBookId) {
@@ -216,14 +218,18 @@ public class UserBookService {
         Double ratingAverage = bookInfoService.getRatingAverage(userBook.getBookInfo());
 
         if(oneLine != null){
+            BookUnitDto unitDto = BookUnitDto.from(userBook);
             return BookInfoBasicResponseDto.from(userBook, ratingAverage, oneLine.getOneLineContent(), detailDto);
         }
         else{
+            BookUnitDto unitDto = BookUnitDto.from(userBook);
             return BookInfoBasicResponseDto.from(userBook, ratingAverage, null, detailDto);
         }
     }
+    */
 
 
+    /*
     // 서재 책 상세보기 - 추가정보
     @Transactional(readOnly = true)
     public BookInfoAdditionalResponseDto getUserBookInfoAdditional(Long userBookId) {
@@ -247,6 +253,7 @@ public class UserBookService {
         }
         return new BookInfoAdditionalResponseDto(oneLineList);
     }
+    */
 
 
     @Transactional(readOnly = true)
