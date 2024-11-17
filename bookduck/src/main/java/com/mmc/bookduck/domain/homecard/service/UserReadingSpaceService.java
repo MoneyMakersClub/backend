@@ -8,6 +8,8 @@ import com.mmc.bookduck.domain.homecard.dto.request.HomeCardRequestDto;
 import com.mmc.bookduck.domain.homecard.dto.request.ReadingSpaceUpdateRequestDto;
 import com.mmc.bookduck.domain.homecard.dto.response.ReadingSpaceResponseDto;
 import com.mmc.bookduck.domain.homecard.entity.HomeCard;
+import com.mmc.bookduck.global.exception.CustomException;
+import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +51,9 @@ public class UserReadingSpaceService {
     public HomeCardDto addHomeCardToReadingSpace(HomeCardRequestDto requestDto) {
         User user = userService.getCurrentUser();
         List<HomeCard> homeCards = homeCardService.getAllHomeCardsOfUser(user);
+        if (homeCards.size() >= 7) {
+            throw new CustomException(ErrorCode.HOMECARD_BAD_REQUEST);
+        }
 
         // 새로운 HomeCard를 추가하고 HomeCardDto로 변환
         HomeCard homeCard = homeCardService.addHomeCard(requestDto, user, homeCards.size());
