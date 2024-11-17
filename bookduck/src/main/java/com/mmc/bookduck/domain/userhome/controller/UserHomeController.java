@@ -46,10 +46,10 @@ public class UserHomeController {
         return ResponseEntity.ok().body(excerptService.searchExcerpts(keyword, pageable));
     }
 
-    @Operation(summary = "한줄평 카드 추가 시 한줄평 검색", description = "한줄평 카드 추가 시 나의 한줄평을 검색합니다.")
-    @GetMapping("/onelines/search")
-    public ResponseEntity<?> searchOneLinesFromReadingSpace(@RequestParam final String keyword,
-                                                            @PageableDefault final Pageable pageable) {
-        return ResponseEntity.ok().body(oneLineService.searchOneLines(keyword, pageable));
-    }
+//    @Operation(summary = "한줄평 카드 추가 시 한줄평 검색", description = "한줄평 카드 추가 시 나의 한줄평을 검색합니다.")
+//    @GetMapping("/onelines/search")
+//    public ResponseEntity<?> searchOneLinesFromReadingSpace(@RequestParam final String keyword,
+//                                                            @PageableDefault final Pageable pageable) {
+//        return ResponseEntity.ok().body(oneLineService.searchOneLines(keyword, pageable));
+//    }
 }

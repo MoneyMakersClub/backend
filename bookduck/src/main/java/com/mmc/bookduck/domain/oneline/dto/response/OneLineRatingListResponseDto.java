@@ -8,14 +8,16 @@ public record OneLineRatingListResponseDto(
         int pageSize,
         long totalElements,
         int totalPages,
+        Long bookInfoId,
         List<OneLineRatingUnitDto> oneLineRatingList
 ) {
-    public static OneLineRatingListResponseDto from(Page<OneLineRatingUnitDto> oneLineRatingPage) {
+    public static OneLineRatingListResponseDto from(Long bookInfoId, Page<OneLineRatingUnitDto> oneLineRatingPage) {
         return new OneLineRatingListResponseDto(
                 oneLineRatingPage.getNumber(),
                 oneLineRatingPage.getSize(),
                 oneLineRatingPage.getTotalElements(),
                 oneLineRatingPage.getTotalPages(),
+                bookInfoId,
                 oneLineRatingPage.getContent()
         );
     }

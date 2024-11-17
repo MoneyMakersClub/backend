@@ -35,6 +35,7 @@ import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingUnitDto;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
+import com.mmc.bookduck.domain.oneline.service.OneLineService;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.S3.S3Service;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -71,7 +72,6 @@ public class BookInfoService {
     private final OneLineRepository oneLineRepository;
     private final S3Service s3Service;
     private final FriendService friendService;
-
 
     // api 도서 목록 조회
     public BookListResponseDto<BookUnitResponseDto> searchBookList(String keyword, Long page, Long size) {
@@ -443,8 +443,13 @@ public class BookInfoService {
             default:
                 throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
         }
-        Page<OneLineRatingUnitDto> dtoPage = oneLinePage.map(OneLineRatingUnitDto::from);
-        return OneLineRatingListResponseDto.from(dtoPage);
+        User currentUser = userService.getCurrentUser();
+        Page<OneLineRatingUnitDto> dtoPage = oneLinePage.map(oneLine -> {
+            Boolean isLiked = oneLine.getOneLineLikes().stream()
+                    .anyMatch(like -> like.getUser().getUserId().equals(currentUser.getUserId()));
+            return OneLineRatingUnitDto.from(oneLine, isLiked);
+        });
+        return OneLineRatingListResponseDto.from(bookInfoId, dtoPage);
     }
 
     @Transactional(readOnly = true)

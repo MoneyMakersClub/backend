@@ -72,12 +72,12 @@ public class OneLineService {
         return oneLine;
     }
 
-    @Transactional(readOnly = true)
-    public OneLineRatingListResponseDto searchOneLines(String keyword, Pageable pageable) {
-        User user = userService.getCurrentUser();
-        String escapedWord = escapeSpecialCharacters(keyword);
-        Page<OneLine> oneLinePage = oneLineRepository.searchAllByOneLineContentOrBookInfoTitleOrAuthorByUserAndCreatedTimeDesc(escapedWord, user, pageable);
-        Page<OneLineRatingUnitDto> oneLineRatingUnitDtoPage = oneLinePage.map(OneLineRatingUnitDto::from);
-        return OneLineRatingListResponseDto.from(oneLineRatingUnitDtoPage);
-    }
+//    @Transactional(readOnly = true)
+//    public OneLineRatingListResponseDto searchOneLines(String keyword, Pageable pageable) {
+//        User user = userService.getCurrentUser();
+//        String escapedWord = escapeSpecialCharacters(keyword);
+//        Page<OneLine> oneLinePage = oneLineRepository.searchAllByOneLineContentOrBookInfoTitleOrAuthorByUserAndCreatedTimeDesc(escapedWord, user, pageable);
+//        Page<OneLineRatingUnitDto> oneLineRatingUnitDtoPage = oneLinePage.map(OneLineRatingUnitDto::from);
+//        return OneLineRatingListResponseDto.from(oneLineRatingUnitDtoPage);
+//    }
 }
