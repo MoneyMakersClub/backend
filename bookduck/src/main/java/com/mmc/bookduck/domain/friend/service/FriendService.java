@@ -1,5 +1,7 @@
 package com.mmc.bookduck.domain.friend.service;
 
+import com.mmc.bookduck.domain.alarm.entity.AlarmType;
+import com.mmc.bookduck.domain.alarm.service.AlarmByTypeService;
 import com.mmc.bookduck.domain.friend.dto.common.FriendUnitDto;
 import com.mmc.bookduck.domain.friend.dto.request.FriendCreateRequestDto;
 import com.mmc.bookduck.domain.friend.dto.response.FriendListResponseDto;
@@ -15,6 +17,7 @@ import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,7 @@ public class FriendService {
     private final FriendRepository friendRepository;
     private final UserService userService;
     private final UserItemService userItemService;
+    private final AlarmByTypeService alarmByTypeService;
 
     // 친구 요청 수락 (=친구 생성)
     public void createFriend(Long friendRequestId){
@@ -52,6 +56,7 @@ public class FriendService {
         friendRepository.save(friend);
         request.setFriendRequestStatus(FriendRequestStatus.ACCEPTED);
         friendRequestRepository.save(request);
+        alarmByTypeService.createFriendAlarm(currentUser, sender, AlarmType.FRIEND_APPROVED);
     }
 
     // 친구 목록 조회
