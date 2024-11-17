@@ -1,5 +1,7 @@
 package com.mmc.bookduck.domain.onelineLike.service;
 
+import com.mmc.bookduck.domain.alarm.entity.AlarmType;
+import com.mmc.bookduck.domain.alarm.service.AlarmByTypeService;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.service.OneLineService;
 import com.mmc.bookduck.domain.onelineLike.entity.OneLineLike;
@@ -21,6 +23,7 @@ public class OneLineLikeService {
     private final OneLineLikeRepository oneLineLikeRepository;
     private final OneLineService oneLineService;
     private final UserService userService;
+    private final AlarmByTypeService alarmByTypeService;
 
     // 생성
     public void createOneLineLike(Long oneLineId) {
@@ -32,6 +35,7 @@ public class OneLineLikeService {
         }
         OneLineLike oneLineLike = new OneLineLike(oneLine, currentUser);
         oneLine.addOneLineLike(oneLineLike);
+        alarmByTypeService.createOneLineLikeAlarm(currentUser, oneLine.getUser(), oneLine.getUserBook().getBookInfo().getBookInfoId());
         oneLineLikeRepository.save(oneLineLike);
     }
 
