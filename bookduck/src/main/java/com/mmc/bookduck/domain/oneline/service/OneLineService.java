@@ -1,7 +1,5 @@
 package com.mmc.bookduck.domain.oneline.service;
 
-import com.mmc.bookduck.domain.alarm.entity.AlarmType;
-import com.mmc.bookduck.domain.alarm.service.AlarmByTypeService;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.homecard.dto.common.OneLineRatingWithBookInfoUnitDto;
@@ -16,12 +14,9 @@ import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 import static com.mmc.bookduck.global.common.EscapeSpecialCharactersService.escapeSpecialCharacters;
 
@@ -32,7 +27,6 @@ public class OneLineService {
     private final OneLineRepository oneLineRepository;
     private final UserService userService;
     private final UserBookService userBookService;
-    private final AlarmByTypeService alarmByTypeService;
 
     // 생성
     public OneLine createOneLine(OneLineCreateRequestDto requestDto) {
@@ -40,7 +34,6 @@ public class OneLineService {
         UserBook userBook = userBookService.getUserBookById(requestDto.userBookId());
         userBookService.validateUserBookOwner(userBook);
         OneLine oneLine = requestDto.toEntity(user, userBook);
-        alarmByTypeService.createFriendAlarm(user, oneLine.getUser(), AlarmType.ONELINELIKE_ADDED);
         return oneLineRepository.save(oneLine);
     }
 

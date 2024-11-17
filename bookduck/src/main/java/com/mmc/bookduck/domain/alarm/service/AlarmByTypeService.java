@@ -15,12 +15,12 @@ import java.text.MessageFormat;
 public class AlarmByTypeService {
     private final AlarmService alarmService;
 
-    // 친구 요청/친구 수락 알림 생성
-    public void createFriendAlarm(User sender, User receiver, AlarmType alarmType) {
-        String message = MessageFormat.format(alarmType.getMessagePattern(), sender.getNickname());
+    // 친구 요청 알림 생성
+    public void createFriendRequestAlarm(User sender, User receiver) {
+        String message = MessageFormat.format(AlarmType.FRIEND_REQUEST.getMessagePattern(), sender.getNickname());
 
         Alarm alarm = Alarm.builder()
-                .alarmType(alarmType)
+                .alarmType(AlarmType.FRIEND_REQUEST)
                 .sender(sender)
                 .receiver(receiver)
                 .message(message)
@@ -30,6 +30,20 @@ public class AlarmByTypeService {
         alarmService.createAlarm(alarm, receiver);
     }
 
+    // 친구 수락 알림 생성
+    public void createFriendApprovedAlarm(User sender, User receiver) {
+        String message = MessageFormat.format(AlarmType.FRIEND_APPROVED.getMessagePattern(), sender.getNickname());
+
+        Alarm alarm = Alarm.builder()
+                .alarmType(AlarmType.FRIEND_APPROVED)
+                .sender(sender)
+                .receiver(receiver)
+                .message(message)
+                .resourceName("User")
+                .resourceId(sender.getUserId())
+                .build();
+        alarmService.createAlarm(alarm, receiver);
+    }
     // 한줄평 좋아요 알림 생성
     public void createOneLineLikeAlarm(User sender, User receiver, Long bookInfoId) {
         AlarmType alarmType = AlarmType.ONELINELIKE_ADDED;
