@@ -81,6 +81,7 @@ public class BookInfoService {
     public BookListResponseDto<BookUnitResponseDto> searchBookList(String keyword, Long page, Long size) {
         User user = userService.getCurrentUser();
         String responseBody = googleBooksApiService.searchBookList(keyword, page, size);
+        int totalBooks = parseTotalBooks(responseBody);
 
         List<BookUnitParseDto> bookInfoList = parseBookInfo(responseBody);
         List<BookUnitResponseDto> bookResponseList = new ArrayList<>();
@@ -100,7 +101,8 @@ public class BookInfoService {
                 bookResponseList.add(responseDto);
             }
         }
-        return new BookListResponseDto<>(bookResponseList);
+        int totalPage = (int) Math.ceil((double) totalBooks / size);
+        return new BookListResponseDto<>(bookResponseList, totalPage, page);
     }
 
     // 목록 정보 파싱
@@ -145,6 +147,17 @@ public class BookInfoService {
             }
             return bookList;
 
+        }catch(Exception e){
+            throw new CustomException(ErrorCode.JSON_PARSING_ERROR);
+        }
+    }
+
+    public int parseTotalBooks(String apiResult){
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(apiResult);
+            int totalItems = rootNode.path("totalItems").asInt();
+            return totalItems;
         }catch(Exception e){
             throw new CustomException(ErrorCode.JSON_PARSING_ERROR);
         }

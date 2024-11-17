@@ -35,8 +35,8 @@ public class BookInfoController {
     @Operation(summary = "API 도서 목록 검색", description = "구글 API에서 특정 키워드에 해당하는 도서 목록을 검색합니다.")
     @GetMapping("/search")
     public ResponseEntity<BookListResponseDto<BookUnitResponseDto>> searchBookList(@RequestParam(name = "keyword") final String keyword,
-                                                                                       @RequestParam final Long page,
-                                                                                       @RequestParam final Long size){
+                                                                                   @RequestParam final Long page,
+                                                                                   @RequestParam final Long size){
 
         return ResponseEntity.ok(bookInfoService.searchBookList(keyword, page, size));
     }
@@ -54,7 +54,7 @@ public class BookInfoController {
         return ResponseEntity.ok(bookInfoService.getApiBookBasicByProviderId(providerId));
     }
 
-    @Operation(summary = "검색 목록에서 서재에 책 추가", description = "책 검색 목록에서 providerId로 책을 서재에 추가합니다.")
+    @Operation(summary = "서재에 도서 추가", description = "책 검색 목록에서 providerId로 책을 서재에 추가합니다.")
     @PostMapping("/{providerId}/add")
     public ResponseEntity<AddUserBookResponseDto> addBookByProviderId(@PathVariable(name = "providerId") final String providerId,
                                                                       @Valid @RequestBody final AddUserBookRequestDto requestDto){
