@@ -5,6 +5,7 @@ import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.dto.response.UserGrowthInfoResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserInfoResponseDto;
+import com.mmc.bookduck.domain.user.entity.Role;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.entity.UserGrowth;
 import com.mmc.bookduck.domain.user.repository.UserGrowthRepository;
@@ -40,7 +41,8 @@ public class UserGrowthService {
         long reviewCount = reviewRepository.countByUserAndCreatedTimeThisYear(user, currentYear);
         long excerptCount = excerptRepository.countByUserAndCreatedTimeThisYear(user, currentYear);
         long bookCount = (reviewCount + excerptCount);
-        return new UserInfoResponseDto(user.getNickname(), bookCount);
+        boolean isOfficial = (user.getRole() == Role.ROLE_ADMIN);
+        return new UserInfoResponseDto(user.getNickname(), bookCount, isOfficial);
     }
 
     @Transactional(readOnly = true)
