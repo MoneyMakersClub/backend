@@ -35,6 +35,10 @@ public class User extends BaseTimeEntity {
 
     private String fcmToken;
 
+    private Boolean isAnnouncementChecked;
+
+    private Boolean isItemUnlockedChecked;
+
     @Builder
     public User(Long userId, String email, LoginType loginType, Role role, String nickname) {
         this.userId = userId;
@@ -43,6 +47,8 @@ public class User extends BaseTimeEntity {
         this.nickname = nickname;
         this.role = role != null ? role : Role.ROLE_USER;
         this.userStatus = UserStatus.ACTIVE;
+        this.isAnnouncementChecked = false;
+        this.isItemUnlockedChecked = false;
     }
 
     // 닉네임 변경
@@ -55,4 +61,11 @@ public class User extends BaseTimeEntity {
         this.fcmToken = fcmToken;
     }
 
+    public void setIsAnnouncementChecked(boolean isAnnouncementChecked) {
+        this.isAnnouncementChecked = isAnnouncementChecked;
+    }
+
+    public void setIsItemUnlockedChecked(boolean isItemUnlockedChecked) {
+        this.isItemUnlockedChecked = isItemUnlockedChecked;
+    }
 }

@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
+    Boolean existsByReceiverAndIsReadFalseAndAlarmType(User user, AlarmType badgeUnlocked);
     Boolean existsByReceiverAndIsReadFalseAndAlarmTypeNot(User receiver, AlarmType alarmType);
 
     @Query("SELECT a FROM Alarm a WHERE a.receiver = :user AND a.alarmType <> 'ANNOUNCEMENT' ORDER BY a.createdTime DESC")

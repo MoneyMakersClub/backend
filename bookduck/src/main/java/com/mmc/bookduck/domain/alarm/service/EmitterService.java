@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.alarm.service;
 
+import com.mmc.bookduck.domain.alarm.dto.ssedata.AlarmBadgeUnlockedDataDto;
 import com.mmc.bookduck.domain.alarm.dto.ssedata.AlarmDefaultDataDto;
 import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
@@ -38,10 +39,27 @@ public class EmitterService {
 
     private void sendToClientIfNewAlarmExists(User user) {
         Boolean isMissedAlarms = alarmRepository.existsByReceiverAndIsReadFalseAndAlarmTypeNot(user, AlarmType.ANNOUNCEMENT);
-        if (isMissedAlarms.equals(true)) {
-            sendToClient(user.getUserId(), AlarmDefaultDataDto.from(true), "new sse alarm exists");
+        Boolean isAnnouncementChecked = user.getIsAnnouncementChecked();
+        Boolean isItemUnlockedChecked = user.getIsItemUnlockedChecked();
+        String messsage;
+
+        if (isMissedAlarms || isAnnouncementChecked || isItemUnlockedChecked) {
+            messsage = "new sse alarm exists";
         } else {
-            sendToClient(user.getUserId(), AlarmDefaultDataDto.from(false), "new sse alarm doesn't exists");
+            messsage = "new sse alarm doesn't exists";
+        }
+        sendToClient(user.getUserId(), AlarmDefaultDataDto.from(
+                isMissedAlarms,
+                isAnnouncementChecked,
+                isItemUnlockedChecked), messsage);
+    }
+
+    private void sendToClientIfBadgeUnlockedAlarmExists(User user) {
+        Boolean isBadgeUnlocked = alarmRepository.existsByReceiverAndIsReadFalseAndAlarmType(user, AlarmType.BADGE_UNLOCKED);
+        if (isBadgeUnlocked.equals(true)) {
+            sendToClient(user.getUserId(), AlarmBadgeUnlockedDataDto.from(true), "new badge alarm exists");
+        } else {
+            sendToClient(user.getUserId(), AlarmBadgeUnlockedDataDto.from(false), "new badge alarm doesn't exists");
         }
     }
 
