@@ -18,7 +18,6 @@ public class User extends BaseTimeEntity {
     @NotNull
     private String email;
 
-    @Enumerated(EnumType.STRING)
     @NotNull
     private LoginType loginType;
 
