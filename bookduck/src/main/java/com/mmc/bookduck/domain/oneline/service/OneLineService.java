@@ -12,7 +12,6 @@ import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
-import com.mmc.bookduck.domain.homecard.service.HomeCardService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,6 @@ public class OneLineService {
     private final OneLineRepository oneLineRepository;
     private final UserService userService;
     private final UserBookService userBookService;
-    private final HomeCardService homeCardService;
     private final AlarmByTypeService alarmByTypeService;
 
     // 생성
@@ -53,7 +51,6 @@ public class OneLineService {
     public void deleteOneLine(Long oneLineId){
         OneLine oneLine = validateOneLineCreator(oneLineId);
         oneLineRepository.delete(oneLine);
-        homeCardService.deleteHomeCardsByOneLine(oneLine);
     }
 
     @Transactional(readOnly = true)

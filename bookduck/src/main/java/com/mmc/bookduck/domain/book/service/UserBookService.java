@@ -22,7 +22,6 @@ import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
-import com.mmc.bookduck.domain.homecard.service.HomeCardService;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -48,7 +47,6 @@ public class UserBookService {
     private final OneLineRepository oneLineRepository;
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
-    private final HomeCardService homeCardService;
 
     //customBook 추가
     public UserBook createCustomBookEntity(CustomBookRequestDto requestDto) {
@@ -128,7 +126,6 @@ public class UserBookService {
             if(createdUserId != null && createdUserId.equals(user.getUserId())){
                 bookInfoService.deleteCustomBookInfo(bookInfo.getBookInfoId());
             }
-            homeCardService.deleteHomeCardsByUserBook(userBook);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }

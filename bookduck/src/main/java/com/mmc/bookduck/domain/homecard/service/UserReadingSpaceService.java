@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.homecard.service;
 
+import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.domain.homecard.dto.common.HomeCardDto;
@@ -26,23 +27,23 @@ public class UserReadingSpaceService {
     public ReadingSpaceResponseDto getUserReadingSpace(Long userId) {
         User user = userService.getActiveUserByUserId(userId);
         User currentUser = userService.getCurrentUser();
-        List<HomeCard> homeCards;
 
-        if (user.equals(currentUser)) {
-            // 자신일 경우 visibility 무관하게 모든 HomeCard 가져오기
-            homeCards = homeCardService.getAllHomeCardsOfUser(user);
-        } else {
-            // 다른 사용자일 경우 PUBLIC HomeCard만 가져오기
-            homeCards = homeCardService.getPublicHomeCardsOfUser(user);
-        }
+        boolean isCurrentUser = currentUser.getUserId().equals(user.getUserId());
         String nickname = user.getNickname();
 
-        // HomeCardConverter를 사용하여 HomeCard를 HomeCardDto로 변환
-        List<HomeCardDto> homeCardDtos = homeCards.stream()
+        List<HomeCardDto> homeCardDtos = homeCardService.getAllHomeCardsOfUser(user).stream()
+                .filter(homeCard -> canViewHomeCard(homeCard, isCurrentUser))
                 .map(homeCard -> homeCardConverter.mapToHomeCardDto(homeCard, nickname))
                 .collect(Collectors.toList());
 
         return new ReadingSpaceResponseDto(homeCardDtos);
+    }
+
+    private boolean canViewHomeCard(HomeCard homeCard, boolean isCurrentUser) {
+        if (isCurrentUser) return true;
+
+        // 다른 유저의 경우 Visibility가 PUBLIC인 것만 허용
+        return homeCard.getExcerpt() == null || homeCard.getExcerpt().getVisibility() == Visibility.PUBLIC;
     }
 
     public HomeCardDto addHomeCardToReadingSpace(HomeCardRequestDto requestDto) {
