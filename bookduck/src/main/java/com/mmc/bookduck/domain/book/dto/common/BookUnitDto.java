@@ -10,7 +10,7 @@ import java.util.List;
 public record BookUnitDto(
         Long bookInfoId,
         Long userbookId,
-        @NotNull String title,
+        String title,
         List<String> author,
         String imgPath,
         Double myRating,
