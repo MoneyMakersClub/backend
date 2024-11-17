@@ -340,7 +340,7 @@ public class UserBookService {
         }
         List<BookCoverImageUnitDto> coverList = new ArrayList<>();
         for(UserBook userBook : userBookList){
-            coverList.add(BookCoverImageUnitDto.from(userBook));
+            coverList.add(BookCoverImageUnitDto.from(userBook.getBookInfo()));
         }
         return new BookListResponseDto<>(coverList);
     }
