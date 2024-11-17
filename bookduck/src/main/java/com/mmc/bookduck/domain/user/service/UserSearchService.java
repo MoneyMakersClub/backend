@@ -4,9 +4,10 @@ import com.mmc.bookduck.domain.friend.service.FriendService;
 import com.mmc.bookduck.domain.item.dto.common.ItemEquippedUnitDto;
 import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.dto.common.UserUnitDto;
-import com.mmc.bookduck.domain.user.dto.response.UserListResponseDto;
+import com.mmc.bookduck.domain.user.entity.Role;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
+import com.mmc.bookduck.global.common.PaginatedResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,17 +29,18 @@ public class UserSearchService {
     private final FriendService friendService;
 
     // 유저 검색
-    public UserListResponseDto searchUsers(String keyword, Pageable pageable) {
+    public PaginatedResponseDto<UserUnitDto> searchUsers(String keyword, Pageable pageable) {
         // 키워드의 이스케이프 처리
         String escapedWord = escapeSpecialCharacters(keyword);
         Page<User> userPage = getSearchedUserPage(escapedWord, pageable);
 
         Page<UserUnitDto> userUnitDtoPage = userPage.map(user -> {
             List<ItemEquippedUnitDto> userItems = userItemService.getUserItemEquippedListOfUser(user);
+            boolean isOfficial = (user.getRole() == Role.ROLE_ADMIN);
             boolean isFriend = friendService.isFriendWithCurrentUser(user);
-            return UserUnitDto.from(user, userItems, isFriend);
+            return UserUnitDto.from(user, userItems, isOfficial, isFriend);
         });
-        return UserListResponseDto.from(userUnitDtoPage);
+        return PaginatedResponseDto.from(userUnitDtoPage);
     }
 
     @Transactional(readOnly = true)

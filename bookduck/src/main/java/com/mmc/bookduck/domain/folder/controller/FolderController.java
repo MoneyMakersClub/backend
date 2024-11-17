@@ -42,10 +42,10 @@ public class FolderController {
 
     @Operation(summary = "폴더 삭제", description = "폴더를 삭제합니다.")
     @DeleteMapping("/{folderId}")
-    public ResponseEntity<String> deleteFolder(@PathVariable(name = "folderId") final Long folderId){
+    public ResponseEntity<Void> deleteFolder(@PathVariable(name = "folderId") final Long folderId){
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(folderService.deleteFolder(folderId));
+        folderService.deleteFolder(folderId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 

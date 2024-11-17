@@ -1,4 +1,4 @@
-package com.mmc.bookduck.domain.homecard.dto.common;
+package com.mmc.bookduck.domain.userhome.dto.common;
 
 public record HomeCardUpdateUnitDto(
         Long cardId,

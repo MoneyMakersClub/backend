@@ -1,6 +1,6 @@
-package com.mmc.bookduck.domain.homecard.dto.request;
+package com.mmc.bookduck.domain.userhome.dto.request;
 
-import com.mmc.bookduck.domain.homecard.entity.CardType;
+import com.mmc.bookduck.domain.userhome.entity.CardType;
 import jakarta.validation.constraints.NotNull;
 
 public record HomeCardRequestDto(

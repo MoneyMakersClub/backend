@@ -2,17 +2,14 @@ package com.mmc.bookduck.domain.archive.service;
 
 import com.mmc.bookduck.domain.archive.dto.request.ExcerptCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.request.ExcerptUpdateRequestDto;
-import com.mmc.bookduck.domain.archive.dto.response.ArchiveResponseDto;
-import com.mmc.bookduck.domain.archive.dto.response.ExcerptResponseDto;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.common.Visibility;
-import com.mmc.bookduck.domain.homecard.dto.common.ExcerptWithBookInfoUnitDto;
+import com.mmc.bookduck.domain.userhome.dto.common.ExcerptWithBookInfoUnitDto;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
-import com.mmc.bookduck.domain.archive.dto.response.ExcerptListResponseDto;
 import com.mmc.bookduck.global.common.PaginatedResponseDto;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;

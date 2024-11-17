@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 public record CustomBookUnitDto(
         Long bookInfoId,
         Long userbookId,
-        @NotNull String title,
+        String title,
         String author,
         String imgPath,
         Double myRating,

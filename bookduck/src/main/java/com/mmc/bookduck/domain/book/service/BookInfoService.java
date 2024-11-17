@@ -39,6 +39,7 @@ import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingUnitDto;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
+import com.mmc.bookduck.domain.oneline.service.OneLineService;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.S3.S3Service;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -76,11 +77,11 @@ public class BookInfoService {
     private final S3Service s3Service;
     private final FriendService friendService;
 
-
     // api 도서 목록 조회
     public BookListResponseDto<BookUnitResponseDto> searchBookList(String keyword, Long page, Long size) {
         User user = userService.getCurrentUser();
         String responseBody = googleBooksApiService.searchBookList(keyword, page, size);
+        int totalBooks = parseTotalBooks(responseBody);
 
         List<BookUnitParseDto> bookInfoList = parseBookInfo(responseBody);
         List<BookUnitResponseDto> bookResponseList = new ArrayList<>();
@@ -100,7 +101,8 @@ public class BookInfoService {
                 bookResponseList.add(responseDto);
             }
         }
-        return new BookListResponseDto<>(bookResponseList);
+        int totalPage = (int) Math.ceil((double) totalBooks / size);
+        return new BookListResponseDto<>(bookResponseList, totalPage, page);
     }
 
     // 목록 정보 파싱
@@ -150,6 +152,17 @@ public class BookInfoService {
         }
     }
 
+    public int parseTotalBooks(String apiResult){
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(apiResult);
+            int totalItems = rootNode.path("totalItems").asInt();
+            return totalItems;
+        }catch(Exception e){
+            throw new CustomException(ErrorCode.JSON_PARSING_ERROR);
+        }
+    }
+
     private String getTextNode(JsonNode node, String fieldName) {
         if (node != null && node.has(fieldName)) {
             return node.get(fieldName).asText();
@@ -168,7 +181,7 @@ public class BookInfoService {
         }
         else{
             BookUnitDto bookUnitDto = parseBookBasic(responseBody);
-            return new BookInfoBasicResponseDto(bookUnitDto, null, null, additional);
+            return BookInfoBasicResponseDto.from(bookUnitDto, additional);
         }
     }
 
@@ -341,9 +354,9 @@ public class BookInfoService {
         BookUnitDto bookUnitDto = BookUnitDto.from(bookInfo, my);
 
         if(userBook.isPresent()){
-            return BookInfoBasicResponseDto.from(bookUnitDto, getRatingAverage(bookInfo), my.myOneLine(), additional);
+            return BookInfoBasicResponseDto.from(bookUnitDto, getRatingAverage(bookInfo),my.oneLineId(), my.myOneLine(), additional);
         }else{
-            return new BookInfoBasicResponseDto(bookUnitDto, getRatingAverage(bookInfo), null, additional);
+            return new BookInfoBasicResponseDto(bookUnitDto, getRatingAverage(bookInfo), null,null, additional);
         }
     }
 
@@ -362,7 +375,7 @@ public class BookInfoService {
 
         if(bookInfo.getCreatedUserId().equals(user.getUserId())){ // 내 customBook
             MyRatingOneLineReadStatusDto myRatingOneLine = getMyRatingOneLineReadStatus(bookInfo, user);
-            return CustomBookResponseDto.from(userBook, myRatingOneLine.myRating(), myRatingOneLine.myOneLine(), true);
+            return CustomBookResponseDto.from(userBook, myRatingOneLine.myRating(),myRatingOneLine.oneLineId(), myRatingOneLine.myOneLine(), true);
         }else if(friendService.isFriendWithCurrentUser(bookInfoCreaterUser)){ //친구 customBook
             return CustomBookResponseDto.from(userBook, false);
         }else{
@@ -429,7 +442,7 @@ public class BookInfoService {
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
 
         MyRatingOneLineReadStatusDto ratingDto = getMyRatingOneLineReadStatus(bookInfo, user);
-        return CustomBookResponseDto.from(userBook, ratingDto.myRating(), ratingDto.myOneLine(), true);
+        return CustomBookResponseDto.from(userBook, ratingDto.myRating(), ratingDto.oneLineId(),ratingDto.myOneLine(), true);
     }
 
     @Transactional(readOnly = true)
@@ -439,12 +452,12 @@ public class BookInfoService {
         if (userBook == null) {
             return MyRatingOneLineReadStatusDto.defaultInstance();
         } else {
-            OneLine oneLineRating = oneLineRepository.findByUserBook(userBook)
+            OneLine oneLine = oneLineRepository.findByUserBook(userBook)
                     .orElse(null);
-            if (oneLineRating == null) {
+            if (oneLine == null) {
                 return MyRatingOneLineReadStatusDto.from(userBook);
             } else {
-                return MyRatingOneLineReadStatusDto.from(userBook, oneLineRating.getOneLineContent());
+                return MyRatingOneLineReadStatusDto.from(userBook, oneLine);
             }
         }
     }
@@ -477,8 +490,13 @@ public class BookInfoService {
             default:
                 throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
         }
-        Page<OneLineRatingUnitDto> dtoPage = oneLinePage.map(OneLineRatingUnitDto::from);
-        return OneLineRatingListResponseDto.from(dtoPage);
+        User currentUser = userService.getCurrentUser();
+        Page<OneLineRatingUnitDto> dtoPage = oneLinePage.map(oneLine -> {
+            Boolean isLiked = oneLine.getOneLineLikes().stream()
+                    .anyMatch(like -> like.getUser().getUserId().equals(currentUser.getUserId()));
+            return OneLineRatingUnitDto.from(oneLine, isLiked);
+        });
+        return OneLineRatingListResponseDto.from(bookInfoId, dtoPage);
     }
 
     @Transactional(readOnly = true)

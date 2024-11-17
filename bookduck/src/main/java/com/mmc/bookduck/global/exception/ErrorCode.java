@@ -26,6 +26,8 @@ public enum ErrorCode {
     USERITEM_BAD_REQUEST(400, "유저의 소유가 아닌 userItemId입니다."),
     BOOKINFO_BAD_REQUEST(400, "API 도서가 아닌 bookInfoId입니다."),
     HOMECARD_BAD_REQUEST(400, "현재 카드 7개가 다 찼습니다."),
+    READINGREPORT_NOT_VIEWABLE(400, "서재에 책이 없어 독서리포트를 볼 수 없습니다."),
+    KEYWORD_NOT_VIEWABLE(400, "분석 가능한 키워드 갯수가 충분하지 않습니다."),
 
     // 401 Unauthorized
     // 로그인 상태여야 하는 요청
@@ -54,7 +56,6 @@ public enum ErrorCode {
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
     USERSETTING_NOT_FOUND(404, "사용자 설정을 찾을 수 없습니다."),
     USERGROWTH_NOT_FOUND(404, "사용자 성장상태를 찾을 수 없습니다."),
-    USERHOME_NOT_FOUND(404, "유저 홈을 찾을 수 없습니다."),
     HOMECARD_NOT_FOUND(404, "카드를 찾을 수 없습니다."),
     FRIEND_REQUEST_NOT_FOUND(404, "친구 요청을 찾을 수 없습니다."),
     FRIEND_NOT_FOUND(404, "친구를 찾을 수 없습니다."),
