@@ -2,6 +2,15 @@ package com.mmc.bookduck.domain.book.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mmc.bookduck.domain.archive.dto.response.ExcerptResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.ReviewResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.UserArchiveResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.UserArchiveResponseDto.ArchiveWithoutTitleAuthor;
+import com.mmc.bookduck.domain.archive.entity.Excerpt;
+import com.mmc.bookduck.domain.archive.entity.Review;
+import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
+import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
+import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookUnitParseDto;
 import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineReadStatusDto;
@@ -32,13 +41,16 @@ import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.google.GoogleBooksApiService;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +63,8 @@ import java.util.List;
 public class BookInfoService {
     private final BookInfoRepository bookInfoRepository;
     private final UserBookRepository userBookRepository;
+    private final ReviewRepository reviewRepository;
+    private final ExcerptRepository excerptRepository;
     private final GenreService genreService;
     private final GoogleBooksApiService googleBooksApiService;
     private final UserService userService;
@@ -308,8 +322,7 @@ public class BookInfoService {
         if(bookInfo.getCreatedUserId() == null){
             throw new CustomException(ErrorCode.CUSTOM_BOOKINFO_NOT_FOUND);
         }
-        UserBook userBook = userBookRepository.findByUserAndBookInfo(user, bookInfo)
-                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
+        UserBook userBook = getUserBookByUserAndBookInfo(bookInfo, user);
 
         User bookInfoCreaterUser = userService.getActiveUserByUserId(bookInfo.getCreatedUserId());
 
@@ -434,4 +447,101 @@ public class BookInfoService {
         return OneLineRatingListResponseDto.from(dtoPage);
     }
 
+    @Transactional(readOnly = true)
+    public BookListResponseDto<BookCoverImageUnitDto> getMostReadBooks() {
+        LocalDateTime monthsAgo = LocalDateTime.now().minusMonths(3);
+        List<UserBook> userBookList = userBookRepository.findAllByCreatedTimeAfter(monthsAgo);
+
+        Map<Long, Integer> bookInfoCountMap = new HashMap<>();
+        for (UserBook userBook : userBookList) {
+            Long bookInfoId = userBook.getBookInfo().getBookInfoId();
+            bookInfoCountMap.put(bookInfoId, bookInfoCountMap.getOrDefault(bookInfoId, 0) + 1);
+        }
+
+        List<Long> bookInfoIdList=  bookInfoCountMap.entrySet().stream()
+                .sorted((entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()))
+                .limit(12)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        List<BookCoverImageUnitDto> coverList = new ArrayList<>();
+        for(Long bookInfoId : bookInfoIdList){
+            BookInfo bookInfo = getBookInfoById(bookInfoId);
+            coverList.add(BookCoverImageUnitDto.from(bookInfo));
+        }
+        return new BookListResponseDto<>(coverList);
+    }
+
+    @Transactional(readOnly = true)
+    public UserArchiveResponseDto getAllUserBookArchive(Long bookInfoId, Long userId, Pageable pageable) {
+        User bookUser = userService.getActiveUserByUserId(userId);
+
+        if(!friendService.isFriendWithCurrentUser(bookUser)){
+            throw new CustomException(ErrorCode.FRIENDSHIP_REQUIRED);
+        }
+        BookInfo bookInfo = getBookInfoById(bookInfoId);
+        UserBook userBook  = getUserBookByUserAndBookInfo(bookInfo, bookUser);
+
+        List<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> archiveList = new ArrayList<>();
+
+        List<Excerpt> excerpts = excerptRepository.findExcerptsByUserBookWithPublic(userBook);
+        List<Review> reviews = reviewRepository.findReviewsByUserBookWithPublic(userBook);
+        for(Excerpt excerpt : excerpts){
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor("EXCERPT", ExcerptResponseDto.from(excerpt)));
+        }
+        for(Review review : reviews){
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor("REVIEW", ReviewResponseDto.from(review)));
+        }
+
+        List<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> sortedArchiveList = sortByCreatedTime(archiveList);
+        Page<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> dtoPage = new PageImpl<>(sortedArchiveList, pageable, sortedArchiveList.size());
+        return UserArchiveResponseDto.fromWithoutTitleAuthor(dtoPage);
+    }
+
+    @Transactional(readOnly = true)
+    public UserArchiveResponseDto getAllMyBookArchive(Long bookInfoId, Pageable pageable) {
+        User user = userService.getCurrentUser();
+        BookInfo bookInfo = getBookInfoById(bookInfoId);
+        UserBook userBook  = getUserBookByUserAndBookInfo(bookInfo, user);
+
+        List<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> archiveList = new ArrayList<>();
+
+        List<Excerpt> excerpts = excerptRepository.findExcerptByUserBookOrderByCreatedTimeDesc(userBook);
+        List<Review> reviews = reviewRepository.findReviewByUserBookOrderByCreatedTimeDesc(userBook);
+        for(Excerpt excerpt : excerpts){
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor("EXCERPT", ExcerptResponseDto.from(excerpt)));
+        }
+        for(Review review : reviews){
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor("REVIEW", ReviewResponseDto.from(review)));
+        }
+
+        List<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> sortedArchiveList = sortByCreatedTime(archiveList);
+        Page<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> dtoPage = new PageImpl<>(sortedArchiveList, pageable, sortedArchiveList.size());
+        return UserArchiveResponseDto.fromWithoutTitleAuthor(dtoPage);
+    }
+
+    // Archive 최신순으로 정렬
+    public List<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> sortByCreatedTime(List<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> archiveList) {
+        archiveList.sort((a1, a2) -> {
+                    LocalDateTime createdTime1 = getCreatedTime(a1);
+                    LocalDateTime createdTime2 = getCreatedTime(a2);
+                    return createdTime2.compareTo(createdTime1); // 최신순 정렬
+                });
+        return archiveList;
+    }
+
+    private LocalDateTime getCreatedTime(ArchiveWithoutTitleAuthor a) {
+        if (a.data() instanceof ExcerptResponseDto) {
+            return ((ExcerptResponseDto) a.data()).createdTime();
+        }
+        else{
+            return ((ReviewResponseDto) a.data()).createdTime();
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public UserBook getUserBookByUserAndBookInfo(BookInfo bookInfo, User user){
+        return userBookRepository.findByUserAndBookInfo(user, bookInfo)
+                .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
+    }
 }

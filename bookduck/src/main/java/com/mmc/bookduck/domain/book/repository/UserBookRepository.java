@@ -5,6 +5,7 @@ import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.entity.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,4 +78,6 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
                                                                @Param("readStatus") ReadStatus readStatus);
 
     List<UserBook> findAllByBookInfoOrderByRatingDesc(BookInfo bookInfo);
+
+    List<UserBook> findAllByCreatedTimeAfter(LocalDateTime createdTime);
 }

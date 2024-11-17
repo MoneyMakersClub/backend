@@ -3,9 +3,6 @@ package com.mmc.bookduck.domain.book.service;
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.request.ExcerptCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.request.ReviewCreateRequestDto;
-import com.mmc.bookduck.domain.archive.dto.response.ExcerptResponseDto;
-import com.mmc.bookduck.domain.archive.dto.response.ReviewResponseDto;
-import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
@@ -13,7 +10,6 @@ import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
-import com.mmc.bookduck.domain.book.dto.common.ReviewExcerptUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
@@ -33,7 +29,6 @@ import com.mmc.bookduck.global.exception.ErrorCode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -190,15 +185,7 @@ public class UserBookService {
         if(statusList.isEmpty()){
             throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
         }
-
-        List<ReadStatus> readStatusList = new ArrayList<>();
-        try {
-            for(String status : statusList){
-                readStatusList.add(ReadStatus.valueOf(status));
-            }
-        } catch (IllegalArgumentException e) {
-            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
-        }
+        List<ReadStatus> readStatusList = validateReadStatus(statusList);
 
         User user = userService.getCurrentUser();
         List<UserBook> sorteduserBookList = sortUserBook(user, sort);
@@ -317,49 +304,6 @@ public class UserBookService {
     }
 
     @Transactional(readOnly = true)
-    public UserBookReviewExcerptResponseDto getAllUserBookReviewExcerpt(Long userbookId) {
-        UserBook userBook = getUserBookById(userbookId);
-        List<Excerpt> excerpts = excerptRepository.findExcerptByUserBookOrderByCreatedTimeDesc(userBook);
-        List<Review> reviews = reviewRepository.findReviewByUserBookOrderByCreatedTimeDesc(userBook);
-
-        List<ReviewExcerptUnitDto> dtoList = new ArrayList<>();
-        for (Excerpt excerpt : excerpts) {
-            ExcerptResponseDto excerptResponseDto = ExcerptResponseDto.from(excerpt);
-            dtoList.add(ReviewExcerptUnitDto.from(excerptResponseDto));
-        }
-        for (Review review : reviews) {
-            ReviewResponseDto reviewResponseDto = ReviewResponseDto.from(review);
-            dtoList.add(ReviewExcerptUnitDto.from(reviewResponseDto));
-        }
-
-        UserBookReviewExcerptResponseDto dto = new UserBookReviewExcerptResponseDto(userbookId, dtoList);
-        return sortByCreatedTime(dto);
-    }
-
-    // UserBookReviewExcerptResponseDto를 최신순으로 정렬
-    public UserBookReviewExcerptResponseDto sortByCreatedTime(UserBookReviewExcerptResponseDto dto) {
-        List<ReviewExcerptUnitDto> sortedList = dto.archiveList().stream()
-                .sorted((unit1, unit2) -> {
-                    // unit1과 unit2의 excerpt와 review의 createdTime을 비교
-                    LocalDateTime createdTime1 = getCreatedTime(unit1);
-                    LocalDateTime createdTime2 = getCreatedTime(unit2);
-                    return createdTime2.compareTo(createdTime1); // 최신순 정렬
-                })
-                .collect(Collectors.toList());
-
-        return new UserBookReviewExcerptResponseDto(dto.userbookId(), sortedList);
-    }
-
-    private LocalDateTime getCreatedTime(ReviewExcerptUnitDto unit) {
-        if (unit.archiveType() == ArchiveType.EXCERPT) {
-            return unit.excerpt().createdTime();
-        }
-        else{
-            return unit.review().createdTime();
-        }
-    }
-
-    @Transactional(readOnly = true)
     public BookListResponseDto<BookCoverImageUnitDto> getRecentRecordBooks() {
         User user = userService.getCurrentUser();
         LocalDateTime monthsAgo = LocalDateTime.now().minusMonths(3);
@@ -404,5 +348,17 @@ public class UserBookService {
         if(!userBook.getUser().getUserId().equals(currentUser.getUserId())){
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
+    }
+
+    public List<ReadStatus> validateReadStatus(List<String> statusList){
+        List<ReadStatus> readStatusList = new ArrayList<>();
+        try {
+            for(String status : statusList){
+                readStatusList.add(ReadStatus.valueOf(status));
+            }
+        } catch (IllegalArgumentException e) {
+            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
+        }
+        return readStatusList;
     }
 }
