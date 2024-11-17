@@ -26,7 +26,7 @@ public enum ErrorCode {
     USERITEM_BAD_REQUEST(400, "유저의 소유가 아닌 userItemId입니다."),
     BOOKINFO_BAD_REQUEST(400, "API 도서가 아닌 bookInfoId입니다."),
     HOMECARD_BAD_REQUEST(400, "현재 카드 7개가 다 찼습니다."),
-    READINGREPORT_NOT_VIEWABLE(400, "아직 책이 없어 독서리포트를 볼 수 없습니다."),
+    READINGREPORT_NOT_VIEWABLE(400, "서재에 책이 없어 독서리포트를 볼 수 없습니다."),
     KEYWORD_NOT_VIEWABLE(400, "분석 가능한 키워드 갯수가 충분하지 않습니다."),
 
     // 401 Unauthorized
