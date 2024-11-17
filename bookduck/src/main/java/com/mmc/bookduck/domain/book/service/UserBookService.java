@@ -8,9 +8,6 @@ import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
-import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
-import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
-import com.mmc.bookduck.domain.book.dto.common.BookUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
@@ -19,7 +16,6 @@ import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
-import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -112,7 +108,7 @@ public class UserBookService {
     }
 
     // 서재에서 책 삭제
-    public String deleteUserBook(Long userBookId) {
+    public void deleteUserBook(Long userBookId) {
         UserBook userBook = getUserBookById(userBookId);
         User user = userService.getCurrentUser();
 
@@ -130,7 +126,6 @@ public class UserBookService {
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
-        return "서재에서 책이 삭제되었습니다.";
     }
 
     // 서재 책 상태 변경

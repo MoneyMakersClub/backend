@@ -4,8 +4,6 @@ import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
-import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.RatingResponseDto;
@@ -40,9 +38,9 @@ public class UserBookController {
 
     @Operation(summary = "서재에서 책 삭제", description = "사용자의 서재에서 책을 삭제합니다.")
     @DeleteMapping("/{userBookId}")
-    public ResponseEntity<String> deleteUserBook(@PathVariable final Long userBookId){
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(userBookService.deleteUserBook(userBookId));
+    public ResponseEntity<Void> deleteUserBook(@PathVariable final Long userBookId){
+        userBookService.deleteUserBook(userBookId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
