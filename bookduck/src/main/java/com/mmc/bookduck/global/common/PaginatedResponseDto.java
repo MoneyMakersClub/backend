@@ -9,7 +9,7 @@ public record PaginatedResponseDto<T>(
         int pageSize,
         long totalElements,
         int totalPages,
-        List<T> content
+        List<T> pageContent
 ) {
     public static <T> PaginatedResponseDto<T> from(Page<T> page) {
         return new PaginatedResponseDto<>(
