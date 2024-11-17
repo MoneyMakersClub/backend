@@ -25,6 +25,7 @@ public enum ErrorCode {
     ITEMTYPE_MISMATCH(400,"ItemType이 맞지 않습니다."),
     USERITEM_BAD_REQUEST(400, "유저의 소유가 아닌 userItemId입니다."),
     BOOKINFO_BAD_REQUEST(400, "API 도서가 아닌 bookInfoId입니다."),
+    HOMECARD_BAD_REQUEST(400, "현재 카드 7개가 다 찼습니다."),
 
     // 401 Unauthorized
     // 로그인 상태여야 하는 요청

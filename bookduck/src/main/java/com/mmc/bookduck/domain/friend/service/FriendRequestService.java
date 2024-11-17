@@ -1,6 +1,5 @@
 package com.mmc.bookduck.domain.friend.service;
 
-import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 import com.mmc.bookduck.domain.alarm.service.AlarmByTypeService;
 import com.mmc.bookduck.domain.friend.dto.common.FriendRequestUnitDto;
 import com.mmc.bookduck.domain.friend.dto.request.FriendRequestDto;
@@ -51,7 +50,7 @@ public class FriendRequestService {
         }
         FriendRequest friendRequest = requestDto.toEntity(sender, receiver);
         friendRequestRepository.save(friendRequest);
-        alarmByTypeService.createFriendAlarm(sender, receiver, AlarmType.FRIEND_REQUEST);
+        alarmByTypeService.createFriendRequestAlarm(sender, receiver);
     }
 
     // 친구 요청 취소

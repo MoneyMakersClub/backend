@@ -2,17 +2,21 @@ package com.mmc.bookduck.domain.book.controller;
 
 import com.mmc.bookduck.domain.archive.dto.response.UserArchiveResponseDto;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
+import com.mmc.bookduck.domain.book.dto.request.AddUserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
+import com.mmc.bookduck.domain.book.dto.response.AddUserBookResponseDto;
+import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.common.CustomBookUnitDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
+import com.mmc.bookduck.domain.book.dto.common.BookUnitDto;
 import com.mmc.bookduck.domain.book.service.BookInfoService;
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -31,8 +35,8 @@ public class BookInfoController {
     @Operation(summary = "API 도서 목록 검색", description = "구글 API에서 특정 키워드에 해당하는 도서 목록을 검색합니다.")
     @GetMapping("/search")
     public ResponseEntity<BookListResponseDto<BookUnitResponseDto>> searchBookList(@RequestParam(name = "keyword") final String keyword,
-                                                                                   @RequestParam final Long page,
-                                                                                   @RequestParam final Long size){
+                                                                                       @RequestParam final Long page,
+                                                                                       @RequestParam final Long size){
 
         return ResponseEntity.ok(bookInfoService.searchBookList(keyword, page, size));
     }
@@ -48,6 +52,13 @@ public class BookInfoController {
     @GetMapping("/external/{providerId}")
     public ResponseEntity<BookInfoBasicResponseDto> getApiBookBasicByProviderId(@PathVariable(name = "providerId") final String providerId){
         return ResponseEntity.ok(bookInfoService.getApiBookBasicByProviderId(providerId));
+    }
+
+    @Operation(summary = "검색 목록에서 서재에 책 추가", description = "책 검색 목록에서 providerId로 책을 서재에 추가합니다.")
+    @PostMapping("/{providerId}/add")
+    public ResponseEntity<AddUserBookResponseDto> addBookByProviderId(@PathVariable(name = "providerId") final String providerId,
+                                                                      @Valid @RequestBody final AddUserBookRequestDto requestDto){
+        return ResponseEntity.ok(bookInfoService.addBookByProviderId(providerId, requestDto));
     }
 
 
@@ -106,10 +117,10 @@ public class BookInfoController {
     //친구의 기록과 발췌 통합 조회
     @Operation(summary = "친구의 전체 기록 조회", description = "책의 친구의 기록을 조회합니다.(감상평+발췌)")
     @GetMapping("/{bookinfoId}/archives/users/{userId}")
-    public ResponseEntity<UserArchiveResponseDto> getAllUserBookArchive(@PathVariable(name = "bookinfoId") final Long bookInfoId,
+    public ResponseEntity<UserArchiveResponseDto> getAllUserBookArchive(@PathVariable(name = "bookinfoId") final Long bookinfoId,
                                                                         @PathVariable(name = "userId") final Long userId,
                                                                         @PageableDefault(size = 20) final Pageable pageable){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(bookInfoService.getAllUserBookArchive(bookInfoId, userId, pageable));
+                .body(bookInfoService.getAllUserBookArchive(bookinfoId,userId, pageable));
     }
 }

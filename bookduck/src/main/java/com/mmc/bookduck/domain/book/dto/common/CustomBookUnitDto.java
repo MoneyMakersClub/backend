@@ -6,7 +6,8 @@ import jakarta.validation.constraints.NotNull;
 
 
 public record CustomBookUnitDto(
-        Long bookinfoId,
+        Long bookInfoId,
+        Long userbookId,
         @NotNull String title,
         String author,
         String imgPath,
@@ -16,6 +17,7 @@ public record CustomBookUnitDto(
     public static CustomBookUnitDto from(BookInfo bookInfo, MyRatingOneLineReadStatusDto dto){
         return new CustomBookUnitDto(
                 bookInfo.getBookInfoId(),
+                dto.userbookId(),
                 bookInfo.getTitle(),
                 bookInfo.getAuthor(),
                 bookInfo.getImgPath(),

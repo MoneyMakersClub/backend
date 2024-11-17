@@ -206,12 +206,14 @@ public class ArchiveService {
     }
 
     public ArchiveResponseDto createArchiveResponseDto(Archive archive, Excerpt excerpt, Review review, UserBook userBook) {
+        Long creatorUserId = userBook.getUser().getUserId();
         Long bookInfoId = userBook.getBookInfo().getBookInfoId();
         String title = userBook.getBookInfo().getTitle();
         String author = userBook.getBookInfo().getAuthor();
         String imgPath = userBook.getBookInfo().getImgPath();
         return ArchiveResponseDto.from(
                 archive,
+                creatorUserId,
                 excerpt != null ? ExcerptResponseDto.from(excerpt) : null,
                 review != null ? ReviewResponseDto.from(review) : null,
                 bookInfoId,

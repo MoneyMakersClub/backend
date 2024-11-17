@@ -10,6 +10,7 @@ import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
+import com.mmc.bookduck.domain.book.dto.common.BookUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
@@ -22,7 +23,6 @@ import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
-import com.mmc.bookduck.domain.userhome.service.UserHomeService;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -41,7 +41,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 public class UserBookService {
-
     private final BookInfoService bookInfoService;
     private final UserBookRepository userBookRepository;
     private final GenreService genreService;
@@ -49,7 +48,6 @@ public class UserBookService {
     private final OneLineRepository oneLineRepository;
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
-    private final UserHomeService userHomeService;
 
     //customBook 추가
     public UserBook createCustomBookEntity(CustomBookRequestDto requestDto) {
@@ -129,7 +127,6 @@ public class UserBookService {
             if(createdUserId != null && createdUserId.equals(user.getUserId())){
                 bookInfoService.deleteCustomBookInfo(bookInfo.getBookInfoId());
             }
-            userHomeService.deleteHomeCardsByUserBook(userBook);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
@@ -207,6 +204,7 @@ public class UserBookService {
     }
 
 
+    /*
     // 서재책 상세보기 - 기본정보
     @Transactional(readOnly = true)
     public BookInfoBasicResponseDto getUserBookInfoBasic(Long userBookId) {
@@ -220,14 +218,18 @@ public class UserBookService {
         Double ratingAverage = bookInfoService.getRatingAverage(userBook.getBookInfo());
 
         if(oneLine != null){
+            BookUnitDto unitDto = BookUnitDto.from(userBook);
             return BookInfoBasicResponseDto.from(userBook, ratingAverage, oneLine.getOneLineContent(), detailDto);
         }
         else{
+            BookUnitDto unitDto = BookUnitDto.from(userBook);
             return BookInfoBasicResponseDto.from(userBook, ratingAverage, null, detailDto);
         }
     }
+    */
 
 
+    /*
     // 서재 책 상세보기 - 추가정보
     @Transactional(readOnly = true)
     public BookInfoAdditionalResponseDto getUserBookInfoAdditional(Long userBookId) {
@@ -251,6 +253,7 @@ public class UserBookService {
         }
         return new BookInfoAdditionalResponseDto(oneLineList);
     }
+    */
 
 
     @Transactional(readOnly = true)

@@ -9,6 +9,6 @@ public record ExcerptCardDto(
         String title,
         String author,
         Long pageNumber, // null일 수 있음
-        String content
+        String excerptContent
 ) implements HomeCardDto {
 }
