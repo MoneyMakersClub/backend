@@ -73,6 +73,7 @@ public class UserBookController {
     }
 
 
+    /*
     @Operation(summary = "서재 책 상세-기본 정보 조회", description = "사용자의 서재 책의 기본 정보를 상세 조회합니다.(책 기본정보 + 현재 사용자의 별점&한줄평)")
     @GetMapping("/{userbookId}")
     public ResponseEntity<BookInfoBasicResponseDto> getUserBookInfoBasic(@PathVariable(name = "userbookId") final Long userbookId){
@@ -89,6 +90,7 @@ public class UserBookController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userBookService.getUserBookInfoAdditional(userbookId));
     }
+    */
 
 
     @Operation(summary = "책 직접 등록", description = "사용자가 책을 직접 등록합니다.")
