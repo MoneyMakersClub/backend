@@ -1,5 +1,7 @@
 package com.mmc.bookduck.domain.oneline.service;
 
+import com.mmc.bookduck.domain.alarm.entity.AlarmType;
+import com.mmc.bookduck.domain.alarm.service.AlarmByTypeService;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.oneline.dto.request.OneLineCreateRequestDto;
@@ -29,6 +31,7 @@ public class OneLineService {
     private final UserService userService;
     private final UserBookService userBookService;
     private final UserHomeService userHomeService;
+    private final AlarmByTypeService alarmByTypeService;
 
     // 생성
     public OneLine createOneLine(OneLineCreateRequestDto requestDto){
@@ -36,6 +39,7 @@ public class OneLineService {
         UserBook userBook = userBookService.getUserBookById(requestDto.userBookId());
         userBookService.validateUserBookOwner(userBook);
         OneLine oneLine = requestDto.toEntity(user, userBook);
+        alarmByTypeService.createFriendAlarm(user, oneLine.getUser(), AlarmType.ONELINELIKE_ADDED);
         return oneLineRepository.save(oneLine);
     }
 
