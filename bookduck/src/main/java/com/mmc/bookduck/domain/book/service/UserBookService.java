@@ -294,11 +294,9 @@ public class UserBookService {
     }
 
     @Transactional
-    public RatingResponseDto deleteRating(Long userbookId) {
+    public void deleteRating(Long userbookId) {
         UserBook userBook = getUserBookById(userbookId);
         userBook.changeRating(0.0);
-
-        return RatingResponseDto.from(userBook);
     }
 
     @Transactional(readOnly = true)

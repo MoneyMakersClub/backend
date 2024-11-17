@@ -111,9 +111,9 @@ public class UserBookController {
     //별점 삭제
     @Operation(summary = "별점 삭제", description = "서재 책의 별점을 삭제합니다.")
     @DeleteMapping("/{userbookId}/rating")
-    public ResponseEntity<RatingResponseDto> deleteRating(@PathVariable(name = "userbookId") final Long userbookId){
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(userBookService.deleteRating(userbookId));
+    public ResponseEntity<Void> deleteRating(@PathVariable(name = "userbookId") final Long userbookId){
+        userBookService.deleteRating(userbookId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @Operation(summary = "검색페이지-최근 기록한책 목록 조회", description = "검색페이지 - 최근 기록한 책 3개를 조회합니다.")
