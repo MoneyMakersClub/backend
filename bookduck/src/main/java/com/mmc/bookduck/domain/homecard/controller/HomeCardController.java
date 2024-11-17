@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/readingspace")
-public class UserHomeController {
+public class HomeCardController {
     private final UserReadingSpaceService readingSpaceService;
     private final ExcerptService excerptService;
     private final OneLineService oneLineService;
@@ -43,13 +43,13 @@ public class UserHomeController {
     @GetMapping("/excerpts/search")
     public ResponseEntity<?> searchExcerptsFromReadingSpace(@RequestParam final String keyword,
                                                             @PageableDefault final Pageable pageable) {
-        return ResponseEntity.ok().body(excerptService.searchExcerpts(keyword, pageable));
+        return ResponseEntity.ok().body(excerptService.searchExcerptsFromReadingSpace(keyword, pageable));
     }
 
-//    @Operation(summary = "한줄평 카드 추가 시 한줄평 검색", description = "한줄평 카드 추가 시 나의 한줄평을 검색합니다.")
-//    @GetMapping("/onelines/search")
-//    public ResponseEntity<?> searchOneLinesFromReadingSpace(@RequestParam final String keyword,
-//                                                            @PageableDefault final Pageable pageable) {
-//        return ResponseEntity.ok().body(oneLineService.searchOneLines(keyword, pageable));
-//    }
+    @Operation(summary = "한줄평 카드 추가 시 한줄평 검색", description = "한줄평 카드 추가 시 나의 한줄평을 검색합니다.")
+    @GetMapping("/onelines/search")
+    public ResponseEntity<?> searchOneLinesFromReadingSpace(@RequestParam final String keyword,
+                                                            @PageableDefault final Pageable pageable) {
+        return ResponseEntity.ok().body(oneLineService.searchOneLineFromReadingSpace(keyword, pageable));
+    }
 }
