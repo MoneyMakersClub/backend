@@ -4,10 +4,8 @@ import com.mmc.bookduck.domain.friend.entity.Friend;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.entity.UserGrowth;
-import com.mmc.bookduck.domain.userhome.entity.UserHome;
 import com.mmc.bookduck.domain.user.entity.UserSetting;
 import com.mmc.bookduck.domain.user.repository.UserGrowthRepository;
-import com.mmc.bookduck.domain.userhome.repository.UserHomeRepository;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
 import com.mmc.bookduck.domain.user.repository.UserSettingRepository;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -32,7 +30,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
     private final UserSettingRepository userSettingRepository;
-    private final UserHomeRepository userHomeRepository;
     private final UserGrowthRepository userGrowthRepository;
     private final FriendRepository friendRepository;
 
@@ -95,14 +92,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .build();
             friendRepository.save(friend);
 
-            // 새로운 User의 UserSetting, UserHome, UserGrowth 생성
+            // 새로운 User의 UserSetting, UserGrowth 생성
             UserSetting userSetting = UserSetting.builder().user(newUser).build();
-            UserHome userHome = UserHome.builder().user(newUser).build();
             UserGrowth userGrowth = UserGrowth.builder().user(newUser).build();
 
             // 각 Repository에 저장
             userSettingRepository.save(userSetting);
-            userHomeRepository.save(userHome);
             userGrowthRepository.save(userGrowth);
 
             return newUser;
