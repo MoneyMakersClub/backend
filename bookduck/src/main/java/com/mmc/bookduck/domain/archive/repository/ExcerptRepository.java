@@ -39,7 +39,8 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
             Pageable pageable);
 
 
-    @Query("SELECT e FROM Excerpt e WHERE e.user.id = :userId")
+    @Query("SELECT e FROM Excerpt e WHERE e.user.userId = :userId")
     List<Excerpt> findByUserId(@Param("userId") Long userId);
 
+    List<Excerpt> findTop30ByUserOrderByCreatedTimeDesc(User user);
 }

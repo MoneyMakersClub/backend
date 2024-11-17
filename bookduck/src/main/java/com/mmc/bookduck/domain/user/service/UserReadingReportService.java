@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.user.service;
 
+import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
@@ -10,6 +11,8 @@ import com.mmc.bookduck.domain.user.dto.common.MonthlyBookCountUnitDto;
 import com.mmc.bookduck.domain.user.dto.common.MostReadGenreUnitDto;
 import com.mmc.bookduck.domain.user.dto.response.UserStatisticsResponseDto;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.global.exception.CustomException;
+import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.komoran.KomoranService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -94,24 +97,52 @@ public class UserReadingReportService {
     }
 
     public List<String> getUserKeywordAnalysis(Long userId) {
+        // 유저 조회
         User user = userService.getActiveUserByUserId(userId);
-        List<Review> reviews = reviewRepository.findTop30ByUserOrderByCreatedTimeDesc(user);
 
-        // reviewCount를 토큰화하여 명사와 형용사만 추출
-        List<String> tokens = new ArrayList<>();
+        // 감상평 및 발췌 가져오기
+        List<Review> reviews = reviewRepository.findTop30ByUserOrderByCreatedTimeDesc(user);
+        List<Excerpt> excerpts = excerptRepository.findTop30ByUserOrderByCreatedTimeDesc(user);
+
+        // 글자수 및 토큰화 동시에 처리
+        int totalLength = 0;
+        Map<String, Long> frequencyMap = new HashMap<>();
+
+        // 감상평에서 명사와 형용사를 추출하고 글자수 누적
         for (Review review : reviews) {
-            tokens.addAll(komoranService.extractNounsAndAdjectives(review.getReviewContent()));
+            String reviewContent = review.getReviewContent();
+            totalLength += reviewContent.length();
+            komoranService.extractNounsAndAdjectives(reviewContent).forEach(token -> {
+                frequencyMap.merge(token, 1L, Long::sum);
+            });
         }
 
-        // 빈도수 계산
-        Map<String, Long> frequencyMap = tokens.stream()
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        // 발췌에서 명사와 형용사를 추출하고 글자수 누적
+        for (Excerpt excerpt : excerpts) {
+            String excerptContent = excerpt.getExcerptContent();
+            totalLength += excerptContent.length();
+            komoranService.extractNounsAndAdjectives(excerptContent).forEach(token -> {
+                frequencyMap.merge(token, 1L, Long::sum);
+            });
+        }
 
-        // Top 6 뽑기
-        return frequencyMap.entrySet().stream()
+        // 글자수 500자 이상 체크
+        if (totalLength < 500) {
+            throw new CustomException(ErrorCode.KEYWORD_NOT_VIEWABLE);
+        }
+
+        // 키워드 빈도수 상위 6개 추출
+        List<String> topKeywords = frequencyMap.entrySet().stream()
                 .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()))
                 .limit(6)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
+
+        // 키워드가 6개 미만이면 예외 던지기
+        if (topKeywords.size() < 6) {
+            throw new CustomException(ErrorCode.KEYWORD_NOT_VIEWABLE);
+        }
+
+        return topKeywords;
     }
 }
