@@ -2,7 +2,6 @@ package com.mmc.bookduck.domain.folder.dto.common;
 
 import com.mmc.bookduck.domain.folder.entity.Folder;
 import com.mmc.bookduck.domain.folder.entity.FolderBook;
-import com.mmc.bookduck.domain.folder.dto.common.FolderBookCoverDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,6 @@ public record FolderBookCoverListDto(Long folderId, String folderName, List<Fold
         for (FolderBook book : folderBooks) {
             coverList.add(new FolderBookCoverDto(
                     book.getFolderBookId(),
-                    book.getUserBook().getUserBookId(),
                     book.getUserBook().getBookInfo().getImgPath()
             ));
         }
