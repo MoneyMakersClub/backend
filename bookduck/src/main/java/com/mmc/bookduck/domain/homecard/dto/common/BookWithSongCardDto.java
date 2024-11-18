@@ -1,6 +1,6 @@
-package com.mmc.bookduck.domain.userhome.dto.common;
+package com.mmc.bookduck.domain.homecard.dto.common;
 
-import com.mmc.bookduck.domain.userhome.entity.CardType;
+import com.mmc.bookduck.domain.homecard.entity.CardType;
 
 public record BookWithSongCardDto(
         Long cardId,

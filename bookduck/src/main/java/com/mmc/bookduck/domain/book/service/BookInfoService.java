@@ -181,7 +181,7 @@ public class BookInfoService {
         }
         else{
             BookUnitDto bookUnitDto = parseBookBasic(responseBody);
-            return new BookInfoBasicResponseDto(bookUnitDto, null, null, additional);
+            return BookInfoBasicResponseDto.from(bookUnitDto, additional);
         }
     }
 
@@ -354,9 +354,9 @@ public class BookInfoService {
         BookUnitDto bookUnitDto = BookUnitDto.from(bookInfo, my);
 
         if(userBook.isPresent()){
-            return BookInfoBasicResponseDto.from(bookUnitDto, getRatingAverage(bookInfo), my.myOneLine(), additional);
+            return BookInfoBasicResponseDto.from(bookUnitDto, getRatingAverage(bookInfo),my.oneLineId(), my.myOneLine(), additional);
         }else{
-            return new BookInfoBasicResponseDto(bookUnitDto, getRatingAverage(bookInfo), null, additional);
+            return new BookInfoBasicResponseDto(bookUnitDto, getRatingAverage(bookInfo), null,null, additional);
         }
     }
 
@@ -375,8 +375,8 @@ public class BookInfoService {
 
         if(bookInfo.getCreatedUserId().equals(user.getUserId())){ // 내 customBook
             MyRatingOneLineReadStatusDto myRatingOneLine = getMyRatingOneLineReadStatus(bookInfo, user);
-            return CustomBookResponseDto.from(userBook, myRatingOneLine.myRating(), myRatingOneLine.myOneLine(), true);
-        }else if(friendService.isFriendWithCurrentUser(bookInfoCreaterUser)){ //친구 customBook
+            return CustomBookResponseDto.from(userBook, myRatingOneLine.myRating(),myRatingOneLine.oneLineId(), myRatingOneLine.myOneLine(), true);
+        }else if(friendService.isFriendWithCurrentUserOrNull(bookInfoCreaterUser)){ //친구 customBook
             return CustomBookResponseDto.from(userBook, false);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST); //내것도 아니고 친구것도 아닌 경우
@@ -442,7 +442,7 @@ public class BookInfoService {
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
 
         MyRatingOneLineReadStatusDto ratingDto = getMyRatingOneLineReadStatus(bookInfo, user);
-        return CustomBookResponseDto.from(userBook, ratingDto.myRating(), ratingDto.myOneLine(), true);
+        return CustomBookResponseDto.from(userBook, ratingDto.myRating(), ratingDto.oneLineId(),ratingDto.myOneLine(), true);
     }
 
     @Transactional(readOnly = true)
@@ -452,12 +452,12 @@ public class BookInfoService {
         if (userBook == null) {
             return MyRatingOneLineReadStatusDto.defaultInstance();
         } else {
-            OneLine oneLineRating = oneLineRepository.findByUserBook(userBook)
+            OneLine oneLine = oneLineRepository.findByUserBook(userBook)
                     .orElse(null);
-            if (oneLineRating == null) {
+            if (oneLine == null) {
                 return MyRatingOneLineReadStatusDto.from(userBook);
             } else {
-                return MyRatingOneLineReadStatusDto.from(userBook, oneLineRating.getOneLineContent());
+                return MyRatingOneLineReadStatusDto.from(userBook, oneLine);
             }
         }
     }
@@ -528,7 +528,7 @@ public class BookInfoService {
     public UserArchiveResponseDto getAllUserBookArchive(Long bookInfoId, Long userId, Pageable pageable) {
         User bookUser = userService.getActiveUserByUserId(userId);
 
-        if(!friendService.isFriendWithCurrentUser(bookUser)){
+        if(!friendService.isFriendWithCurrentUserOrNull(bookUser)){
             throw new CustomException(ErrorCode.FRIENDSHIP_REQUIRED);
         }
         BookInfo bookInfo = getBookInfoById(bookInfoId);

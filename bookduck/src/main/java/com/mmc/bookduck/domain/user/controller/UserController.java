@@ -6,7 +6,7 @@ import com.mmc.bookduck.domain.archive.service.ArchiveService;
 import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.dto.response.UserKeywordResponseDto;
 import com.mmc.bookduck.domain.user.service.*;
-import com.mmc.bookduck.domain.userhome.service.UserReadingSpaceService;
+import com.mmc.bookduck.domain.homecard.service.UserReadingSpaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
