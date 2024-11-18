@@ -28,14 +28,6 @@ public class UserBookController {
 
     private final UserBookService userBookService;
 
-    @Operation(summary = "서재에 책 추가", description = "사용자의 서재에 책을 추가합니다.")
-    @PostMapping
-    public ResponseEntity<UserBookResponseDto> addUserBook(@Valid @RequestBody UserBookRequestDto dto){
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userBookService.addUserBook(dto));
-    }
-
-
     @Operation(summary = "서재에서 책 삭제", description = "사용자의 서재에서 책을 삭제합니다.")
     @DeleteMapping("/{userBookId}")
     public ResponseEntity<Void> deleteUserBook(@PathVariable final Long userBookId){

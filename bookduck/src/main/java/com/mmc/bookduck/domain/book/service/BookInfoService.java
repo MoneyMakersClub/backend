@@ -46,6 +46,8 @@ import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.google.GoogleBooksApiService;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -401,7 +403,9 @@ public class BookInfoService {
         }
 
         if(count > 0){
-            return (totalRating / count);
+            double average = totalRating / count;
+            BigDecimal roundedAverage = new BigDecimal(average).setScale(2, RoundingMode.HALF_UP);
+            return roundedAverage.doubleValue();
         }else{
             return null;
         }
