@@ -15,6 +15,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     long countByUser(User user);
 
+    long countByUserAndCreatedTimeBetween(User user, LocalDateTime startDate, LocalDateTime endDate);
+
     @Query("SELECT COUNT(r) FROM Review r WHERE r.user = :user AND YEAR(r.createdTime) = :currentYear")
     long countByUserAndCreatedTimeThisYear(@Param("user") User user, @Param("currentYear") int currentYear);
 
