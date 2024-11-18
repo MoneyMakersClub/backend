@@ -20,6 +20,5 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
 
     void deleteAllBySender(User user);
     void deleteAllByReceiver(User user);
-
-    void deleteByReceiverAndCreatedTimeBefore(User user, LocalDateTime threeMonthsAgo);
+    void deleteByCreatedTimeBefore(LocalDateTime createdTime);
 }

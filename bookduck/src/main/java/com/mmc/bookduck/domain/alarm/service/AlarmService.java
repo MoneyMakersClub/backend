@@ -30,13 +30,9 @@ public class AlarmService {
     private final UserService userService;
     private final FCMService fcmService;
 
-    // 최근 일반 Alarm 목록 읽고 3개월 전 알림은 삭제
+    // 최근 일반 Alarm 목록 읽기
     public PaginatedResponseDto<AlarmUnitDto> getCommonAlarms(Pageable pageable){
         User user = userService.getCurrentUser();
-
-        // 3개월 전 알림 삭제
-        LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
-        alarmRepository.deleteByReceiverAndCreatedTimeBefore(user, threeMonthsAgo);
 
         Page<Alarm> alarmPage = alarmRepository.findByReceiverOrderByCreatedTimeDesc(user, pageable);
         Page<AlarmUnitDto> alarmUnitDtos =  alarmPage.map(AlarmUnitDto::new);
