@@ -372,7 +372,7 @@ public class BookInfoService {
 
         if(count > 0){
             double average = totalRating / count;
-            BigDecimal roundedAverage = new BigDecimal(average).setScale(2, RoundingMode.HALF_UP);
+            BigDecimal roundedAverage = new BigDecimal(average).setScale(1, RoundingMode.HALF_UP);
             return roundedAverage.doubleValue();
         }else{
             return null;
