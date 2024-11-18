@@ -1,6 +1,7 @@
 package com.mmc.bookduck.global.oauth2;
 
 import com.mmc.bookduck.domain.user.entity.LoginType;
+import com.mmc.bookduck.domain.user.entity.Role;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -53,6 +54,8 @@ public class OAuth2Attributes {
                 .email(email)
                 .loginType(loginType)
                 .nickname(nickname)
+                .role(Role.ROLE_USER)
+                .isOfficial(false)
                 .build();
     }
 

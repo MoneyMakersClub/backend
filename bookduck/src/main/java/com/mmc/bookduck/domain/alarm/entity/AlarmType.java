@@ -19,7 +19,6 @@ public enum AlarmType {
     private final String messagePattern;
     private final boolean sendPush;
 
-
     // 메시지 생성 메서드
 //    public String generateMessage(Alarm alarm) {
 //        return switch (this) {

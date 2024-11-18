@@ -4,6 +4,7 @@ import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -35,14 +36,24 @@ public class User extends BaseTimeEntity {
 
     private String fcmToken;
 
+    private Boolean isAnnouncementChecked;
+
+    private Boolean isItemUnlockedChecked;
+    
+    @ColumnDefault("false")
+    private boolean isOfficial;
+
     @Builder
-    public User(Long userId, String email, LoginType loginType, Role role, String nickname) {
+    public User(Long userId, String email, LoginType loginType, Role role, String nickname, boolean isOfficial) {
         this.userId = userId;
         this.email = email;
         this.loginType = loginType;
         this.nickname = nickname;
-        this.role = role != null ? role : Role.ROLE_USER;
+        this.role = role;
         this.userStatus = UserStatus.ACTIVE;
+        this.isAnnouncementChecked = true;
+        this.isItemUnlockedChecked = true;
+        this.isOfficial = isOfficial;
     }
 
     // 닉네임 변경
@@ -55,4 +66,11 @@ public class User extends BaseTimeEntity {
         this.fcmToken = fcmToken;
     }
 
+    public void setIsAnnouncementChecked(boolean isAnnouncementChecked) {
+        this.isAnnouncementChecked = isAnnouncementChecked;
+    }
+
+    public void setIsItemUnlockedChecked(boolean isItemUnlockedChecked) {
+        this.isItemUnlockedChecked = isItemUnlockedChecked;
+    }
 }
