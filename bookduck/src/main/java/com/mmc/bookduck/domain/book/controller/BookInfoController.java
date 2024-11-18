@@ -8,10 +8,8 @@ import com.mmc.bookduck.domain.book.dto.response.AddUserBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookUnitResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.common.CustomBookUnitDto;
-import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
-import com.mmc.bookduck.domain.book.dto.common.BookUnitDto;
 import com.mmc.bookduck.domain.book.service.BookInfoService;
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,13 +57,6 @@ public class BookInfoController {
     public ResponseEntity<AddUserBookResponseDto> addBookByProviderId(@PathVariable(name = "providerId") final String providerId,
                                                                       @Valid @RequestBody final AddUserBookRequestDto requestDto){
         return ResponseEntity.ok(bookInfoService.addBookByProviderId(providerId, requestDto));
-    }
-
-
-    @Operation(summary = "API 도서 상세-추가 정보 조회", description = "구글 API 도서의 추가 정보를 상세 조회합니다.(현재 책에 대한 다른 사용자들의 별점&한줄평 목록 3개)")
-    @GetMapping("/external/{providerId}/additional")
-    public ResponseEntity<BookInfoAdditionalResponseDto> getApiBookAdditional(@PathVariable(name = "providerId") String providerId){
-        return ResponseEntity.ok(bookInfoService.getApiBookAdditional(providerId));
     }
 
 
