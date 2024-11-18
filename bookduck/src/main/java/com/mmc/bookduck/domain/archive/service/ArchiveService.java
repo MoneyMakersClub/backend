@@ -78,7 +78,18 @@ public class ArchiveService {
     public ArchiveResponseDto getArchive(Long id, ArchiveType archiveType) {
         Archive archive = findArchiveByType(id, archiveType);
         UserBook userBook = getUserBookFromExcerptOrReview(archive);
-        return createArchiveResponseDto(archive, archive.getExcerpt(), archive.getReview(), userBook);
+        // currentUser와 creatorUser 사이의 관계에 따른 response 필터링
+        Long currentUserId = userService.getCurrentUser().getUserId();
+        Long creatorId = userBook.getUser().getUserId();
+        boolean isCreator = creatorId.equals(currentUserId);
+        boolean isFriend = friendRepository.findFriendBetweenUsers(currentUserId, creatorId).isPresent();
+        Excerpt filteredExcerpt = isCreator || (isFriend && archive.getExcerpt().getVisibility() == Visibility.PUBLIC)
+                ? archive.getExcerpt()
+                : null;
+        Review filteredReview = isCreator || (isFriend && archive.getReview().getVisibility() == Visibility.PUBLIC)
+                ? archive.getReview()
+                : null;
+        return createArchiveResponseDto(archive, filteredExcerpt, filteredReview, userBook);
     }
 
     // 수정

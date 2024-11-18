@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.export.service;
 
 import com.mmc.bookduck.domain.export.dto.ExportCharResponseDto;
+import com.mmc.bookduck.domain.export.dto.ExportStatsResponseDto;
 import com.mmc.bookduck.domain.item.dto.common.ItemEquippedUnitDto;
 import com.mmc.bookduck.domain.item.entity.UserItem;
 import com.mmc.bookduck.domain.item.service.UserItemService;
@@ -32,5 +33,9 @@ public class ExportService {
         UserKeywordResponseDto keywordResponse = userReadingReportService.getUserKeywordWithLimit(user.getUserId(), 3);
         List<ItemEquippedUnitDto> userItemEquipped = userItemService.getUserItemEquippedListOfUser(user);
         return new ExportCharResponseDto(nickname, duckTitle, keywordResponse, userItemEquipped);
+    }
+
+    public ExportStatsResponseDto getStatsExportInfo(){
+        return new ExportStatsResponseDto();
     }
 }
