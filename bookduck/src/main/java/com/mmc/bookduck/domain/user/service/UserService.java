@@ -74,6 +74,7 @@ public class UserService {
                     .loginType(LoginType.GOOGLE)
                     .nickname(officialAccountNickname)
                     .role(Role.ROLE_ADMIN)
+                    .isOfficial(true)
                     .build();
             userRepository.saveAndFlush(officialAccount);
         }

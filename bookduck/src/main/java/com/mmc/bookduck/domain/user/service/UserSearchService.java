@@ -36,7 +36,7 @@ public class UserSearchService {
 
         Page<UserUnitDto> userUnitDtoPage = userPage.map(user -> {
             List<ItemEquippedUnitDto> userItems = userItemService.getUserItemEquippedListOfUser(user);
-            boolean isOfficial = (user.getRole() == Role.ROLE_ADMIN);
+            boolean isOfficial = user.isOfficial();
             boolean isFriend = friendService.isFriendWithCurrentUserOrNull(user);
             return UserUnitDto.from(user, userItems, isOfficial, isFriend);
         });
