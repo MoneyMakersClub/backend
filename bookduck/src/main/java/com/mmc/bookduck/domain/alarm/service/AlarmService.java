@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.alarm.service;
 
-import com.mmc.bookduck.domain.alarm.dto.response.AlarmListResponseDto;
+import com.mmc.bookduck.domain.alarm.dto.common.AnnoucementUnitDto;
+import com.mmc.bookduck.domain.alarm.dto.request.AlarmReadRequestDto;
 import com.mmc.bookduck.domain.alarm.dto.common.AlarmUnitDto;
 import com.mmc.bookduck.domain.alarm.dto.ssedata.AlarmDefaultDataDto;
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
@@ -9,18 +10,18 @@ import com.mmc.bookduck.domain.alarm.entity.PushAlarmFormat;
 import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
+import com.mmc.bookduck.global.common.PaginatedResponseDto;
+import com.mmc.bookduck.global.exception.CustomException;
+import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.fcm.FCMService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 @Transactional
@@ -31,17 +32,41 @@ public class AlarmService {
     private final UserService userService;
     private final FCMService fcmService;
 
-    // 최근 알림 목록 읽어오기
-    public AlarmListResponseDto getAndReadRecentAlarms(){
-        Pageable pageable = PageRequest.of(0, 30);
-        List<AlarmUnitDto> alarmUnitDtos = getAndReadAlarms(pageable);
-        return AlarmListResponseDto.fromAlarmUnitDto(alarmUnitDtos);
+    // 최근 일반 Alarm 목록 읽어오기
+    public PaginatedResponseDto<AlarmUnitDto> getCommonAlarms(Pageable pageable){
+        User user = userService.getCurrentUser();
+
+        // 3개월 전 알림 삭제
+        LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
+        alarmRepository.deleteByReceiverAndCreatedTimeBefore(user, threeMonthsAgo);
+
+        // Announcement 제외 가져오기
+        Page<Alarm> alarmPage = alarmRepository.findByReceiverAndNotAnnouncementOrderByCreatedTimeDesc(user, pageable);
+        Page<AlarmUnitDto> alarmUnitDtos =  alarmPage.map(AlarmUnitDto::new);
+        return PaginatedResponseDto.from(alarmUnitDtos);
     }
 
-    // Alarm 생성 읽어오기
+    // Alarm 읽기
+    public void checkCommonAlarm(AlarmReadRequestDto requestDto) {
+        User user = userService.getCurrentUser();
+        Alarm alarm = alarmRepository.findById(requestDto.alarmId())
+                .orElseThrow(()-> new CustomException(ErrorCode.ALARM_NOT_FOUND));
+        if (user.equals(alarm.getReceiver())) {
+            alarm.readAlarm();
+            alarmRepository.save(alarm);
+        } else {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
+        }
+    }
+
+    // Alarm 생성
     public void createAlarm(Alarm alarm, User receiver) {
         alarmRepository.save(alarm);
-        emitterService.notify(receiver.getUserId(), AlarmDefaultDataDto.from(true), "new alarm");
+        emitterService.notify(
+                receiver.getUserId(),
+                AlarmDefaultDataDto.from(false, receiver.getIsAnnouncementChecked(), receiver.getIsItemUnlockedChecked()),
+                "new alarm"
+        );
 
         // 푸시알림 전송
         if (alarm.getAlarmType().isSendPush()) {
@@ -57,25 +82,12 @@ public class AlarmService {
         alarmRepository.deleteAllByReceiver(user);
     }
 
-    private List<AlarmUnitDto> getAndReadAlarms(Pageable pageable) {
-        List<AlarmUnitDto> alarmUnitDtoList = new ArrayList<>();
-        User currentUser = userService.getCurrentUser();
-        // Announcement 유형 제외 가져오기
-        Page<Alarm> alarmPage = alarmRepository.findByReceiverAndNotAnnouncementOrderByCreatedTimeDesc(currentUser, pageable);
-        if (alarmPage != null && alarmPage.hasContent()) {
-            for (Alarm alarm : alarmPage) {
-                alarmUnitDtoList.add(new AlarmUnitDto(alarm));
-                alarm.readAlarm();
-            }
-            alarmRepository.saveAll(alarmPage);
-        }
-        return alarmUnitDtoList;
-    }
-
-    public List<AlarmUnitDto> getRecentAnnouncements() {
-        Pageable pageable = PageRequest.of(0, 30);
-        // Announcement 유형만 가져오기
+    public PaginatedResponseDto<AnnoucementUnitDto> getRecentAnnouncements(Pageable pageable) {
+        // user가 공지 읽음으로 표시
+        User user = userService.getCurrentUser();
+        user.setIsAnnouncementChecked(true);
         Page<Alarm> announcementPage = alarmRepository.findByAlarmTypeOrderByCreatedTimeDesc(AlarmType.ANNOUNCEMENT, pageable);
-        return announcementPage.stream().map(AlarmUnitDto::new).collect(Collectors.toList());
+        Page<AnnoucementUnitDto> annoucementUnitDtos = announcementPage.map(AnnoucementUnitDto::new);
+        return PaginatedResponseDto.from(annoucementUnitDtos);
     }
 }

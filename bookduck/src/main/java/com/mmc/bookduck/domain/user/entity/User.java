@@ -47,8 +47,8 @@ public class User extends BaseTimeEntity {
         this.nickname = nickname;
         this.role = role != null ? role : Role.ROLE_USER;
         this.userStatus = UserStatus.ACTIVE;
-        this.isAnnouncementChecked = false;
-        this.isItemUnlockedChecked = false;
+        this.isAnnouncementChecked = true;
+        this.isItemUnlockedChecked = true;
     }
 
     // 닉네임 변경

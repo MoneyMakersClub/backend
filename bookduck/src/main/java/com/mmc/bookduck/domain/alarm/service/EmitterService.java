@@ -48,18 +48,15 @@ public class EmitterService {
         } else {
             messsage = "new sse alarm doesn't exists";
         }
-        sendToClient(user.getUserId(), AlarmDefaultDataDto.from(
-                isMissedAlarms,
-                isAnnouncementChecked,
-                isItemUnlockedChecked), messsage);
+        sendToClient(user.getUserId(), AlarmDefaultDataDto.from(!isMissedAlarms, isAnnouncementChecked, isItemUnlockedChecked), messsage);
     }
 
     private void sendToClientIfBadgeUnlockedAlarmExists(User user) {
         Boolean isBadgeUnlocked = alarmRepository.existsByReceiverAndIsReadFalseAndAlarmType(user, AlarmType.BADGE_UNLOCKED);
         if (isBadgeUnlocked.equals(true)) {
-            sendToClient(user.getUserId(), AlarmBadgeUnlockedDataDto.from(true), "new badge alarm exists");
+            sendToClient(user.getUserId(), AlarmBadgeUnlockedDataDto.from(false), "new badge alarm exists");
         } else {
-            sendToClient(user.getUserId(), AlarmBadgeUnlockedDataDto.from(false), "new badge alarm doesn't exists");
+            sendToClient(user.getUserId(), AlarmBadgeUnlockedDataDto.from(true), "new badge alarm doesn't exists");
         }
     }
 
