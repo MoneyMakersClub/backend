@@ -11,7 +11,7 @@ public record UserBookResponseDto(
         ReadStatus readStatus,
         double rating,
         Long bookInfoId,
-        boolean isCustom
+        boolean isCustomBook
 ) {
     public static UserBookResponseDto from(UserBook userBook) {
         boolean isCustom = false;
