@@ -1,6 +1,8 @@
 package com.mmc.bookduck.domain.alarm.controller;
 
 import com.mmc.bookduck.domain.alarm.dto.request.AlarmReadRequestDto;
+import com.mmc.bookduck.domain.alarm.service.AlarmService;
+import com.mmc.bookduck.domain.alarm.service.AnnouncementService;
 import com.mmc.bookduck.domain.alarm.service.EmitterService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +21,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequestMapping("/alarms")
 public class AlarmController {
     private final EmitterService emitterService;
-    private final com.mmc.bookduck.domain.alarm.service.AlarmService alarmService;
+    private final AlarmService alarmService;
+    private final AnnouncementService announcementService;
 
     @Operation(summary = "알림 구독", description = "알림을 구독합니다.")
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE) // Content-Type 지정
@@ -43,6 +46,6 @@ public class AlarmController {
     @Operation(summary = "공지 목록 조회 및 읽음 처리", description = "공지 목록을 조회하고 읽음 처리합니다.")
     @PatchMapping("/announcements")
     public ResponseEntity<?> getRecentAnnouncements(@PageableDefault final Pageable pageable) {
-        return ResponseEntity.ok(alarmService.getRecentAnnouncements(pageable));
+        return ResponseEntity.ok(announcementService.getRecentAnnouncements(pageable));
     }
 }

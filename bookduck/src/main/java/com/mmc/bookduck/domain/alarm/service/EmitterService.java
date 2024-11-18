@@ -38,7 +38,7 @@ public class EmitterService {
     }
 
     private void sendToClientIfNewAlarmExists(User user) {
-        Boolean isMissedAlarms = alarmRepository.existsByReceiverAndIsReadFalseAndAlarmTypeNot(user, AlarmType.ANNOUNCEMENT);
+        Boolean isMissedAlarms = alarmRepository.existsByReceiverAndIsReadFalse(user);
         Boolean isAnnouncementChecked = user.getIsAnnouncementChecked();
         Boolean isItemUnlockedChecked = user.getIsItemUnlockedChecked();
         String messsage;

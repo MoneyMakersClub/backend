@@ -1,11 +1,9 @@
 package com.mmc.bookduck.domain.alarm.service;
 
-import com.mmc.bookduck.domain.alarm.dto.common.AnnoucementUnitDto;
 import com.mmc.bookduck.domain.alarm.dto.request.AlarmReadRequestDto;
 import com.mmc.bookduck.domain.alarm.dto.common.AlarmUnitDto;
 import com.mmc.bookduck.domain.alarm.dto.ssedata.AlarmDefaultDataDto;
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
-import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 import com.mmc.bookduck.domain.alarm.entity.PushAlarmFormat;
 import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -32,7 +30,7 @@ public class AlarmService {
     private final UserService userService;
     private final FCMService fcmService;
 
-    // 최근 일반 Alarm 목록 읽어오기
+    // 최근 일반 Alarm 목록 읽고 3개월 전 알림은 삭제
     public PaginatedResponseDto<AlarmUnitDto> getCommonAlarms(Pageable pageable){
         User user = userService.getCurrentUser();
 
@@ -40,13 +38,12 @@ public class AlarmService {
         LocalDateTime threeMonthsAgo = LocalDateTime.now().minusMonths(3);
         alarmRepository.deleteByReceiverAndCreatedTimeBefore(user, threeMonthsAgo);
 
-        // Announcement 제외 가져오기
-        Page<Alarm> alarmPage = alarmRepository.findByReceiverAndNotAnnouncementOrderByCreatedTimeDesc(user, pageable);
+        Page<Alarm> alarmPage = alarmRepository.findByReceiverOrderByCreatedTimeDesc(user, pageable);
         Page<AlarmUnitDto> alarmUnitDtos =  alarmPage.map(AlarmUnitDto::new);
         return PaginatedResponseDto.from(alarmUnitDtos);
     }
 
-    // Alarm 읽기
+    // Alarm 읽음처리
     public void checkCommonAlarm(AlarmReadRequestDto requestDto) {
         User user = userService.getCurrentUser();
         Alarm alarm = alarmRepository.findById(requestDto.alarmId())
@@ -80,14 +77,5 @@ public class AlarmService {
     public void deleteAllAlarmsOfMember(User user){
         alarmRepository.deleteAllBySender(user);
         alarmRepository.deleteAllByReceiver(user);
-    }
-
-    public PaginatedResponseDto<AnnoucementUnitDto> getRecentAnnouncements(Pageable pageable) {
-        // user가 공지 읽음으로 표시
-        User user = userService.getCurrentUser();
-        user.setIsAnnouncementChecked(true);
-        Page<Alarm> announcementPage = alarmRepository.findByAlarmTypeOrderByCreatedTimeDesc(AlarmType.ANNOUNCEMENT, pageable);
-        Page<AnnoucementUnitDto> annoucementUnitDtos = announcementPage.map(AnnoucementUnitDto::new);
-        return PaginatedResponseDto.from(annoucementUnitDtos);
     }
 }
