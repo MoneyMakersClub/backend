@@ -36,6 +36,10 @@ public class User extends BaseTimeEntity {
 
     private String fcmToken;
 
+    private Boolean isAnnouncementChecked;
+
+    private Boolean isItemUnlockedChecked;
+    
     @ColumnDefault("false")
     private boolean isOfficial;
 
@@ -47,6 +51,8 @@ public class User extends BaseTimeEntity {
         this.nickname = nickname;
         this.role = role;
         this.userStatus = UserStatus.ACTIVE;
+        this.isAnnouncementChecked = true;
+        this.isItemUnlockedChecked = true;
         this.isOfficial = isOfficial;
     }
 
@@ -60,4 +66,11 @@ public class User extends BaseTimeEntity {
         this.fcmToken = fcmToken;
     }
 
+    public void setIsAnnouncementChecked(boolean isAnnouncementChecked) {
+        this.isAnnouncementChecked = isAnnouncementChecked;
+    }
+
+    public void setIsItemUnlockedChecked(boolean isItemUnlockedChecked) {
+        this.isItemUnlockedChecked = isItemUnlockedChecked;
+    }
 }

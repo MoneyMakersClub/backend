@@ -7,6 +7,7 @@ import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 import java.time.LocalDateTime;
 
 public record AlarmUnitDto(
+        Long alarmId,
         Boolean isRead,
         AlarmType alarmType,
         LocalDateTime createdTime,
@@ -16,6 +17,7 @@ public record AlarmUnitDto(
 ) {
     public AlarmUnitDto(Alarm alarm) {
         this(
+                alarm.getAlarmId(),
                 alarm.isRead(),
                 alarm.getAlarmType(),
                 alarm.getCreatedTime(),
