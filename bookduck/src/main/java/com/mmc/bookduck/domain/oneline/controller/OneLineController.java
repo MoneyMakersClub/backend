@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/onelines")
-@Tag(name = "oneLine", description = "한줄평 관련 API입니다.")
+@Tag(name = "OneLine", description = "한줄평 관련 API입니다.")
 public class OneLineController {
     private final OneLineService oneLineService;
     private final OneLineLikeService oneLineLikeService;

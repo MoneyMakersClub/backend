@@ -9,6 +9,7 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
 import com.mmc.bookduck.domain.user.dto.common.MonthlyBookCountUnitDto;
 import com.mmc.bookduck.domain.user.dto.common.MostReadGenreUnitDto;
+import com.mmc.bookduck.domain.user.dto.response.UserKeywordResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserStatisticsResponseDto;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -92,7 +93,7 @@ public class UserReadingReportService {
         );
     }
 
-    public List<String> getUserKeywordAnalysis(Long userId) {
+    public List<String> analyseUserKeyword(Long userId) {
         User user = userService.getActiveUserByUserId(userId);
         List<Review> reviews = reviewRepository.findTop30ByUserOrderByCreatedTimeDesc(user);
         List<Excerpt> excerpts = excerptRepository.findTop30ByUserOrderByCreatedTimeDesc(user);
@@ -134,4 +135,10 @@ public class UserReadingReportService {
         }
         return topKeywords;
     }
+
+    public UserKeywordResponseDto getUserKeywordWithLimit(Long userId, int limit) {
+        List<String> allKeywords = analyseUserKeyword(userId);
+        return UserKeywordResponseDto.from(allKeywords, limit);
+    }
+
 }
