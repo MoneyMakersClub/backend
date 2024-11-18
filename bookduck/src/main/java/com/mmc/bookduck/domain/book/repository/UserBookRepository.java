@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.book.repository;
 
 import com.mmc.bookduck.domain.book.entity.BookInfo;
+import com.mmc.bookduck.domain.book.entity.GenreName;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -24,7 +25,10 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
     List<UserBook> findByUserAndReadStatus(User user, ReadStatus readStatus);
 
     long countByUser(User user);
+
     long countByUserAndReadStatus(User user, ReadStatus readStatus);
+
+    long countByUserAndReadStatusAndCreatedTimeBetween(User user, ReadStatus readStatus, LocalDateTime startDate, LocalDateTime endDate);
 
     // userbook 테이블과 bookinfo 테이블 조인해서 userbook의 user에 해당하는 bookinfo 정보 검색
     @Query("SELECT ub FROM UserBook ub JOIN ub.bookInfo b WHERE ub.user = :userId AND (" +
@@ -58,6 +62,16 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
             "ORDER BY COUNT(ub) DESC")
     List<Object[]> findTopCategoriesByUser(@Param("user") User user, Pageable pageable);
 
+    @Query("SELECT g.genreName " +
+            "FROM UserBook ub " +
+            "JOIN ub.bookInfo b " +
+            "JOIN b.genre g " +
+            "WHERE ub.user = :user " +
+            "AND ub.createdTime BETWEEN :startDate AND :endDate " +
+            "GROUP BY g.genreName " +
+            "ORDER BY COUNT(ub) DESC")
+    GenreName findTopGenreByUserAndCreatedTimeBetween(@Param("user") User user, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
     // 유저가 가장 많이 읽은 작가들
     @Query(value = "SELECT b.author, COUNT(ub) AS bookCount FROM UserBook ub " +
             "JOIN ub.bookInfo b " +
@@ -65,6 +79,14 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
             "GROUP BY b.author " +
             "ORDER BY bookCount DESC")
     List<Object[]> findMostReadAuthorByUser(@Param("user") User user);
+
+    @Query("SELECT ub.bookInfo.author " +
+                    "FROM UserBook ub " +
+                    "WHERE ub.user = :user " +
+                    "AND ub.createdTime BETWEEN :startDate AND :endDate " +
+                    "GROUP BY ub.bookInfo.author " +
+                    "ORDER BY COUNT(ub) DESC")
+    String findTopAuthorByUserAndCreatedTimeBetween(@Param("user") User user, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     // BookInfo의 작가명으로 UserBook top3찾기
     List<UserBook> findTop3ByBookInfo_AuthorOrderByCreatedTimeDesc(String author);

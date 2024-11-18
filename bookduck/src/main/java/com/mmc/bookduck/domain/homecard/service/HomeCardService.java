@@ -1,4 +1,4 @@
-package com.mmc.bookduck.domain.userhome.service;
+package com.mmc.bookduck.domain.homecard.service;
 
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.service.ExcerptService;
@@ -7,11 +7,11 @@ import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.service.OneLineService;
 import com.mmc.bookduck.domain.user.entity.User;
-import com.mmc.bookduck.domain.userhome.dto.common.HomeCardUpdateUnitDto;
-import com.mmc.bookduck.domain.userhome.dto.request.HomeCardRequestDto;
-import com.mmc.bookduck.domain.userhome.dto.request.ReadingSpaceUpdateRequestDto;
-import com.mmc.bookduck.domain.userhome.entity.HomeCard;
-import com.mmc.bookduck.domain.userhome.repository.HomeCardRepository;
+import com.mmc.bookduck.domain.homecard.dto.common.HomeCardUpdateUnitDto;
+import com.mmc.bookduck.domain.homecard.dto.request.HomeCardRequestDto;
+import com.mmc.bookduck.domain.homecard.dto.request.ReadingSpaceUpdateRequestDto;
+import com.mmc.bookduck.domain.homecard.entity.HomeCard;
+import com.mmc.bookduck.domain.homecard.repository.HomeCardRepository;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserHomeService {
+public class HomeCardService {
     private final HomeCardRepository homeCardRepository;
     private final ExcerptService excerptService;
     private final OneLineService oneLineService;

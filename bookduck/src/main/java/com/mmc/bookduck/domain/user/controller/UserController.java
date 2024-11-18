@@ -4,8 +4,9 @@ import com.mmc.bookduck.domain.archive.dto.response.UserArchiveResponseDto;
 import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.domain.archive.service.ArchiveService;
 import com.mmc.bookduck.domain.item.service.UserItemService;
+import com.mmc.bookduck.domain.user.dto.response.UserKeywordResponseDto;
 import com.mmc.bookduck.domain.user.service.*;
-import com.mmc.bookduck.domain.userhome.service.UserReadingSpaceService;
+import com.mmc.bookduck.domain.homecard.service.UserReadingSpaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "User", description = "User 관련 API입니다.")
 @RestController
@@ -61,7 +64,7 @@ public class UserController {
     @Operation(summary = "유저 독서 리포트 조회 - 키워드", description = "유저의 독서 리포트 중 키워드 부분을 조회합니다.")
     @GetMapping("/{userId}/keywords")
     public ResponseEntity<?> getUserKeywordAnalysis(@PathVariable final Long userId) {
-        return ResponseEntity.ok().body(userReadingReportService.getUserKeywordAnalysis(userId));
+        return ResponseEntity.ok().body(userReadingReportService.getUserKeywordWithLimit(userId, 6));
     }
 
     @Operation(summary = "유저 리딩스페이스 조회", description = "유저 리딩스페이스를 조회합니다.")
