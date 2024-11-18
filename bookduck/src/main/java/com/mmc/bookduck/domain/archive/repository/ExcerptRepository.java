@@ -16,6 +16,8 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
 
     long countByUser(User user);
 
+    long countByUserAndCreatedTimeBetween(User user, LocalDateTime startDate, LocalDateTime endDate);
+
     @Query("SELECT COUNT(e) FROM Excerpt e WHERE e.user = :user AND YEAR(e.createdTime) = :currentYear")
     long countByUserAndCreatedTimeThisYear(@Param("user") User user, @Param("currentYear") int currentYear);
 
@@ -43,4 +45,5 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
     List<Excerpt> findByUserId(@Param("userId") Long userId);
 
     List<Excerpt> findTop30ByUserOrderByCreatedTimeDesc(User user);
+
 }

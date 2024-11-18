@@ -12,7 +12,7 @@ public record OneLineRatingUnitDto(
         Boolean isLiked,
         LocalDateTime createdTime,
         Long userId,
-        String userNickName
+        String userNickname
 ) {
     public static OneLineRatingUnitDto from(OneLine oneLine, Boolean isLiked) {
         return new OneLineRatingUnitDto(
