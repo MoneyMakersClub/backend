@@ -18,7 +18,6 @@ import com.mmc.bookduck.domain.book.dto.request.AddUserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
 import com.mmc.bookduck.domain.book.dto.response.AddUserBookResponseDto;
-import com.mmc.bookduck.domain.book.dto.response.BookInfoAdditionalResponseDto;
 import com.mmc.bookduck.domain.book.dto.common.BookUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
@@ -39,13 +38,14 @@ import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingUnitDto;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
-import com.mmc.bookduck.domain.oneline.service.OneLineService;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.S3.S3Service;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import com.mmc.bookduck.global.google.GoogleBooksApiService;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -308,36 +308,6 @@ public class BookInfoService {
         return new BookListResponseDto<>(dtos);
     }
 
-
-    //api도서 상세정보 - 추가정보
-    @Transactional(readOnly = true)
-    public BookInfoAdditionalResponseDto getApiBookAdditional(String providerId) {
-        User user = userService.getCurrentUser();
-        BookInfo bookInfo = bookInfoRepository.findByProviderId(providerId)
-                .orElse(null);
-        if(bookInfo == null){
-            return new BookInfoAdditionalResponseDto(new ArrayList<>());
-        }
-        List<UserBook> sameBookInfo_userBookList = userBookRepository.findAllByBookInfoOrderByRatingDesc(bookInfo);
-
-        List<BookRatingUnitDto> oneLineList = new ArrayList<>();
-        if (!sameBookInfo_userBookList.isEmpty()) {
-            for (UserBook book : sameBookInfo_userBookList) {
-                //내 userBook 제외
-                if (!book.getUser().equals(user)) {
-                    Optional<OneLine> oneLine =  oneLineRepository.findByUserBook(book);
-                    if(oneLine.isPresent()){
-                        oneLineList.add(BookRatingUnitDto.from(oneLine.get(), book));
-                    }
-                    if(oneLineList.size() == 3){
-                        break;
-                    }
-                }
-            }
-        }
-        return new BookInfoAdditionalResponseDto(oneLineList);
-    }
-
     @Transactional(readOnly = true)
     public BookInfoBasicResponseDto getApiBookBasicByBookInfoId(Long bookInfoId) {
         User user = userService.getCurrentUser();
@@ -401,7 +371,9 @@ public class BookInfoService {
         }
 
         if(count > 0){
-            return (totalRating / count);
+            double average = totalRating / count;
+            BigDecimal roundedAverage = new BigDecimal(average).setScale(1, RoundingMode.HALF_UP);
+            return roundedAverage.doubleValue();
         }else{
             return null;
         }
@@ -419,12 +391,6 @@ public class BookInfoService {
                 }
                 if (dto.author() != null) {
                     bookInfo.setAuthor(dto.author());
-                }
-                if (dto.pageCount() != null) {
-                    bookInfo.setPageCount(dto.pageCount());
-                }
-                if (dto.publisher() != null) {
-                    bookInfo.setPublisher(dto.publisher());
                 }
                 if(dto.coverImage() != null){
                     String newImgPath = s3Service.uploadFile(dto.coverImage());
