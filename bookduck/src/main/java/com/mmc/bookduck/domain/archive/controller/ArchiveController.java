@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -62,4 +64,11 @@ public class ArchiveController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "나의 기록 검색", description = "나의 기록(발췌, 감상평)을 검색합니다.")
+    @GetMapping("/search")
+    public ResponseEntity<?> searchUsers(@RequestParam("keyword") final String keyword,
+                                         @PageableDefault(size = 20) final Pageable pageable) {
+        archiveService.searchArchives(keyword, pageable);
+        return ResponseEntity.ok().body();
+    }
 }
