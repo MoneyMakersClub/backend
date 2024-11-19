@@ -55,13 +55,13 @@ public class UserBookService {
 
     public CustomBookResponseDto createCustomBook(CustomBookRequestDto requestDto) {
         UserBook userBook = createCustomBookEntity(requestDto);
-        return CustomBookResponseDto.from(userBook, 0.0,null, null, true);
+        return new CustomBookResponseDto(userBook, 0.0,null, null, true);
     }
 
     // 서재에 책 추가
     public UserBookResponseDto addUserBook(UserBookRequestDto requestDto) {
         UserBook savedUserBook = addUserBookEntity(requestDto);
-        return UserBookResponseDto.from(savedUserBook);
+        return new UserBookResponseDto(savedUserBook);
     }
 
     public UserBook addUserBookEntity(UserBookRequestDto requestDto) {
@@ -144,7 +144,7 @@ public class UserBookService {
         if(userBook.getUser().getUserId().equals(user.getUserId())){
             userBook.changeReadStatus(ReadStatus.valueOf(status));
 
-            return UserBookResponseDto.from(userBook);
+            return new UserBookResponseDto(userBook);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
@@ -166,7 +166,7 @@ public class UserBookService {
         List<UserBookResponseDto> dtos = new ArrayList<>();
 
         for(UserBook book : userBookList){
-            dtos.add(UserBookResponseDto.from(book));
+            dtos.add(new UserBookResponseDto(book));
         }
         return new UserBookListResponseDto(dtos);
     }
@@ -193,7 +193,7 @@ public class UserBookService {
 
         List<UserBookResponseDto> dtos = new ArrayList<>();
         for(UserBook book : userBookList){
-            dtos.add(UserBookResponseDto.from(book));
+            dtos.add(new UserBookResponseDto(book));
         }
         return new UserBookListResponseDto(dtos);
     }
@@ -206,7 +206,7 @@ public class UserBookService {
         UserBook userBook = getUserBookById(userBookId);
 
         String koreanGenreName = genreService.genreNameToKorean(userBook.getBookInfo().getGenre());
-        BookInfoDetailDto detailDto = BookInfoDetailDto.from(userBook.getBookInfo(), koreanGenreName);
+        BookInfoDetailDto detailDto = new BookInfoDetailDto(userBook.getBookInfo(), koreanGenreName);
 
         OneLine oneLine = oneLineRepository.findByUserBook(userBook)
                 .orElse(null);
@@ -238,7 +238,7 @@ public class UserBookService {
                 if (!book.equals(userBook)) {
                     Optional<OneLine> oneLine =  oneLineRepository.findByUserBook(book);
                     if(oneLine.isPresent()){
-                        oneLineList.add(BookRatingUnitDto.from(oneLine.get(), book));
+                        oneLineList.add(new BookRatingUnitDto(oneLine.get(), book));
                     }
                     if(oneLineList.size() == 3){
                         break;
