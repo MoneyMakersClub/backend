@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.homecard.dto.common;
 
+import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.homecard.entity.CardType;
 
 public record ExcerptCardDto(
@@ -9,6 +10,7 @@ public record ExcerptCardDto(
         String title,
         String author,
         Long pageNumber, // null일 수 있음
-        String excerptContent
+        String excerptContent,
+        Visibility visibility
 ) implements HomeCardDto {
 }

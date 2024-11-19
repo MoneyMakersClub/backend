@@ -25,7 +25,7 @@ public class HomeCardConverter {
         Excerpt excerpt = homeCard.getExcerpt();
         return new ExcerptCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(),
                 excerpt.getUserBook().getBookInfo().getTitle(), excerpt.getUserBook().getBookInfo().getAuthor(),
-                excerpt.getPageNumber(), excerpt.getExcerptContent());
+                excerpt.getPageNumber(), excerpt.getExcerptContent(), excerpt.getVisibility());
     }
 
     private OneLineCardDto convertToOneLineCardDto(HomeCard homeCard) {
