@@ -6,7 +6,6 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.friend.service.FriendService;
 import com.mmc.bookduck.domain.user.dto.response.UserGrowthInfoResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserInfoResponseDto;
-import com.mmc.bookduck.domain.user.entity.Role;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.entity.UserGrowth;
 import com.mmc.bookduck.domain.user.repository.UserGrowthRepository;
