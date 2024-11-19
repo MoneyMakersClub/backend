@@ -95,9 +95,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                        .requestMatchers("/users/{userId}").permitAll()
-                        .requestMatchers("/users/{userId}/readingspace").permitAll()
-                        .requestMatchers("/users/{userId}/character").permitAll()
+                        .requestMatchers("/users/{userId:[0-9]+}/{section:statistics|keywords|growth|badges}").authenticated()
+                        .requestMatchers("/users/{userId:[0-9]+}/{section:readingspace|character}").permitAll()
+                        .requestMatchers("/users/{userId:[0-9]+}").permitAll()
                         .anyRequest().authenticated()
                 )
                 // X-Frame-Options: SAME ORIGIN으로 설정
