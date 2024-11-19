@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,9 +41,9 @@ public class UserReadingReportService {
             throw new CustomException(ErrorCode.READINGREPORT_NOT_VIEWABLE);
         }
 
-        // 1. 가장 많이 읽은 카테고리, Top3 카테고리
-        List<Object[]> topCategoryResults = userBookRepository.findTopCategoriesByUser(user, Pageable.ofSize(3));
-        List<MostReadGenreUnitDto> mostReadGenres = topCategoryResults.stream()
+        // 1. 가장 많이 읽은 장르, Top3 장르
+        List<Object[]> topGenres = userBookRepository.findTopGenresByUser(user, Pageable.ofSize(3));
+        List<MostReadGenreUnitDto> mostReadGenres = topGenres.stream()
                 .map(result -> new MostReadGenreUnitDto((String) result[0], (Long) result[1]))
                 .toList();
         String duckTitle = mostReadGenres.isEmpty() ? null : mostReadGenres.get(0).genreName();
@@ -106,18 +105,14 @@ public class UserReadingReportService {
         for (Review review : reviews) {
             String reviewContent = review.getReviewContent();
             totalLength += reviewContent.length();
-            komoranService.extractNounsAndAdjectives(reviewContent).forEach(token -> {
-                frequencyMap.merge(token, 1L, Long::sum);
-            });
+            komoranService.extractNounsAndAdjectives(reviewContent).forEach(token -> frequencyMap.merge(token, 1L, Long::sum));
         }
 
         // 발췌에서 명사와 형용사를 추출하고 글자수 누적
         for (Excerpt excerpt : excerpts) {
             String excerptContent = excerpt.getExcerptContent();
             totalLength += excerptContent.length();
-            komoranService.extractNounsAndAdjectives(excerptContent).forEach(token -> {
-                frequencyMap.merge(token, 1L, Long::sum);
-            });
+            komoranService.extractNounsAndAdjectives(excerptContent).forEach(token -> frequencyMap.merge(token, 1L, Long::sum));
         }
 
         // 글자수 500자 이상 체크
