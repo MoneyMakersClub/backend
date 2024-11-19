@@ -440,7 +440,7 @@ public class BookInfoService {
     public OneLineRatingListResponseDto getOneLineList(Long bookInfoId, String orderBy, Pageable pageable) {
         BookInfo bookInfo = getBookInfoById(bookInfoId);
         Page<OneLine> oneLinePage;
-        switch (orderBy) {
+        switch (orderBy.toLowerCase()) {
             case "likes":
                 oneLinePage = oneLineRepository.findByBookInfoOrderByOneLineLikesDesc(bookInfo, pageable);
                 break;
