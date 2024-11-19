@@ -250,9 +250,9 @@ public class ArchiveService {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
         });
 
-        PaginatedResponseDto<ArchiveSearchListResponseDto.ResultWithType> paginatedResponse =
+        PaginatedResponseDto<ArchiveSearchListResponseDto.ResultWithType> dtoPage =
                 PaginatedResponseDto.from(resultWithTypePage);
-        return ArchiveSearchListResponseDto.from(paginatedResponse);
+        return ArchiveSearchListResponseDto.from(dtoPage);
     }
 
 
