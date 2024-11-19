@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -65,7 +66,8 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "https://localhost:3000",
                 "http://localhost:3001",
-                "https://main.d2upl1xcgysyb.amplifyapp.com")); // TODO: 추후 변경 필요
+                "https://main.d2upl1xcgysyb.amplifyapp.com",
+                "https://api.bookduck.kro.kr")); // TODO: 추후 변경 필요
 
         configuration.addAllowedMethod("*"); // TODO: 추후 확인 필요
         configuration.addAllowedHeader("*");
@@ -94,6 +96,7 @@ public class SecurityConfig {
                 // 요청 권한 설정 TODO: 수정할 것
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(AUTH_WHITELIST).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/archives/share/{id}").permitAll()
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                         .requestMatchers("/users/{userId:[0-9]+}/{section:statistics|keywords|growth|badges}").authenticated()
                         .requestMatchers("/users/{userId:[0-9]+}/{section:readingspace|character}").permitAll()
