@@ -1,7 +1,7 @@
 package com.mmc.bookduck.domain.export.service;
 
-import com.mmc.bookduck.domain.archive.dto.response.ExcerptCardResponseDto;
-import com.mmc.bookduck.domain.archive.dto.response.ReviewCardResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.ExcerptExportResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.ReviewExportResponseDto;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
@@ -126,15 +126,15 @@ public class ExportService {
     }
 
     // 발췌 카드 공유하기
-    public ExcerptCardResponseDto getExcerptCardInfo(Long excerptId) {
+    public ExcerptExportResponseDto getExcerptCardInfo(Long excerptId) {
         Excerpt excerpt = excerptService.getExcerptById(excerptId);
-        return ExcerptCardResponseDto.from(excerpt);
+        return ExcerptExportResponseDto.from(excerpt);
     }
 
     // 감상평 카드 공유하기
-    public ReviewCardResponseDto getReviewCardInfo(Long reviewId) {
+    public ReviewExportResponseDto getReviewCardInfo(Long reviewId) {
         Review review = reviewService.getReviewById(reviewId);
-        return ReviewCardResponseDto.from(review);
+        return ReviewExportResponseDto.from(review);
     }
 
 }

@@ -1,7 +1,7 @@
 package com.mmc.bookduck.domain.export.controller;
 
-import com.mmc.bookduck.domain.archive.dto.response.ExcerptCardResponseDto;
-import com.mmc.bookduck.domain.archive.dto.response.ReviewCardResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.ExcerptExportResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.ReviewExportResponseDto;
 import com.mmc.bookduck.domain.export.dto.ExportCharResponseDto;
 import com.mmc.bookduck.domain.export.dto.ExportStatsResponseDto;
 import com.mmc.bookduck.domain.export.service.ExportService;
@@ -36,14 +36,14 @@ public class ExportController {
     @GetMapping("/excerptcard/{excerptId}")
     @Operation(summary = "발췌 카드 공유하기 정보 제공", description = "공유할 발췌 카드 이미지의 정보를 조회합니다.")
     public ResponseEntity<?> getExcerptCardInfo(@PathVariable("excerptId") final Long excerptId) {
-        ExcerptCardResponseDto responseDto = exportService.getExcerptCardInfo(excerptId);
+        ExcerptExportResponseDto responseDto = exportService.getExcerptCardInfo(excerptId);
         return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/reviewcard/{reviewId}")
     @Operation(summary = "감상평 카드 공유하기 정보 제공", description = "공유할 감상평 카드 이미지의 정보를 조회합니다.")
     public ResponseEntity<?> getReviewCardInfo(@PathVariable("reviewId") final Long reviewId) {
-        ReviewCardResponseDto responseDto = exportService.getReviewCardInfo(reviewId);
+        ReviewExportResponseDto responseDto = exportService.getReviewCardInfo(reviewId);
         return ResponseEntity.ok(responseDto);
     }
 }
