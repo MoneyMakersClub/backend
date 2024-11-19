@@ -7,10 +7,10 @@ public record ExcerptCardDto(
         Long cardId,
         Long cardIndex,
         CardType cardType,
-        String title,
-        String author,
-        Long pageNumber, // null일 수 있음
         String excerptContent,
-        Visibility visibility
+        Long pageNumber, // null일 수 있음
+        Visibility visibility,
+        String title,
+        String author
 ) implements HomeCardDto {
 }
