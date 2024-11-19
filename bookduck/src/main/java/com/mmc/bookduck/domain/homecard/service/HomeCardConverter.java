@@ -26,15 +26,15 @@ public class HomeCardConverter {
     private ExcerptCardDto convertToExcerptCardDto(HomeCard homeCard) {
         Excerpt excerpt = homeCard.getExcerpt();
         return new ExcerptCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(),
-                excerpt.getUserBook().getBookInfo().getTitle(), excerpt.getUserBook().getBookInfo().getAuthor(),
-                excerpt.getPageNumber(), excerpt.getExcerptContent());
+                excerpt.getExcerptContent(), excerpt.getPageNumber(), excerpt.getVisibility(),
+                excerpt.getUserBook().getBookInfo().getTitle(), excerpt.getUserBook().getBookInfo().getAuthor());
     }
 
     private OneLineCardDto convertToOneLineCardDto(HomeCard homeCard) {
         OneLine oneLine = homeCard.getOneLine();
         return new OneLineCardDto(homeCard.getHomeCardId(), homeCard.getCardIndex(), homeCard.getCardType(),
-                oneLine.getUserBook().getBookInfo().getTitle(), oneLine.getUserBook().getBookInfo().getAuthor(),
-                oneLine.getUserBook().getRating(), oneLine.getOneLineContent());
+                oneLine.getOneLineContent(), oneLine.getUserBook().getRating(),
+                oneLine.getUserBook().getBookInfo().getTitle(), oneLine.getUserBook().getBookInfo().getAuthor());
     }
 
     private BookWithMemoCardDto convertToBookWithMemoCardDto(HomeCard homeCard) {
