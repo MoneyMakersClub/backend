@@ -92,6 +92,29 @@ public class ArchiveService {
         return createArchiveResponseDto(archive, filteredExcerpt, filteredReview, userBook);
     }
 
+    // 공유 링크를 통한 조회
+    @Transactional(readOnly = true)
+    public ArchiveResponseDto getSharedArchive(Long id, ArchiveType archiveType) {
+        Archive archive = findArchiveByType(id, archiveType); // 기록 삭제되는 경우 에러 여기서 함께 처리됨
+
+        // 공개 기록이 아니면 에러
+        Visibility visibility = switch (archiveType) {
+            case EXCERPT -> archive.getExcerpt().getVisibility();
+            case REVIEW -> archive.getReview().getVisibility();
+            default -> throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
+        };
+        if (visibility == Visibility.PRIVATE) { throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);}
+
+        UserBook userBook = getUserBookFromExcerptOrReview(archive);
+        Excerpt publicExcerpt = archive.getExcerpt() != null && archive.getExcerpt().getVisibility() == Visibility.PUBLIC
+                ? archive.getExcerpt()
+                : null;
+        Review publicReview = archive.getReview() != null && archive.getReview().getVisibility() == Visibility.PUBLIC
+                ? archive.getReview()
+                : null;
+        return createArchiveResponseDto(archive, publicExcerpt, publicReview, userBook);
+    }
+
     // 수정
     public ArchiveResponseDto updateArchive(Long id, ArchiveType archiveType, ArchiveUpdateRequestDto requestDto) {
         Archive archive = findArchiveByType(id, archiveType);

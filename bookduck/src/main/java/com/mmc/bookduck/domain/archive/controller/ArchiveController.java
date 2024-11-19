@@ -73,4 +73,11 @@ public class ArchiveController {
         ArchiveSearchListResponseDto responseDto = archiveService.searchArchives(keyword, pageable, orderBy);
         return ResponseEntity.ok().body(responseDto);
     }
+
+    @GetMapping("/share/{id}")
+    @Operation(summary = "공유된 링크로 발췌 및 감상평 통합 조회", description = "공유된 링크로 발췌와 감상평을 조회합니다.")
+    public ResponseEntity<?> getSharedArchive(@PathVariable("id") final Long id, @RequestParam("type") final ArchiveType archiveType) {
+        ArchiveResponseDto responseDto = archiveService.getSharedArchive(id, archiveType);
+        return ResponseEntity.ok(responseDto);
+    }
 }
