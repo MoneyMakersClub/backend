@@ -3,9 +3,11 @@ package com.mmc.bookduck.domain.archive.controller;
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveUpdateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.response.ArchiveResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.ArchiveSearchListResponseDto;
 import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.domain.archive.service.ArchiveService;
 import com.mmc.bookduck.domain.archive.service.OcrService;
+import com.mmc.bookduck.global.common.PaginatedResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -66,9 +68,9 @@ public class ArchiveController {
 
     @Operation(summary = "나의 기록 검색", description = "나의 기록(발췌, 감상평)을 검색합니다.")
     @GetMapping("/search")
-    public ResponseEntity<?> searchUsers(@RequestParam("keyword") final String keyword,
+    public ResponseEntity<?> searchUsers(@RequestParam("keyword") final String keyword, @RequestParam(value = "orderBy", defaultValue = "accuracy") final String orderBy,
                                          @PageableDefault(size = 20) final Pageable pageable) {
-        archiveService.searchArchives(keyword, pageable);
-        return ResponseEntity.ok().body();
+        ArchiveSearchListResponseDto responseDto = archiveService.searchArchives(keyword, pageable, orderBy);
+        return ResponseEntity.ok().body(responseDto);
     }
 }

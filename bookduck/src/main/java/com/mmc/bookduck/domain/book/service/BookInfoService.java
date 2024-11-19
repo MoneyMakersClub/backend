@@ -39,7 +39,6 @@ import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingUnitDto;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
-import com.mmc.bookduck.domain.oneline.service.OneLineService;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.S3.S3Service;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -474,7 +473,7 @@ public class BookInfoService {
     public OneLineRatingListResponseDto getOneLineList(Long bookInfoId, String orderBy, Pageable pageable) {
         BookInfo bookInfo = getBookInfoById(bookInfoId);
         Page<OneLine> oneLinePage;
-        switch (orderBy) {
+        switch (orderBy.toLowerCase()) {
             case "likes":
                 oneLinePage = oneLineRepository.findByBookInfoOrderByOneLineLikesDesc(bookInfo, pageable);
                 break;
