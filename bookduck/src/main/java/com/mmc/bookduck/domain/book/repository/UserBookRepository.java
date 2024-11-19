@@ -54,13 +54,14 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
 
     List<UserBook> findAllByUser(User user);
 
-    // 유저가 가장 많이 읽은 카테고리들
-    @Query(value = "SELECT bi.category, COUNT(ub) FROM UserBook ub " +
+    // 유저가 가장 많이 읽은 장르들
+    @Query("SELECT g.genreName, COUNT(ub) FROM UserBook ub " +
             "JOIN ub.bookInfo bi " +
+            "JOIN bi.genre g " +
             "WHERE ub.user = :user " +
-            "GROUP BY bi.category " +
+            "GROUP BY g.genreName " +
             "ORDER BY COUNT(ub) DESC")
-    List<Object[]> findTopCategoriesByUser(@Param("user") User user, Pageable pageable);
+    List<Object[]> findTopGenresByUser(@Param("user") User user, Pageable pageable);
 
     @Query("SELECT g.genreName " +
             "FROM UserBook ub " +
