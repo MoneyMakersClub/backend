@@ -12,7 +12,7 @@ public record UserArchiveResponseDto(
         long totalElements,
         int totalPages,
         List<ArchiveWithType> archiveList,
-        List<ArchiveWithoutTitleAuthor> UserBookArchiveList
+        List<ArchiveWithoutTitleAuthor> userBookArchiveList
 ) {
     public record ArchiveWithType(
             String type, // EXCERPT, REVIEW

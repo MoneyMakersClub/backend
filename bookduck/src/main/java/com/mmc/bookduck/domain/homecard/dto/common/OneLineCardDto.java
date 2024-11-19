@@ -6,9 +6,9 @@ public record OneLineCardDto(
         Long cardId,
         Long cardIndex,
         CardType cardType,
+        String oneLineContent,
+        double rating,
         String title,
-        String author,
-        Double rating, // null일 수 있음
-        String oneLineContent
+        String author
 ) implements HomeCardDto {
 }

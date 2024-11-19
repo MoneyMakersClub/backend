@@ -1,13 +1,12 @@
 package com.mmc.bookduck.domain.archive.service;
 
+import com.mmc.bookduck.domain.archive.dto.common.ExcerptSearchUnitDto;
+import com.mmc.bookduck.domain.archive.dto.common.ReviewSearchUnitDto;
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveUpdateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.request.ExcerptCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.request.ReviewCreateRequestDto;
-import com.mmc.bookduck.domain.archive.dto.response.ArchiveResponseDto;
-import com.mmc.bookduck.domain.archive.dto.response.ExcerptResponseDto;
-import com.mmc.bookduck.domain.archive.dto.response.ReviewResponseDto;
-import com.mmc.bookduck.domain.archive.dto.response.UserArchiveResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.*;
 import com.mmc.bookduck.domain.archive.entity.Archive;
 import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
@@ -21,20 +20,21 @@ import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.friend.entity.Friend;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
 import com.mmc.bookduck.domain.user.service.UserService;
+import com.mmc.bookduck.global.common.PaginatedResponseDto;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import static com.mmc.bookduck.global.common.EscapeSpecialCharactersService.escapeSpecialCharacters;
 
 @Slf4j
 @Service
@@ -216,6 +216,46 @@ public class ArchiveService {
         return UserArchiveResponseDto.from(dtoPage);
     }
 
+    // 나의 기록 검색
+    @Transactional(readOnly = true)
+    public ArchiveSearchListResponseDto searchArchives(String keyword, Pageable pageable, String orderBy) {
+        Long userId = userService.getCurrentUser().getUserId();
+        String escapedKeyword = escapeSpecialCharacters(keyword);
+
+        Page<Object[]> rawResults = switch (orderBy.toLowerCase()) {
+            case "accuracy" -> archiveRepository.searchByAccuracy(userId, escapedKeyword, pageable);
+            case "latest" -> archiveRepository.searchByLatest(userId, escapedKeyword, pageable);
+            default -> throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+        };
+
+        Page<ArchiveSearchListResponseDto.ResultWithType> resultWithTypePage = rawResults.map(row -> {
+            String type = (String) row[0];
+            Long id = (Long) row[1];
+            String content = (String) row[2];
+            String title = (String) row[3];
+            Visibility visibility = Visibility.valueOf((String) row[4]);
+            LocalDateTime createdTime = ((Timestamp) row[5]).toLocalDateTime();
+
+            if ("EXCERPT".equals(type)) {
+                return new ArchiveSearchListResponseDto.ResultWithType(
+                        "EXCERPT",
+                        new ExcerptSearchUnitDto(id, content, visibility, createdTime)
+                );
+            } else if ("REVIEW".equals(type)) {
+                return new ArchiveSearchListResponseDto.ResultWithType(
+                        "REVIEW",
+                        new ReviewSearchUnitDto(id, title, content, visibility, createdTime)
+                );
+            }
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+        });
+
+        PaginatedResponseDto<ArchiveSearchListResponseDto.ResultWithType> dtoPage =
+                PaginatedResponseDto.from(resultWithTypePage);
+        return ArchiveSearchListResponseDto.from(dtoPage);
+    }
+
+
     public ArchiveResponseDto createArchiveResponseDto(Archive archive, Excerpt excerpt, Review review, UserBook userBook) {
         Long creatorUserId = userBook.getUser().getUserId();
         Long bookInfoId = userBook.getBookInfo().getBookInfoId();
@@ -234,6 +274,7 @@ public class ArchiveService {
         );
     }
 
+    @Transactional(readOnly = true)
     public Archive findArchiveByType(Long id, ArchiveType archiveType) {
         return switch (archiveType) {
             case EXCERPT -> archiveRepository.findByExcerpt_ExcerptId(id)
