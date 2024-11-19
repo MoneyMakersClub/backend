@@ -1,10 +1,8 @@
 package com.mmc.bookduck.domain.archive.repository;
 
 
-import com.mmc.bookduck.domain.archive.dto.response.ArchiveSearchListResponseDto;
 import com.mmc.bookduck.domain.archive.entity.Archive;
 
-import com.mmc.bookduck.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,7 +22,6 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long> {
         e.excerpt_id AS id,
         e.excerpt_content AS content,
         NULL AS title,
-        NULL AS color,
         e.visibility AS visibility,
         e.created_time AS created_time
      FROM excerpt e
@@ -36,7 +33,6 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long> {
         r.review_id AS id,
         r.review_content AS content,
         r.review_title AS title,
-        r.color AS color,
         r.visibility AS visibility,
         r.created_time AS created_time
      FROM review r
@@ -75,7 +71,6 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long> {
         e.excerpt_id AS id,
         e.excerpt_content AS content,
         NULL AS title,
-        NULL AS color,
         e.visibility AS visibility,
         e.created_time AS created_time
      FROM excerpt e
@@ -87,7 +82,6 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long> {
         r.review_id AS id,
         r.review_content AS content,
         r.review_title AS title,
-        r.color AS color,
         r.visibility AS visibility,
         r.created_time AS created_time
      FROM review r

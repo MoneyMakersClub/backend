@@ -233,8 +233,8 @@ public class ArchiveService {
             Long id = (Long) row[1];
             String content = (String) row[2];
             String title = (String) row[3];
-            Visibility visibility = Visibility.valueOf((String) row[5]);
-            LocalDateTime createdTime = ((Timestamp) row[6]).toLocalDateTime();
+            Visibility visibility = Visibility.valueOf((String) row[4]);
+            LocalDateTime createdTime = ((Timestamp) row[5]).toLocalDateTime();
 
             if ("EXCERPT".equals(type)) {
                 return new ArchiveSearchListResponseDto.ResultWithType(
