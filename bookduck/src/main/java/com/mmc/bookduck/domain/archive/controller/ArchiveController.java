@@ -68,7 +68,7 @@ public class ArchiveController {
 
     @Operation(summary = "나의 기록 검색", description = "나의 기록(발췌, 감상평)을 검색합니다.")
     @GetMapping("/search")
-    public ResponseEntity<?> searchUsers(@RequestParam("keyword") final String keyword, @RequestParam(value = "orderBy", defaultValue = "accuracy") final String orderBy,
+    public ResponseEntity<?> searchArchives(@RequestParam("keyword") final String keyword, @RequestParam(value = "orderBy", defaultValue = "accuracy") final String orderBy,
                                          @PageableDefault(size = 20) final Pageable pageable) {
         ArchiveSearchListResponseDto responseDto = archiveService.searchArchives(keyword, pageable, orderBy);
         return ResponseEntity.ok().body(responseDto);
