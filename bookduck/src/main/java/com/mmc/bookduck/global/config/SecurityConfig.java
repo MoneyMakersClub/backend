@@ -55,8 +55,7 @@ public class SecurityConfig {
     }
 
     private static final String[] AUTH_WHITELIST = {
-            // TODO: 추후 변경 필요
-            "/auth/refresh", "/logout"
+            "/auth/refresh", "/logout" // TODO: 추후 변경 필요
     };
 
     @Bean
@@ -99,6 +98,9 @@ public class SecurityConfig {
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .requestMatchers(HttpMethod.GET, "/archives/share/{id}").permitAll()
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
+                        .requestMatchers("/users/{userId:[0-9]+}/{section:statistics|keywords|growth|badges}").authenticated()
+                        .requestMatchers("/users/{userId:[0-9]+}/{section:readingspace|character}").permitAll()
+                        .requestMatchers("/users/{userId:[0-9]+}").permitAll()
                         .anyRequest().authenticated()
                 )
                 // X-Frame-Options: SAME ORIGIN으로 설정

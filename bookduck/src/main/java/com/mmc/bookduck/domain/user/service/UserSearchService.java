@@ -42,7 +42,6 @@ public class UserSearchService {
         return PaginatedResponseDto.from(userUnitDtoPage);
     }
 
-    @Transactional(readOnly = true)
     public Page<User> getSearchedUserPage(String keyword, Pageable pageable) {
         Pageable sortedByNickname = PageRequest.of(
                 pageable.getPageNumber(),

@@ -11,14 +11,10 @@ public record UserBookResponseDto(
         ReadStatus readStatus,
         double rating,
         Long bookInfoId,
-        boolean isCustomBook
+        Boolean isCustomBook
 ) {
-    public static UserBookResponseDto from(UserBook userBook) {
-        boolean isCustom = false;
-        if(userBook.getBookInfo().getCreatedUserId() != null){
-            isCustom = true;
-        }
-        return new UserBookResponseDto(
+    public UserBookResponseDto(UserBook userBook, boolean isCustomBook) {
+        this(
                 userBook.getUserBookId(),
                 userBook.getBookInfo().getTitle(),
                 userBook.getBookInfo().getAuthor(),
@@ -26,7 +22,7 @@ public record UserBookResponseDto(
                 userBook.getReadStatus(),
                 userBook.getRating(),
                 userBook.getBookInfo().getBookInfoId(),
-                isCustom
+                isCustomBook
         );
     }
 }

@@ -11,7 +11,6 @@ import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
-import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookUnitParseDto;
 import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineReadStatusDto;
 import com.mmc.bookduck.domain.book.dto.request.AddUserBookRequestDto;
@@ -50,12 +49,13 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,16 +122,11 @@ public class BookInfoService {
                 JsonNode info = itemNode.get("volumeInfo");
                 // title
                 String title = getTextNode(info, "title");
-                // authors
+                // author
                 JsonNode authorsNode = info.get("authors");
-                List<String> authors = new ArrayList<>();
-                if (authorsNode != null && authorsNode.isArray()) {
-                    for (JsonNode authorNode : authorsNode) {
-                        authors.add(authorNode.asText());
-                    }
-                } else {
-                    // authors가 없으면, null로 설정
-                    authors = null;
+                String author = null;
+                if (authorsNode != null && authorsNode.isArray() && authorsNode.size() > 0) {
+                    author = authorsNode.get(0).asText();
                 }
                 // image
                 String imgPath;
@@ -143,7 +138,7 @@ public class BookInfoService {
                 } else {
                     imgPath = null;
                 }
-                bookList.add(new BookUnitParseDto(title, authors, imgPath, providerId));
+                bookList.add(new BookUnitParseDto(title, author, imgPath, providerId));
             }
             return bookList;
 
@@ -234,13 +229,9 @@ public class BookInfoService {
             String title = getTextNode(info, "title");
             // authors
             JsonNode authorsNode = info.get("authors");
-            List<String> authors = new ArrayList<>();
-            if (authorsNode != null && authorsNode.isArray()) {
-                for (JsonNode authorNode : authorsNode) {
-                    authors.add(authorNode.asText());
-                }
-            } else {
-                authors = null;
+            String author = null;
+            if (authorsNode != null && authorsNode.isArray() && authorsNode.size() > 0) {
+                author = authorsNode.get(0).asText();
             }
             // image
             String imgPath;
@@ -252,7 +243,7 @@ public class BookInfoService {
             } else {
                 imgPath = null;
             }
-            return new BookUnitDto(null, null, title, authors, imgPath, null, null);
+            return new BookUnitDto(null, null, title, author, imgPath, null, null);
 
         }catch(Exception e){
             throw new CustomException(ErrorCode.JSON_PARSING_ERROR);
@@ -262,7 +253,7 @@ public class BookInfoService {
     // api bookInfo 저장
     public BookInfo saveApiBookInfo (UserBookRequestDto dto) {
 
-        String saveAuthor = dto.authors().getFirst();
+        String saveAuthor = dto.author();
         Genre genre = genreService.findGenreById(dto.genreId());
 
         BookInfo bookInfo = dto.toEntity(saveAuthor,genre);
@@ -320,7 +311,7 @@ public class BookInfoService {
 
         MyRatingOneLineReadStatusDto my = getMyRatingOneLineReadStatus(bookInfo, user);
         String koreanGenreName = genreService.genreNameToKorean(bookInfo.getGenre());
-        BookInfoDetailDto additional = BookInfoDetailDto.from(bookInfo, koreanGenreName);
+        BookInfoDetailDto additional = new BookInfoDetailDto(bookInfo, koreanGenreName);
         BookUnitDto bookUnitDto = BookUnitDto.from(bookInfo, my);
 
         if(userBook.isPresent()){
@@ -345,9 +336,9 @@ public class BookInfoService {
 
         if(bookInfo.getCreatedUserId().equals(user.getUserId())){ // 내 customBook
             MyRatingOneLineReadStatusDto myRatingOneLine = getMyRatingOneLineReadStatus(bookInfo, user);
-            return CustomBookResponseDto.from(userBook, myRatingOneLine.myRating(),myRatingOneLine.oneLineId(), myRatingOneLine.myOneLine(), true);
+            return new CustomBookResponseDto(userBook, myRatingOneLine.myRating(),myRatingOneLine.oneLineId(), myRatingOneLine.myOneLine(), true);
         }else if(friendService.isFriendWithCurrentUserOrNull(bookInfoCreaterUser)){ //친구 customBook
-            return CustomBookResponseDto.from(userBook, false);
+            return new CustomBookResponseDto(userBook, false);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST); //내것도 아니고 친구것도 아닌 경우
         }
@@ -408,7 +399,7 @@ public class BookInfoService {
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
 
         MyRatingOneLineReadStatusDto ratingDto = getMyRatingOneLineReadStatus(bookInfo, user);
-        return CustomBookResponseDto.from(userBook, ratingDto.myRating(), ratingDto.oneLineId(),ratingDto.myOneLine(), true);
+        return new CustomBookResponseDto(userBook, ratingDto.myRating(), ratingDto.oneLineId(),ratingDto.myOneLine(), true);
     }
 
     @Transactional(readOnly = true)
@@ -460,7 +451,7 @@ public class BookInfoService {
         Page<OneLineRatingUnitDto> dtoPage = oneLinePage.map(oneLine -> {
             Boolean isLiked = oneLine.getOneLineLikes().stream()
                     .anyMatch(like -> like.getUser().getUserId().equals(currentUser.getUserId()));
-            return OneLineRatingUnitDto.from(oneLine, isLiked);
+            return new OneLineRatingUnitDto(oneLine, isLiked);
         });
         return OneLineRatingListResponseDto.from(bookInfoId, dtoPage);
     }
@@ -583,6 +574,6 @@ public class BookInfoService {
             UserBook userBook = requestDto.toEntity(user, newBookInfo, ReadStatus.valueOf(requestDto.readStatus()));
             savedUserBook = userBookRepository.save(userBook);
         }
-        return AddUserBookResponseDto.from(savedUserBook);
+        return new AddUserBookResponseDto(savedUserBook);
     }
 }

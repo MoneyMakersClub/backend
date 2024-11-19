@@ -8,8 +8,8 @@ public record BookRatingUnitDto(
         double rating,
         String oneLine
 ) {
-    public static BookRatingUnitDto from(OneLine oneLine, UserBook userBook) {
-        return new BookRatingUnitDto(
+    public BookRatingUnitDto(OneLine oneLine, UserBook userBook) {
+        this(
                 oneLine.getUser().getNickname(),
                 userBook.getRating(),
                 oneLine.getOneLineContent()

@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
@@ -58,7 +59,8 @@ public class UserService {
     }
     
     // 사용자가 활성 상태임을 검증
-    private void validateActiveUserStatus(User user) throws CustomException {
+    @Transactional(readOnly = true)
+    public void validateActiveUserStatus(User user) throws CustomException {
         if (!user.getUserStatus().equals(UserStatus.ACTIVE)) {
             throw new CustomException(ErrorCode.USER_STATUS_IS_NOT_ACTIVE);
         }
@@ -66,7 +68,6 @@ public class UserService {
 
     // 공식계정 생성
     @PostConstruct
-    @Transactional
     public void createOfficialAccount() {
         if (userRepository.findByEmail(officialAccountEmail).isEmpty()) {
             User officialAccount = User.builder()
@@ -80,7 +81,6 @@ public class UserService {
         }
     }
 
-    @Transactional
     public User saveUser(User user){
         return userRepository.save(user);
     }

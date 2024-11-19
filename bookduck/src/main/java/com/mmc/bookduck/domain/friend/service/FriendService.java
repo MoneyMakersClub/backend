@@ -1,6 +1,5 @@
 package com.mmc.bookduck.domain.friend.service;
 
-import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 import com.mmc.bookduck.domain.alarm.service.AlarmByTypeService;
 import com.mmc.bookduck.domain.friend.dto.common.FriendUnitDto;
 import com.mmc.bookduck.domain.friend.dto.request.FriendCreateRequestDto;
@@ -17,7 +16,6 @@ import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

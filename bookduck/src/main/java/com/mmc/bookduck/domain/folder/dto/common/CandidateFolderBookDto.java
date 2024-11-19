@@ -12,8 +12,8 @@ public record CandidateFolderBookDto(
         ReadStatus readStatus,
         boolean isCustom
 ) {
-    public static CandidateFolderBookDto from(UserBook userBook, boolean isCustom) {
-        return new CandidateFolderBookDto(
+    public CandidateFolderBookDto(UserBook userBook, boolean isCustom) {
+        this(
                 userBook.getUserBookId(),
                 userBook.getBookInfo().getTitle(),
                 userBook.getBookInfo().getAuthor(),
