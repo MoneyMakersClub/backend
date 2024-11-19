@@ -7,16 +7,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 public record CustomBookRequestDto(@NotBlank(message = "title은 필수입니다. title은 공백일 수 없습니다.") String title,
                                    @NotBlank(message = "author은 필수입니다. author은 공백일 수 없습니다.") String author,
-                                   Long pageCount,
-                                   String publisher,
                                    MultipartFile coverImage) {
 
     public BookInfo toEntity(String imgPath, Genre genre, Long userId){
         return BookInfo.builder()
                 .title(this.title)
                 .author(this.author)
-                .pageCount(this.pageCount)
-                .publisher(this.publisher)
                 .imgPath(imgPath)
                 .genre(genre)
                 .createdUserId(userId)
