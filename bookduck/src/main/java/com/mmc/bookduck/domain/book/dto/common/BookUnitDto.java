@@ -11,7 +11,7 @@ public record BookUnitDto(
         Long bookInfoId,
         Long userbookId,
         String title,
-        List<String> author,
+        String author,
         String imgPath,
         Double myRating,
         ReadStatus readStatus
@@ -43,7 +43,7 @@ public record BookUnitDto(
                 bookInfo.getBookInfoId(),
                 ratingDto.userbookId(),
                 bookInfo.getTitle(),
-                Collections.singletonList(bookInfo.getAuthor()),
+                bookInfo.getAuthor(),
                 bookInfo.getImgPath(),
                 ratingDto.myRating(),
                 ratingDto.readStatus()

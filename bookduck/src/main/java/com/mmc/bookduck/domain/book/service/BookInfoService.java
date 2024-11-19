@@ -11,7 +11,6 @@ import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
-import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookUnitParseDto;
 import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineReadStatusDto;
 import com.mmc.bookduck.domain.book.dto.request.AddUserBookRequestDto;
@@ -122,16 +121,11 @@ public class BookInfoService {
                 JsonNode info = itemNode.get("volumeInfo");
                 // title
                 String title = getTextNode(info, "title");
-                // authors
+                // author
                 JsonNode authorsNode = info.get("authors");
-                List<String> authors = new ArrayList<>();
-                if (authorsNode != null && authorsNode.isArray()) {
-                    for (JsonNode authorNode : authorsNode) {
-                        authors.add(authorNode.asText());
-                    }
-                } else {
-                    // authors가 없으면, null로 설정
-                    authors = null;
+                String author = null;
+                if (authorsNode != null && authorsNode.isArray() && authorsNode.size() > 0) {
+                    author = authorsNode.get(0).asText();
                 }
                 // image
                 String imgPath;
@@ -143,7 +137,7 @@ public class BookInfoService {
                 } else {
                     imgPath = null;
                 }
-                bookList.add(new BookUnitParseDto(title, authors, imgPath, providerId));
+                bookList.add(new BookUnitParseDto(title, author, imgPath, providerId));
             }
             return bookList;
 
@@ -234,13 +228,9 @@ public class BookInfoService {
             String title = getTextNode(info, "title");
             // authors
             JsonNode authorsNode = info.get("authors");
-            List<String> authors = new ArrayList<>();
-            if (authorsNode != null && authorsNode.isArray()) {
-                for (JsonNode authorNode : authorsNode) {
-                    authors.add(authorNode.asText());
-                }
-            } else {
-                authors = null;
+            String author = null;
+            if (authorsNode != null && authorsNode.isArray() && authorsNode.size() > 0) {
+                author = authorsNode.get(0).asText();
             }
             // image
             String imgPath;
@@ -252,7 +242,7 @@ public class BookInfoService {
             } else {
                 imgPath = null;
             }
-            return new BookUnitDto(null, null, title, authors, imgPath, null, null);
+            return new BookUnitDto(null, null, title, author, imgPath, null, null);
 
         }catch(Exception e){
             throw new CustomException(ErrorCode.JSON_PARSING_ERROR);
@@ -262,7 +252,7 @@ public class BookInfoService {
     // api bookInfo 저장
     public BookInfo saveApiBookInfo (UserBookRequestDto dto) {
 
-        String saveAuthor = dto.authors().getFirst();
+        String saveAuthor = dto.author();
         Genre genre = genreService.findGenreById(dto.genreId());
 
         BookInfo bookInfo = dto.toEntity(saveAuthor,genre);
