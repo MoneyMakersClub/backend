@@ -1,5 +1,7 @@
 package com.mmc.bookduck.domain.export.controller;
 
+import com.mmc.bookduck.domain.archive.dto.response.ExcerptCardResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.ReviewCardResponseDto;
 import com.mmc.bookduck.domain.export.dto.ExportCharResponseDto;
 import com.mmc.bookduck.domain.export.dto.ExportStatsResponseDto;
 import com.mmc.bookduck.domain.export.service.ExportService;
@@ -7,10 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @Tag(name = "Export", description = "Export 관련 API입니다.")
@@ -31,6 +30,20 @@ public class ExportController {
     @Operation(summary = "통계 요약 내보내기 정보 제공", description = "통계 요약 내보내기 할 정보를 조회합니다.")
     public ResponseEntity<?> getStatisticsExportInfo() {
         ExportStatsResponseDto responseDto = exportService.getStatsExportInfo();
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @GetMapping("/excerptcard/{excerptId}")
+    @Operation(summary = "발췌 카드 공유하기 정보 제공", description = "공유할 발췌 카드 이미지의 정보를 조회합니다.")
+    public ResponseEntity<?> getExcerptCardInfo(@PathVariable("excerptId") final Long excerptId) {
+        ExcerptCardResponseDto responseDto = exportService.getExcerptCardInfo(excerptId);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @GetMapping("/reviewcard/{reviewId}")
+    @Operation(summary = "감상평 카드 공유하기 정보 제공", description = "공유할 감상평 카드 이미지의 정보를 조회합니다.")
+    public ResponseEntity<?> getReviewCardInfo(@PathVariable("reviewId") final Long reviewId) {
+        ReviewCardResponseDto responseDto = exportService.getReviewCardInfo(reviewId);
         return ResponseEntity.ok(responseDto);
     }
 }

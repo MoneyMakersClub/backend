@@ -1,7 +1,13 @@
 package com.mmc.bookduck.domain.export.service;
 
+import com.mmc.bookduck.domain.archive.dto.response.ExcerptCardResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.ReviewCardResponseDto;
+import com.mmc.bookduck.domain.archive.entity.Excerpt;
+import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
+import com.mmc.bookduck.domain.archive.service.ExcerptService;
+import com.mmc.bookduck.domain.archive.service.ReviewService;
 import com.mmc.bookduck.domain.book.entity.GenreName;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
@@ -27,15 +33,18 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class ExportService {
     private final UserService userService;
     private final UserReadingReportService userReadingReportService;
     private final UserItemService userItemService;
+    private final ExcerptService excerptService;
+    private final ReviewService reviewService;
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
     private final UserBookRepository userBookRepository;
 
+    // 캐릭터 내보내기
     public ExportCharResponseDto getCharExportInfo(){
         User user = userService.getCurrentUser();
         long userBookCount = userBookRepository.countByUser(user);
@@ -51,6 +60,7 @@ public class ExportService {
         return new ExportCharResponseDto(nickname, duckTitle, keywordResponse, userItemEquipped);
     }
 
+    // 통계 요약 내보내기
     public ExportStatsResponseDto getStatsExportInfo(){
         User user = userService.getCurrentUser();
         String nickname = user.getNickname();
@@ -114,4 +124,17 @@ public class ExportService {
         LocalDate endDate = LocalDate.of(year, range[1], LocalDate.of(year, range[1], 1).lengthOfMonth()); // m월 마지막 날
         return new LocalDate[]{startDate, endDate};
     }
+
+    // 발췌 카드 공유하기
+    public ExcerptCardResponseDto getExcerptCardInfo(Long excerptId) {
+        Excerpt excerpt = excerptService.getExcerptById(excerptId);
+        return ExcerptCardResponseDto.from(excerpt);
+    }
+
+    // 감상평 카드 공유하기
+    public ReviewCardResponseDto getReviewCardInfo(Long reviewId) {
+        Review review = reviewService.getReviewById(reviewId);
+        return ReviewCardResponseDto.from(review);
+    }
+
 }
