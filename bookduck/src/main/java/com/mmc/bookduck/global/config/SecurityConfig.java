@@ -95,7 +95,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(AUTH_WHITELIST).permitAll()
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                        .anyRequest().permitAll() // 임시로 모두 오픈
+                        .requestMatchers("/users/{userId}").permitAll()
+                        .requestMatchers("/users/{userId}/readingspace").permitAll()
+                        .requestMatchers("/users/{userId}/character").permitAll()
+                        .anyRequest().authenticated()
                 )
                 // X-Frame-Options: SAME ORIGIN으로 설정
                 .headers(header -> header
