@@ -4,7 +4,6 @@ import com.mmc.bookduck.domain.friend.service.FriendService;
 import com.mmc.bookduck.domain.item.dto.common.ItemEquippedUnitDto;
 import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.dto.common.UserUnitDto;
-import com.mmc.bookduck.domain.user.entity.Role;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
 import com.mmc.bookduck.global.common.PaginatedResponseDto;
