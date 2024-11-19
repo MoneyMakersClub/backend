@@ -3,7 +3,6 @@ package com.mmc.bookduck.domain.book.dto.common;
 import com.mmc.bookduck.domain.book.dto.request.AddUserBookRequestDto;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.Genre;
-import com.mmc.bookduck.domain.book.entity.UserBook;
 
 import java.util.List;
 
@@ -35,7 +34,7 @@ public record BookInfoDetailDto(
         return BookInfo.builder()
                 .providerId(providerId)
                 .title(dto.title())
-                .author(dto.authors().getFirst())
+                .author(dto.author())
                 .publisher(this.publisher)
                 .publishDate(this.publishedDate)
                 .description(this.description)
