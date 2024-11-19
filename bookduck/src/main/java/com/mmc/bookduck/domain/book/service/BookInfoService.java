@@ -11,7 +11,6 @@ import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
-import com.mmc.bookduck.domain.book.dto.common.BookRatingUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookUnitParseDto;
 import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineReadStatusDto;
 import com.mmc.bookduck.domain.book.dto.request.AddUserBookRequestDto;

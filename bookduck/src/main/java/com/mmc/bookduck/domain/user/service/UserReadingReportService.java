@@ -33,6 +33,7 @@ public class UserReadingReportService {
     private final ReviewRepository reviewRepository;
     private final UserService userService;
     private final KomoranService komoranService;
+
     public UserStatisticsResponseDto getUserStatistics(Long userId) {
         // UserBook이 0권이라면 조회 불가능
         User user = userService.getActiveUserByUserId(userId);
