@@ -39,9 +39,7 @@ import java.util.Optional;
 public class UserBookService {
     private final BookInfoService bookInfoService;
     private final UserBookRepository userBookRepository;
-    private final GenreService genreService;
     private final UserService userService;
-    private final OneLineRepository oneLineRepository;
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
 
@@ -61,7 +59,12 @@ public class UserBookService {
     // 서재에 책 추가
     public UserBookResponseDto addUserBook(UserBookRequestDto requestDto) {
         UserBook savedUserBook = addUserBookEntity(requestDto);
-        return new UserBookResponseDto(savedUserBook);
+        return convertToUserBookResponseDto(savedUserBook);
+    }
+
+    private UserBookResponseDto convertToUserBookResponseDto(UserBook userBook) {
+        boolean isCustomBook = (userBook.getBookInfo().getCreatedUserId() != null);
+        return new UserBookResponseDto(userBook, isCustomBook);
     }
 
     public UserBook addUserBookEntity(UserBookRequestDto requestDto) {
@@ -143,8 +146,7 @@ public class UserBookService {
         // 권한체크
         if(userBook.getUser().getUserId().equals(user.getUserId())){
             userBook.changeReadStatus(ReadStatus.valueOf(status));
-
-            return new UserBookResponseDto(userBook);
+            return convertToUserBookResponseDto(userBook);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
@@ -152,52 +154,44 @@ public class UserBookService {
 
     @Transactional(readOnly = true)
     public UserBook getUserBookById(Long userBookId){
-        UserBook userBook = userBookRepository.findById(userBookId)
+        return userBookRepository.findById(userBookId)
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
-        return userBook;
     }
 
     // 서재 책 전체 조회
-    public UserBookListResponseDto getAllUserBook(String sort){
-
+    public UserBookListResponseDto getAllUserBook(String sort) {
         User user = userService.getCurrentUser();
         List<UserBook> userBookList = sortUserBook(user, sort);
 
-        List<UserBookResponseDto> dtos = new ArrayList<>();
+        List<UserBookResponseDto> dtos = userBookList.stream()
+                .map(this::convertToUserBookResponseDto)
+                .toList();
 
-        for(UserBook book : userBookList){
-            dtos.add(new UserBookResponseDto(book));
-        }
         return new UserBookListResponseDto(dtos);
     }
 
     // 서재 책 상태별 조회
-    public UserBookListResponseDto getStatusUserBook(List<String> statusList, String sort){
+    public UserBookListResponseDto getStatusUserBook(List<String> statusList, String sort) {
 
-        if(statusList.isEmpty()){
+        if (statusList.isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
         }
+
         List<ReadStatus> readStatusList = validateReadStatus(statusList);
-
         User user = userService.getCurrentUser();
-        List<UserBook> sorteduserBookList = sortUserBook(user, sort);
 
-        List<UserBook> userBookList = new ArrayList<>();
-        for(UserBook userBook : sorteduserBookList){
-            for(ReadStatus status : readStatusList){
-                if(userBook.getReadStatus().equals(status)){
-                    userBookList.add(userBook);
-                }
-            }
-        }
+        // 필터링 및 정렬된 책 리스트 생성
+        List<UserBook> userBookList = sortUserBook(user, sort).stream()
+                .filter(userBook -> readStatusList.contains(userBook.getReadStatus())) // 상태 필터링
+                .toList();
 
-        List<UserBookResponseDto> dtos = new ArrayList<>();
-        for(UserBook book : userBookList){
-            dtos.add(new UserBookResponseDto(book));
-        }
+        // DTO 변환
+        List<UserBookResponseDto> dtos = userBookList.stream()
+                .map(this::convertToUserBookResponseDto)
+                .toList();
+
         return new UserBookListResponseDto(dtos);
     }
-
 
     /*
     // 서재책 상세보기 - 기본정보
