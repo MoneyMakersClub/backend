@@ -17,8 +17,8 @@ public record BookInfoDetailDto(
         String language
 ) {
 
-    public static BookInfoDetailDto from(BookInfo bookInfo, String koreanGenreName) {
-        return new BookInfoDetailDto(
+    public BookInfoDetailDto(BookInfo bookInfo, String koreanGenreName) {
+        this (
                 bookInfo.getPublisher(),
                 bookInfo.getPublishDate(),
                 bookInfo.getDescription(),

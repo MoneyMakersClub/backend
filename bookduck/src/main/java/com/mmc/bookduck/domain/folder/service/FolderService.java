@@ -4,6 +4,7 @@ import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.folder.dto.common.CandidateFolderBookDto;
+import com.mmc.bookduck.domain.folder.dto.common.FolderBookCoverDto;
 import com.mmc.bookduck.domain.folder.dto.common.FolderBookCoverListDto;
 import com.mmc.bookduck.domain.folder.dto.request.FolderBookOrderRequestDto;
 import com.mmc.bookduck.domain.folder.dto.request.FolderRequestDto;
@@ -50,7 +51,7 @@ public class FolderService {
         Folder folder = new Folder(dto.folderName(), user);
 
         Folder savedFolder = folderRepository.save(folder);
-        return FolderResponseDto.from(savedFolder);
+        return new FolderResponseDto(savedFolder);
     }
 
     // 폴더명 수정
@@ -66,7 +67,7 @@ public class FolderService {
         Folder folder = findFolderById(folderId);
 
         folder.updateFolderName(dto.folderName());
-        return FolderResponseDto.from(folder);
+        return new FolderResponseDto(folder);
     }
 
     // 폴더 삭제
@@ -114,7 +115,7 @@ public class FolderService {
 
         for (FolderBook folderBook : folderBooks) {
             boolean isCustom = checkIsCustom(folderBook.getUserBook());
-            folderBookList.add(FolderBookUnitDto.from(folderBook, isCustom));
+            folderBookList.add(new FolderBookUnitDto(folderBook, isCustom));
         }
         return new FolderBookListResponseDto(folder, folderBookList);
     }
@@ -146,7 +147,7 @@ public class FolderService {
         List<FolderBookUnitDto> dtoList = new ArrayList<>();
         for(FolderBook book : orderedFolderBooks){
             boolean isCustom = checkIsCustom(book.getUserBook());
-            dtoList.add(FolderBookUnitDto.from(book, isCustom));
+            dtoList.add(new FolderBookUnitDto(book, isCustom));
         }
         return new FolderBookListResponseDto(folder, dtoList);
 
@@ -163,7 +164,7 @@ public class FolderService {
         if(folder.getUser().equals(user)){
             for(FolderBook folderBook : folder.getFolderBooks()){
                 boolean isCustom = checkIsCustom(folderBook.getUserBook());
-                folderBookList.add(FolderBookUnitDto.from(folderBook, isCustom));
+                folderBookList.add(new FolderBookUnitDto(folderBook, isCustom));
             }
             return new FolderBookListResponseDto(folder, folderBookList);
         }else{
@@ -181,7 +182,15 @@ public class FolderService {
 
         if(folders != null){
             for(Folder folder : folders){
-                folderList.add(FolderBookCoverListDto.from(folder, folder.getFolderBooks()));
+                List<FolderBook> folderBooks = folder.getFolderBooks();
+                List<FolderBookCoverDto> coverList = new ArrayList<>();
+                for (FolderBook book : folderBooks) {
+                    coverList.add(new FolderBookCoverDto(
+                            book.getFolderBookId(),
+                            book.getUserBook().getBookInfo().getImgPath()
+                    ));
+                }
+                folderList.add(FolderBookCoverListDto.from(folder, coverList));
             }
         }
         return new AllFolderListResponseDto(folderList);
@@ -211,7 +220,7 @@ public class FolderService {
                 for(ReadStatus readStatus : readStatusList){
                     if(folderBook.getUserBook().getReadStatus().equals(readStatus)){
                         boolean isCustom = checkIsCustom(folderBook.getUserBook());
-                        folderBookList.add(FolderBookUnitDto.from(folderBook, isCustom));
+                        folderBookList.add(new FolderBookUnitDto(folderBook, isCustom));
                     }
                 }
             }
@@ -248,7 +257,7 @@ public class FolderService {
         if(statusList == null || statusList.isEmpty()){
             for(UserBook userBook: candidateList){
                 boolean isCustom = checkIsCustom(userBook);
-                dtoList.add(CandidateFolderBookDto.from(userBook, isCustom));
+                dtoList.add(new CandidateFolderBookDto(userBook, isCustom));
             }
         }
         else{
@@ -257,7 +266,7 @@ public class FolderService {
                 for(UserBook userBook: candidateList){
                     if(userBook.getReadStatus().equals(readStatus)){
                         boolean isCustom = checkIsCustom(userBook);
-                        dtoList.add(CandidateFolderBookDto.from(userBook, isCustom));
+                        dtoList.add(new CandidateFolderBookDto(userBook, isCustom));
                     }
                 }
             }
@@ -273,7 +282,7 @@ public class FolderService {
         List<FolderBook> folderBooks = folderBookService.orderFolderBooks(folder);
         for (FolderBook folderBook : folderBooks) {
             boolean isCustom = checkIsCustom(folderBook.getUserBook());
-            folderBookList.add(FolderBookUnitDto.from(folderBook, isCustom));
+            folderBookList.add(new FolderBookUnitDto(folderBook, isCustom));
         }
         return new FolderBookListResponseDto(folder, folderBookList);
     }

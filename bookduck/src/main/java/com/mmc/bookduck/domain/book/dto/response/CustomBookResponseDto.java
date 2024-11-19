@@ -5,8 +5,8 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 
 public record CustomBookResponseDto(boolean isMine, Long bookInfoId, Long userBookId, String title, String author, String imgPath, ReadStatus readStatus, Double myRating,Long oneLineId, String myOneLine){
 
-    public static CustomBookResponseDto from(UserBook userBook, Double myRating, Long oneLineId, String myOneLine, boolean isMine){
-        return new CustomBookResponseDto(
+    public CustomBookResponseDto(UserBook userBook, Double myRating, Long oneLineId, String myOneLine, boolean isMine){
+        this(
                 isMine,
                 userBook.getBookInfo().getBookInfoId(),
                 userBook.getUserBookId(),
@@ -17,10 +17,10 @@ public record CustomBookResponseDto(boolean isMine, Long bookInfoId, Long userBo
                 myRating,
                 oneLineId,
                 myOneLine
-                );
+        );
     }
-    public static CustomBookResponseDto from(UserBook userBook, boolean isMine){
-        return new CustomBookResponseDto(
+    public CustomBookResponseDto(UserBook userBook, boolean isMine){
+        this(
                 isMine,
                 userBook.getBookInfo().getBookInfoId(),
                 userBook.getUserBookId(),

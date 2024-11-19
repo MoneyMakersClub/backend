@@ -14,8 +14,8 @@ public record OneLineRatingUnitDto(
         Long userId,
         String userNickname
 ) {
-    public static OneLineRatingUnitDto from(OneLine oneLine, Boolean isLiked) {
-        return new OneLineRatingUnitDto(
+    public OneLineRatingUnitDto(OneLine oneLine, Boolean isLiked) {
+        this(
                 oneLine.getOneLineId(),
                 oneLine.getOneLineContent(),
                 oneLine.getUserBook().getRating(),
