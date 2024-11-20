@@ -1,5 +1,7 @@
 package com.mmc.bookduck.domain.item.entity;
 
+import com.mmc.bookduck.global.common.BaseTimeEntity;
+import com.mmc.bookduck.global.common.CreatedTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -7,7 +9,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Item {
+public class Item extends CreatedTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
