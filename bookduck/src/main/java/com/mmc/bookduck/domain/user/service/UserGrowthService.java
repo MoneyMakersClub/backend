@@ -3,6 +3,7 @@ package com.mmc.bookduck.domain.user.service;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
+import com.mmc.bookduck.domain.friend.service.FriendService;
 import com.mmc.bookduck.domain.user.dto.response.UserGrowthInfoResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserInfoResponseDto;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -24,6 +25,7 @@ public class UserGrowthService {
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
     private final UserService userService;
+    private final FriendService friendService;
 
     @Transactional(readOnly = true)
     public UserGrowth getUserGrowthByUserId(Long userId)
@@ -40,7 +42,12 @@ public class UserGrowthService {
         long reviewCount = reviewRepository.countByUserAndCreatedTimeThisYear(user, currentYear);
         long excerptCount = excerptRepository.countByUserAndCreatedTimeThisYear(user, currentYear);
         long bookCount = (reviewCount + excerptCount);
-        return new UserInfoResponseDto(user.getNickname(), bookCount);
+        boolean isOfficial = user.isOfficial();
+        User currentUser = userService.getCurrentUserOrNull();
+        Boolean isFriend = (currentUser == null || !currentUser.equals(user))
+                ? friendService.isFriendWithCurrentUserOrNull(user)
+                : null;
+        return new UserInfoResponseDto(user.getNickname(), bookCount, isOfficial, isFriend);
     }
 
     @Transactional(readOnly = true)

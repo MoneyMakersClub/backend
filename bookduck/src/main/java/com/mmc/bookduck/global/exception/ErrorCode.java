@@ -19,17 +19,19 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(400, "입력값이 잘못되었습니다."),
     MISSING_PARAMETER(400, "필수 파라미터가 누락되었습니다."),
     INVALID_UNLOCK_CONDITION(400, "해제 조건이 잘못되었습니다."),
+    ARCHIVE_DOES_NOT_MATCH(400, "발췌/리뷰Id와 archive에 등록된 Id가 일치하지않습니다."),
     // enum 값이 잘못됨
     INVALID_ENUM_VALUE(400, "enum 값이 잘못되었습니다."),
     ITEMTYPE_MISMATCH(400,"ItemType이 맞지 않습니다."),
     USERITEM_BAD_REQUEST(400, "유저의 소유가 아닌 userItemId입니다."),
-
+    BOOKINFO_BAD_REQUEST(400, "API 도서가 아닌 bookInfoId입니다."),
+    HOMECARD_BAD_REQUEST(400, "현재 카드 7개가 다 찼습니다."),
+    READINGREPORT_NOT_VIEWABLE(400, "서재에 책이 없어 독서리포트를 볼 수 없습니다."),
+    KEYWORD_NOT_VIEWABLE(400, "분석 가능한 키워드 갯수가 충분하지 않습니다."),
 
     // 401 Unauthorized
     // 로그인 상태여야 하는 요청
     NOT_AUTHENTICATED(401, "로그인 상태가 아닙니다."),
-    // 권한이 없는 요청을 보냄
-    UNAUTHORIZED_REQUEST(401,"권한이 없습니다."),
     // 소셜 로그인이 정상적으로 이루어지지 않음
     OAUTH2_LOGIN_FAILED(401, "소셜 로그인에 실패했습니다."),
     // 유효하지 않은 토큰
@@ -41,14 +43,20 @@ public enum ErrorCode {
     // 액세스 토큰이 만료되지 않은 상황에서 재발급받으려는 경우
     ACCESS_TOKEN_NOT_EXPIRED(401,"액세스 토큰이 아직 만료되지 않았습니다."),
     // 쿠키에 리프레시 토큰이 들어있지 않은 경우
-    NO_COOKIE(401, "쿠키에 값이 존재하지 않습니다."),
+    NO_COOKIE(401, "쿠키에 리프레시 토큰이 존재하지 않습니다."),
     USER_STATUS_IS_NOT_ACTIVE(401, "계정이 활성 상태가 아닙니다."),
+
+    // 403 Forbidden
+    FRIENDSHIP_REQUIRED(403, "친구 관계가 필요합니다."),
+    // 권한이 없는 요청을 보냄
+    UNAUTHORIZED_REQUEST(403,"권한이 없습니다."),
 
     // 404 Not Found
     // 각 리소스를 찾지 못함
     USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다."),
     USERSETTING_NOT_FOUND(404, "사용자 설정을 찾을 수 없습니다."),
     USERGROWTH_NOT_FOUND(404, "사용자 성장상태를 찾을 수 없습니다."),
+    HOMECARD_NOT_FOUND(404, "카드를 찾을 수 없습니다."),
     FRIEND_REQUEST_NOT_FOUND(404, "친구 요청을 찾을 수 없습니다."),
     FRIEND_NOT_FOUND(404, "친구를 찾을 수 없습니다."),
     BOOKINFO_NOT_FOUND(404, "책 정보를 찾을 수 없습니다."),
@@ -57,8 +65,8 @@ public enum ErrorCode {
     ARCHIVE_NOT_FOUND(404, "독서 기록을 찾을 수 없습니다."),
     REVIEW_NOT_FOUND(404, "감상평을 찾을 수 없습니다."),
     EXCERPT_NOT_FOUND(404, "발췌를 찾을 수 없습니다."),
-    ONELINERATING_NOT_FOUND(404, "한줄평점을 찾을 수 없습니다."),
-    ONELINERATINGLIKE_NOT_FOUND(404, "한줄평점 좋아요를 찾을 수 없습니다."),
+    ONELINE_NOT_FOUND(404, "한줄평을 찾을 수 없습니다."),
+    ONELINELIKE_NOT_FOUND(404, "한줄평 좋아요를 찾을 수 없습니다."),
     ALARM_NOT_FOUND(404, "알림을 찾을 수 없습니다."),
     FOLDER_NOT_FOUND(404, "폴더를 찾을 수 없습니다."),
     FOLDERBOOK_NOT_FOUND(404, "폴더내의 책을 찾을 수 없습니다."),
@@ -78,7 +86,7 @@ public enum ErrorCode {
     USERBOOK_ALREADY_EXISTS(409, "이미 사용자의 책이 등록되어 있습니다."),
     REVIEW_ALREADY_EXISTS(409, "이미 존재하는 감상평입니다."),
     EXCERPT_ALREADY_EXISTS(409, "이미 존재하는 발췌입니다."),
-    ONELINERATINGLIKE_ALREADY_EXISTS(409, "이미 존재하는 한줄평점입니다."),
+    ONELINELIKE_ALREADY_EXISTS(409, "이미 존재하는 한줄평점입니다."),
     ALARM_ALREADY_EXISTS(409, "이미 존재하는 알림입니다."),
     FOLDERNAME_ALREADY_EXISTS(409, "이미 존재하는 폴더 이름입니다."),
     FOLDERBOOK_ALREADY_EXISTS(409, "이미 폴더 내에 존재하는 책입니다."),
@@ -93,12 +101,14 @@ public enum ErrorCode {
     UPLOAD_FAIL_TO_GOOGLE(500, "Google Storage에 업로드하지 못했습니다."),
     UPLOAD_FAIL_TO_S3(500, "S3에 업로드하지 못했습니다."),
     EMPTY_IMAGE_FILE(500, "첨부 파일이 없습니다."),
-    //JSON
+    // JSON
     JSON_PARSING_ERROR(500, "API JSON에서 정보를 파싱하는 중 문제가 발생했습니다."),
     // Oauth2, JWT
     ILLEGAL_REGISTRATION_ID(500, "잘못된 registrationId입니다."),
     DATABASE_ERROR(500, "데이터베이스 오류가 발생했습니다."),
     INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다."),
+    // FCM
+    FIREBASE_SDK_ERROR(500, "Firebase Admin SDK 비공개 키를 찾을 수 없습니다."),
 
     ;
 

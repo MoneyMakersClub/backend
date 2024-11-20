@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserBadgeService {
     private final UserBadgeRepository userBadgeRepository;
@@ -89,7 +90,6 @@ public class UserBadgeService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     public List<UserBadge> deleteDuplicateUserBadges(List<UserBadge> userBadges) {
         // 중복 제거: 동일한 badgeId를 가진 UserBadge가 여러 개 있으면 하나만 남기기
         Map<Long, UserBadge> badgeIdToUniqueUserBadgeMap = userBadges.stream()

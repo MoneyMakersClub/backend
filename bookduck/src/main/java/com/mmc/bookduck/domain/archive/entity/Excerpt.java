@@ -6,6 +6,7 @@ import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,12 +25,11 @@ public class Excerpt extends BaseTimeEntity {
     private Long excerptId;
 
     @NotNull
+    @Size(max = 300, message = "발췌 내용은 최대 300자까지 입력할 수 있습니다.")
     private String excerptContent;
 
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
-
-    private boolean isMain;
 
     @NotNull
     private Long pageNumber;
@@ -47,10 +47,9 @@ public class Excerpt extends BaseTimeEntity {
     private UserBook userBook;
 
     @Builder
-    public Excerpt(String excerptContent, Visibility visibility, boolean isMain, Long pageNumber, User user, UserBook userBook) {
+    public Excerpt(String excerptContent, Visibility visibility, Long pageNumber, User user, UserBook userBook) {
         this.excerptContent = excerptContent;
         this.visibility = visibility;
-        this.isMain = isMain;
         this.pageNumber = pageNumber;
         this.user = user;
         this.userBook = userBook;

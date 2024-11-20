@@ -1,21 +1,18 @@
 package com.mmc.bookduck.domain.book.dto.common;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.mmc.bookduck.domain.book.entity.UserBook;
+import com.mmc.bookduck.domain.book.entity.BookInfo;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public record BookCoverImageUnitDto (Long userbookId,
-                                     Long bookInfoId,
-                                     String imgPath,
-                                     String title,
-                                     String author){
-    public static BookCoverImageUnitDto from(UserBook userBook) {
+public record BookCoverImageUnitDto(
+        Long bookInfoId,
+        String imgPath,
+        String title
+){
+
+    public static BookCoverImageUnitDto from(BookInfo bookInfo) {
         return new BookCoverImageUnitDto(
-                userBook.getUserBookId(),
-                null,
-                userBook.getBookInfo().getImgPath(),
-                userBook.getBookInfo().getTitle(),
-                userBook.getBookInfo().getAuthor()
+                bookInfo.getBookInfoId(),
+                bookInfo.getImgPath(),
+                bookInfo.getTitle()
         );
     }
 }

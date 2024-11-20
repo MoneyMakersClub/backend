@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.friend.service;
 
+import com.mmc.bookduck.domain.alarm.service.AlarmByTypeService;
 import com.mmc.bookduck.domain.friend.dto.common.FriendUnitDto;
 import com.mmc.bookduck.domain.friend.dto.request.FriendCreateRequestDto;
 import com.mmc.bookduck.domain.friend.dto.response.FriendListResponseDto;
@@ -8,6 +9,7 @@ import com.mmc.bookduck.domain.friend.entity.FriendRequest;
 import com.mmc.bookduck.domain.friend.entity.FriendRequestStatus;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
 import com.mmc.bookduck.domain.friend.repository.FriendRequestRepository;
+import com.mmc.bookduck.domain.item.dto.common.ItemEquippedUnitDto;
 import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -28,6 +30,7 @@ public class FriendService {
     private final FriendRepository friendRepository;
     private final UserService userService;
     private final UserItemService userItemService;
+    private final AlarmByTypeService alarmByTypeService;
 
     // 친구 요청 수락 (=친구 생성)
     public void createFriend(Long friendRequestId){
@@ -51,15 +54,20 @@ public class FriendService {
         friendRepository.save(friend);
         request.setFriendRequestStatus(FriendRequestStatus.ACCEPTED);
         friendRequestRepository.save(request);
+        alarmByTypeService.createFriendApprovedAlarm(currentUser, sender);
     }
 
     // 친구 목록 조회
     @Transactional(readOnly = true)
     public FriendListResponseDto getFriendList() {
         User currentUser = userService.getCurrentUser();
-        List<FriendUnitDto> friendList = friendRepository.findAllByUser1UserId(currentUser.getUserId())
-                .stream()
-                .map(friend -> FriendUnitDto.from(friend, userItemService.getUserItemEquippedListOfUser(friend.getUser2())))
+        List<Friend> friends = friendRepository.findAllByUser1UserIdOrUser2UserId(currentUser.getUserId(), currentUser.getUserId());
+        List<FriendUnitDto> friendList = friends.stream()
+                .map(friend -> {
+                    User friendUser = getFriendUser(friend, currentUser);
+                    List<ItemEquippedUnitDto> userItemEquipped = userItemService.getUserItemEquippedListOfUser(friendUser);
+                    return FriendUnitDto.from(friend, friendUser, userItemEquipped);
+                })
                 .collect(Collectors.toList());
         return FriendListResponseDto.from(friendList);
     }
@@ -90,8 +98,16 @@ public class FriendService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isFriendWithCurrentUser(User otherUser) {
-        User currentUser = userService.getCurrentUser();
+    public boolean isFriendWithCurrentUserOrNull(User otherUser) {
+        User currentUser = userService.getCurrentUserOrNull();
+        if (currentUser == null) {
+            return false;
+        }
         return friendRepository.findFriendBetweenUsers(currentUser.getUserId(), otherUser.getUserId()).isPresent();
+    }
+
+    @Transactional(readOnly = true)
+    public User getFriendUser(Friend friend, User currentUser) {
+        return friend.getUser1().equals(currentUser) ? friend.getUser2() : friend.getUser1();
     }
 }

@@ -1,10 +1,12 @@
 package com.mmc.bookduck.domain.book.repository;
 
 import com.mmc.bookduck.domain.book.entity.BookInfo;
+import com.mmc.bookduck.domain.book.entity.GenreName;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.entity.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +24,11 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
 
     List<UserBook> findByUserAndReadStatus(User user, ReadStatus readStatus);
 
+    long countByUser(User user);
+
     long countByUserAndReadStatus(User user, ReadStatus readStatus);
+
+    long countByUserAndReadStatusAndCreatedTimeBetween(User user, ReadStatus readStatus, LocalDateTime startDate, LocalDateTime endDate);
 
     // userbook 테이블과 bookinfo 테이블 조인해서 userbook의 user에 해당하는 bookinfo 정보 검색
     @Query("SELECT ub FROM UserBook ub JOIN ub.bookInfo b WHERE ub.user = :userId AND (" +
@@ -48,13 +54,24 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
 
     List<UserBook> findAllByUser(User user);
 
-    // 유저가 가장 많이 읽은 카테고리들
-    @Query(value = "SELECT bi.category, COUNT(ub) FROM UserBook ub " +
+    // 유저가 가장 많이 읽은 장르들
+    @Query("SELECT g.genreName, COUNT(ub) FROM UserBook ub " +
             "JOIN ub.bookInfo bi " +
+            "JOIN bi.genre g " +
             "WHERE ub.user = :user " +
-            "GROUP BY bi.category " +
+            "GROUP BY g.genreName " +
             "ORDER BY COUNT(ub) DESC")
-    List<Object[]> findTopCategoriesByUser(@Param("user") User user, Pageable pageable);
+    List<Object[]> findTopGenresByUser(@Param("user") User user, Pageable pageable);
+
+    @Query("SELECT g.genreName " +
+            "FROM UserBook ub " +
+            "JOIN ub.bookInfo b " +
+            "JOIN b.genre g " +
+            "WHERE ub.user = :user " +
+            "AND ub.createdTime BETWEEN :startDate AND :endDate " +
+            "GROUP BY g.genreName " +
+            "ORDER BY COUNT(ub) DESC")
+    GenreName findTopGenreByUserAndCreatedTimeBetween(@Param("user") User user, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     // 유저가 가장 많이 읽은 작가들
     @Query(value = "SELECT b.author, COUNT(ub) AS bookCount FROM UserBook ub " +
@@ -64,17 +81,25 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
             "ORDER BY bookCount DESC")
     List<Object[]> findMostReadAuthorByUser(@Param("user") User user);
 
-    // BookInfo의 작가명으로 UserBook 찾기
-    List<UserBook> findAllByBookInfo_Author(String author);
+    @Query("SELECT ub.bookInfo.author " +
+                    "FROM UserBook ub " +
+                    "WHERE ub.user = :user " +
+                    "AND ub.createdTime BETWEEN :startDate AND :endDate " +
+                    "GROUP BY ub.bookInfo.author " +
+                    "ORDER BY COUNT(ub) DESC")
+    String findTopAuthorByUserAndCreatedTimeBetween(@Param("user") User user, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+
+    // BookInfo의 작가명으로 UserBook top3찾기
+    List<UserBook> findTop3ByBookInfo_AuthorOrderByCreatedTimeDesc(String author);
 
     // 유저의 UserBook들 올해 상반기/하반기별로 조회
     @Query("SELECT ub FROM UserBook ub WHERE ub.user = :user AND " +
             "((:isFirstHalf = true AND MONTH(ub.createdTime) BETWEEN 1 AND 6) OR " +
-            "(:isFirstHalf = false AND MONTH(ub.createdTime) BETWEEN 7 AND 12)) AND " +
-            "ub.readStatus = :readStatus")
-    List<UserBook> findAllByUserAndCreatedInHalfWithReadStatus(@Param("user") User user,
-                                                               @Param("isFirstHalf") boolean isFirstHalf,
-                                                               @Param("readStatus") ReadStatus readStatus);
+            "(:isFirstHalf = false AND MONTH(ub.createdTime) BETWEEN 7 AND 12))")
+    List<UserBook> findAllByUserAndCreatedInHalf(@Param("user") User user,
+                                                               @Param("isFirstHalf") boolean isFirstHalf);
 
     List<UserBook> findAllByBookInfoOrderByRatingDesc(BookInfo bookInfo);
+
+    List<UserBook> findAllByCreatedTimeAfter(LocalDateTime createdTime);
 }

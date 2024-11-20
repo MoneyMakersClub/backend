@@ -2,6 +2,8 @@ package com.mmc.bookduck.domain.user.dto.response;
 
 public record UserInfoResponseDto (
         String nickname,
-        long bookCount
+        long bookCount,
+        Boolean isOfficial,
+        Boolean isFriend
 ) {
 }

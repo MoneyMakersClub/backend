@@ -19,6 +19,8 @@ public class FolderBook {
     @Column(updatable = false)
     private Long folderBookId;
 
+    private int bookOrder;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folder_id", updatable = false)
     @NotNull
@@ -31,12 +33,17 @@ public class FolderBook {
     private UserBook userBook;
 
     @Builder
-    public FolderBook(UserBook userBook, Folder folder) {
+    public FolderBook(UserBook userBook, Folder folder, int bookOrder) {
         this.folder = folder;
         this.userBook = userBook;
+        this.bookOrder = bookOrder;
     }
 
     public void setFolder(Folder folder) {
         this.folder = folder;
+    }
+
+    public void setBookOrder(int i) {
+        this.bookOrder = i;
     }
 }

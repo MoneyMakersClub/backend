@@ -4,6 +4,7 @@ import com.mmc.bookduck.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,24 +34,43 @@ public class User extends BaseTimeEntity {
     @NotNull
     private UserStatus userStatus;
 
-    private String birth;
+    private String fcmToken;
 
-    private String gender;
+    private Boolean isAnnouncementChecked;
 
-    private String country;
+    private Boolean isItemUnlockedChecked;
+    
+    @ColumnDefault("false")
+    private boolean isOfficial;
 
     @Builder
-    public User(Long userId, String email, LoginType loginType, String nickname) {
+    public User(Long userId, String email, LoginType loginType, Role role, String nickname, boolean isOfficial) {
         this.userId = userId;
         this.email = email;
         this.loginType = loginType;
         this.nickname = nickname;
-        this.role = Role.ROLE_USER;
+        this.role = role;
         this.userStatus = UserStatus.ACTIVE;
+        this.isAnnouncementChecked = true;
+        this.isItemUnlockedChecked = true;
+        this.isOfficial = isOfficial;
     }
 
     // 닉네임 변경
     public void updateNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    // FCM 토큰 세팅
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
+    public void setIsAnnouncementChecked(boolean isAnnouncementChecked) {
+        this.isAnnouncementChecked = isAnnouncementChecked;
+    }
+
+    public void setIsItemUnlockedChecked(boolean isItemUnlockedChecked) {
+        this.isItemUnlockedChecked = isItemUnlockedChecked;
     }
 }

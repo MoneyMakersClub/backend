@@ -19,45 +19,50 @@ import java.io.IOException;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtUtil jwtUtil;
     private final CookieUtil cookieUtil;
-    private static final String REDIRECT_URL = "http://localhost:3000/api/oauth"; // TODO: 추후 프론트엔드 배포 주소로 교체
+    private static final String OAUTH_PATH = "/api/oauth";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
         try {
-            // 새로운 액세스 토큰 발급
-            String accessToken = jwtUtil.generateAccessToken(authentication);
-            // 액세스 토큰 유효 시간
-            int expiresIn = jwtUtil.getAccessTokenMaxAge();
+            // 요청의 origin 또는 referer 헤더를 사용해 출처 확인
+            String origin = request.getHeader("origin");
+            String referer = request.getHeader("referer");
 
-            // 새로운 리프레시 토큰 발급
+            // origin이나 referer 헤더가 있는 경우 이를 기준으로 redirectUrl 설정
+            String baseRedirectUrl;
+            if (origin != null) {
+                baseRedirectUrl = origin;
+            } else if (referer != null) {
+                baseRedirectUrl = referer.split("/")[0] + "//" + referer.split("/")[2]; // 프로토콜 및 호스트만 사용
+            } else {
+                // 기본값을 로컬호스트로 설정
+                baseRedirectUrl = "http://localhost:3000";
+            }
+            String redirectUrl = baseRedirectUrl + OAUTH_PATH;
+
+            // 액세스 토큰 및 리프레시 토큰 발급, 리프레시 토큰을 쿠키에 저장
+            String accessToken = jwtUtil.generateAccessToken(authentication);
+            int expiresIn = jwtUtil.getAccessTokenMaxAge();
             String refreshToken = jwtUtil.generateRefreshToken(authentication);
-            // 리프레시 토큰을 HttpOnly 쿠키에 저장
             cookieUtil.addCookie(response, "refreshToken", refreshToken, jwtUtil.getRefreshTokenMaxAge());
 
-            // OAuth2UserDetails를 통해 신규 유저 여부 확인
+            // OAuth2UserDetails으로부터 신규 유저 여부와 userId 확인
             OAuth2UserDetails userDetails = (OAuth2UserDetails) authentication.getPrincipal();
             boolean isNewUser = userDetails.isNewUser();
-
-            // userId를 건넴
             Long userId = userDetails.userId();
 
-            // 로그 출력용
-            if (isNewUser) {
-                log.info("소셜 로그인-회원 가입에 성공하였습니다. 발급된 accessToken: {}", accessToken);
-            } else {
-                log.info("소셜 로그인-가입된 계정으로 로그인 성공하였습니다. 발급된 accessToken: {}", accessToken);
-            }
+            log.info("소셜 로그인 {}에 성공하였습니다. 발급된 accessToken: {}", isNewUser ? "회원 가입" : "로그인", accessToken);
 
             // 액세스 토큰을 쿼리 파라미터로 전달하여 리디렉션
-            String redirectUrl = UriComponentsBuilder.fromUriString(REDIRECT_URL)
+            String redirectUrlWithParams = UriComponentsBuilder.fromUriString(redirectUrl)
                     .queryParam("accessToken", accessToken)
                     .queryParam("expiresIn", expiresIn)
                     .queryParam("isNewUser", isNewUser)
                     .queryParam("userId", userId)
                     .build()
                     .toUriString();
-            response.sendRedirect(redirectUrl);
+            response.sendRedirect(redirectUrlWithParams);
         } catch (Exception e) {
             log.error("소셜 로그인 실패: {}", e.getMessage());
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "소셜 로그인 실패");

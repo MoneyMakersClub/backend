@@ -5,8 +5,8 @@ import com.mmc.bookduck.domain.folder.entity.Folder;
 
 import java.util.List;
 
-public record FolderBookListResponseDto(Long folderId, String folderName, int folderBookCount, List<FolderBookUnitDto> folderBookList) {
+public record FolderBookListResponseDto(String folderName, int folderBookCount, List<FolderBookUnitDto> folderBookList) {
     public FolderBookListResponseDto(Folder folder, List<FolderBookUnitDto> folderBookList) {
-        this(folder.getFolderId(), folder.getFolderName(), folderBookList.size(), folderBookList);
+        this(folder.getFolderName(), folderBookList.size(), folderBookList);
     }
 }

@@ -3,16 +3,17 @@ package com.mmc.bookduck.domain.archive.controller;
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveUpdateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.response.ArchiveResponseDto;
+import com.mmc.bookduck.domain.archive.dto.response.ArchiveSearchListResponseDto;
 import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.domain.archive.service.ArchiveService;
-import com.mmc.bookduck.domain.archive.service.ExcerptService;
 import com.mmc.bookduck.domain.archive.service.OcrService;
-import com.mmc.bookduck.domain.archive.service.ReviewService;
-import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
+import com.mmc.bookduck.global.common.PaginatedResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -65,4 +66,18 @@ public class ArchiveController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "나의 기록 검색", description = "나의 기록(발췌, 감상평)을 검색합니다.")
+    @GetMapping("/search")
+    public ResponseEntity<?> searchArchives(@RequestParam("keyword") final String keyword, @RequestParam(value = "orderBy", defaultValue = "accuracy") final String orderBy,
+                                         @PageableDefault(size = 20) final Pageable pageable) {
+        ArchiveSearchListResponseDto responseDto = archiveService.searchArchives(keyword, pageable, orderBy);
+        return ResponseEntity.ok().body(responseDto);
+    }
+
+    @GetMapping("/share/{id}")
+    @Operation(summary = "공유된 링크로 발췌 및 감상평 통합 조회", description = "공유된 링크로 발췌와 감상평을 조회합니다.")
+    public ResponseEntity<?> getSharedArchive(@PathVariable("id") final Long id, @RequestParam("type") final ArchiveType archiveType) {
+        ArchiveResponseDto responseDto = archiveService.getSharedArchive(id, archiveType);
+        return ResponseEntity.ok(responseDto);
+    }
 }

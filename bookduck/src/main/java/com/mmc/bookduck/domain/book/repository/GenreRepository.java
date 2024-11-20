@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface GenreRepository extends JpaRepository<Genre, Long> {
 
     Optional<Genre> findByGenreName(GenreName genreName);
+
+    boolean existsByGenreName(GenreName genreName);
 }

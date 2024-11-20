@@ -8,13 +8,16 @@ import java.util.List;
 public record UserUnitDto(
         Long userId,
         String nickname,
-        boolean isFriend,
+        Boolean isOfficial,
+        Boolean isFriend,
         List<ItemEquippedUnitDto> itemEquipped
 ) {
-    public static UserUnitDto from (User user, List<ItemEquippedUnitDto> itemEquipped, boolean isFriend) {
+    public static UserUnitDto from (User user, List<ItemEquippedUnitDto> itemEquipped,
+                                    boolean isFriend, boolean isOfficial) {
         return new UserUnitDto(
                 user.getUserId(),
                 user.getNickname(),
+                isOfficial,
                 isFriend,
                 itemEquipped
         );
