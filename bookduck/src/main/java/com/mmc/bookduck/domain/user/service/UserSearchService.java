@@ -36,7 +36,7 @@ public class UserSearchService {
         Page<UserUnitDto> userUnitDtoPage = userPage.map(user -> {
             List<ItemEquippedUnitDto> userItems = userItemService.getUserItemEquippedListOfUser(user);
             boolean isOfficial = user.isOfficial();
-            boolean isFriend = friendService.isFriendWithCurrentUserOrNull(user);
+            Boolean isFriend = friendService.isFriendWithCurrentUserOrNull(user);
             return UserUnitDto.from(user, userItems, isOfficial, isFriend);
         });
         return PaginatedResponseDto.from(userUnitDtoPage);
