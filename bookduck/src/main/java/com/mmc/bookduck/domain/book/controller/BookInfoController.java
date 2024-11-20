@@ -114,4 +114,11 @@ public class BookInfoController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(bookInfoService.getAllUserBookArchive(bookinfoId,userId, pageable));
     }
+
+    @Operation(summary = "연관 추천 도서 조회", description = "이 책을 읽은 사용자들이 많이 읽은 도서를 6권 조회합니다.")
+    @GetMapping("/{bookinfoId}/explore")
+    public ResponseEntity<?> getRelatedBooks(@PathVariable("bookinfoId") final Long bookInfoId) {
+        BookListResponseDto<BookCoverImageUnitDto> responseDto = bookInfoService.getRelatedBooks(bookInfoId);
+        return ResponseEntity.ok(responseDto);
+    }
 }
