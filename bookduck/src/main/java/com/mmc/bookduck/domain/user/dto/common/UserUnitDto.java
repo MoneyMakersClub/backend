@@ -1,7 +1,6 @@
 package com.mmc.bookduck.domain.user.dto.common;
 
 import com.mmc.bookduck.domain.item.dto.common.ItemEquippedUnitDto;
-import com.mmc.bookduck.domain.user.entity.Role;
 import com.mmc.bookduck.domain.user.entity.User;
 
 import java.util.List;
