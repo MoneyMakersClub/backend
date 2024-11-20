@@ -66,7 +66,8 @@ public class FriendService {
                 .map(friend -> {
                     User friendUser = getFriendUser(friend, currentUser);
                     List<ItemEquippedUnitDto> userItemEquipped = userItemService.getUserItemEquippedListOfUser(friendUser);
-                    return FriendUnitDto.from(friend, friendUser, userItemEquipped);
+                    boolean isOfficial = friendUser.isOfficial();
+                    return FriendUnitDto.from(friend, friendUser, isOfficial, userItemEquipped);
                 })
                 .collect(Collectors.toList());
         return FriendListResponseDto.from(friendList);

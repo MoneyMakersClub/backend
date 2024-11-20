@@ -576,4 +576,16 @@ public class BookInfoService {
         }
         return new AddUserBookResponseDto(savedUserBook);
     }
+
+    // 연관 추천 도서 조회
+    @Transactional(readOnly = true)
+    public BookListResponseDto<BookCoverImageUnitDto> getRelatedBooks(Long bookInfoId) {
+        List<BookInfo> relatedBooks = bookInfoRepository.findRelatedBooksByBookInfoId(bookInfoId);
+        List<BookCoverImageUnitDto> topSixBooks = relatedBooks.stream()
+                .limit(6)
+                .map(BookCoverImageUnitDto::from)
+                .collect(Collectors.toList());
+        return new BookListResponseDto<>(topSixBooks);
+    }
+
 }
