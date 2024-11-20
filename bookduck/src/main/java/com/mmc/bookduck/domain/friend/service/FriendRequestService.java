@@ -77,6 +77,7 @@ public class FriendRequestService {
                         friendRequest,
                         friendRequest.getSender().getUserId(),
                         friendRequest.getSender().getNickname(),
+                        friendRequest.getSender().isOfficial(),
                         userItemService.getUserItemEquippedListOfUser(friendRequest.getSender())
                 ))
                 .collect(Collectors.toList());
@@ -93,6 +94,7 @@ public class FriendRequestService {
                         friendRequest,
                         friendRequest.getReceiver().getUserId(),
                         friendRequest.getReceiver().getNickname(),
+                        friendRequest.getReceiver().isOfficial(),
                         userItemService.getUserItemEquippedListOfUser(friendRequest.getReceiver())
                 ))
                 .collect(Collectors.toList());
