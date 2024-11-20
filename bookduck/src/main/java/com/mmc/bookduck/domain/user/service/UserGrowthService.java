@@ -43,8 +43,10 @@ public class UserGrowthService {
         long excerptCount = excerptRepository.countByUserAndCreatedTimeThisYear(user, currentYear);
         long bookCount = (reviewCount + excerptCount);
         boolean isOfficial = user.isOfficial();
-
-        boolean isFriend = friendService.isFriendWithCurrentUserOrNull(user);
+        User currentUser = userService.getCurrentUserOrNull();
+        Boolean isFriend = (currentUser == null || !currentUser.equals(user))
+                ? friendService.isFriendWithCurrentUserOrNull(user)
+                : null;
         return new UserInfoResponseDto(user.getNickname(), bookCount, isOfficial, isFriend);
     }
 
