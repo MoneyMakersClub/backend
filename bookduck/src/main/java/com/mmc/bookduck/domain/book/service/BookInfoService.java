@@ -330,9 +330,8 @@ public class BookInfoService {
         if(bookInfo.getCreatedUserId() == null){
             throw new CustomException(ErrorCode.CUSTOM_BOOKINFO_NOT_FOUND);
         }
-        UserBook userBook = getUserBookByUserAndBookInfo(bookInfo, user);
-
         User bookInfoCreaterUser = userService.getActiveUserByUserId(bookInfo.getCreatedUserId());
+        UserBook userBook = getUserBookByUserAndBookInfo(bookInfo, bookInfoCreaterUser);
 
         if(bookInfo.getCreatedUserId().equals(user.getUserId())){ // 내 customBook
             MyRatingOneLineReadStatusDto myRatingOneLine = getMyRatingOneLineReadStatus(bookInfo, user);
