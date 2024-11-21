@@ -4,7 +4,6 @@ import com.mmc.bookduck.domain.alarm.dto.request.AlarmReadRequestDto;
 import com.mmc.bookduck.domain.alarm.dto.common.AlarmUnitDto;
 import com.mmc.bookduck.domain.alarm.dto.ssedata.AlarmDefaultDataDto;
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
-import com.mmc.bookduck.domain.alarm.entity.PushAlarmFormat;
 import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -65,7 +64,7 @@ public class AlarmService {
         if (alarm.getAlarmType().isSendPush()) {
             String fcmToken = receiver.getFcmToken();
             if (fcmToken != null) {
-                fcmService.sendPushMessage(fcmToken, PushAlarmFormat.valueOf(alarm.getAlarmType().name()));
+                fcmService.sendPushMessage(fcmToken, alarm.getMessage());
             }
         }
     }
