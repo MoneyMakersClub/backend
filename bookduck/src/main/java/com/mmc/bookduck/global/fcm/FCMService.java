@@ -5,7 +5,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import com.mmc.bookduck.domain.alarm.entity.PushAlarmFormat;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.repository.UserRepository;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -15,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,10 +34,10 @@ public class FCMService {
     }
 
     // 토큰 기반 전송
-    public void sendPushMessage(String token, PushAlarmFormat pushAlarmFormat) {
+    public void sendPushMessage(String token, String alarmMessage) {
         Message message = Message.builder().setNotification(Notification.builder()
-                        .setTitle(pushAlarmFormat.getTitle())
-                        .setBody(pushAlarmFormat.getBody())
+                        .setTitle(alarmMessage)
+                        .setBody("북덕에서 확인하세요.")
                         .build())
                 .setToken(token)  // 대상 디바이스의 등록 토큰
                 .build();

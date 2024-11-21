@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.alarm.service;
 
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
 import com.mmc.bookduck.domain.alarm.entity.AlarmType;
+import com.mmc.bookduck.domain.badge.entity.BadgeType;
 import com.mmc.bookduck.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -76,13 +77,14 @@ public class AlarmByTypeService {
     }
 
     // 뱃지 잠금해제 알림 생성
-    public void createBadgeUnlockAlarm(User receiver) {
+    public void createBadgeUnlockAlarm(User receiver, BadgeType badgeType) {
         AlarmType alarmType = AlarmType.BADGE_UNLOCKED;
+        String message = MessageFormat.format(alarmType.getMessagePattern(), badgeType.getTitle());
 
         Alarm alarm = Alarm.builder()
                 .alarmType(alarmType)
                 .receiver(receiver)
-                .message(alarmType.getMessagePattern())
+                .message(message)
                 .resourceName("Badge")
                 .build();
         alarmService.createAlarm(alarm, receiver);

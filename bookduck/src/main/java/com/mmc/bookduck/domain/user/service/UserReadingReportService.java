@@ -4,6 +4,7 @@ import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
+import com.mmc.bookduck.domain.book.entity.GenreName;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
@@ -44,9 +45,9 @@ public class UserReadingReportService {
         // 1. 가장 많이 읽은 장르, Top3 장르
         List<Object[]> topGenres = userBookRepository.findTopGenresByUser(user, Pageable.ofSize(3));
         List<MostReadGenreUnitDto> mostReadGenres = topGenres.stream()
-                .map(result -> new MostReadGenreUnitDto((String) result[0], (Long) result[1]))
+                .map(result -> new MostReadGenreUnitDto((GenreName) result[0], (Long) result[1]))
                 .toList();
-        String duckTitle = mostReadGenres.isEmpty() ? null : mostReadGenres.get(0).genreName();
+        String duckTitle = mostReadGenres.isEmpty() ? null : mostReadGenres.get(0).genreName().name();
 
         // 2. 발췌 수, 감상평 수, 완독한 책 수
         long excerptCount = excerptRepository.countByUser(user);

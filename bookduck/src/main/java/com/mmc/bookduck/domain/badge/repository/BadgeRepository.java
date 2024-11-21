@@ -10,4 +10,6 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
     int countByBadgeType(BadgeType badgeType);
 
     List<Badge> findAllByBadgeType(BadgeType badgeType);
+
+    boolean existsByBadgeName(String name);
 }
