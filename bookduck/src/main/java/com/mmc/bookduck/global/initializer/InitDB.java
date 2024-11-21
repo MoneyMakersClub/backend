@@ -1,29 +1,24 @@
-package com.mmc.bookduck.global.common;
+package com.mmc.bookduck.global.initializer;
 
+import com.mmc.bookduck.domain.badge.entity.Badge;
 import com.mmc.bookduck.domain.badge.repository.BadgeRepository;
 import com.mmc.bookduck.domain.book.entity.Genre;
 import com.mmc.bookduck.domain.book.entity.GenreName;
 import com.mmc.bookduck.domain.book.repository.GenreRepository;
 import com.mmc.bookduck.domain.item.entity.Item;
-import com.mmc.bookduck.domain.item.entity.ItemData;
 import com.mmc.bookduck.domain.item.repository.ItemRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Component
 @Transactional
 @RequiredArgsConstructor
 public class InitDB {
-
     private final GenreRepository genreRepository;
-    private final BadgeRepository badgeRepository;
     private final ItemRepository itemRepository;
-
+    private final BadgeRepository badgeRepository;
 
     @PostConstruct
     public void initializeGenres() {
@@ -42,11 +37,25 @@ public class InitDB {
         for (ItemData itemData : ItemData.values()) {
             if (!itemRepository.existsByItemName(itemData.name())) {
                 itemRepository.save(Item.builder()
-                        .itemName(itemData.getItemName())
+                        .itemName(itemData.name())
                         .itemType(itemData.getItemType())
-                        .description(itemData.name())
+                        .description(itemData.getDescription())
                         .unlockCondition(itemData.getUnlockCondition().getGenres()
                                 + "%" + itemData.getUnlockCondition().getRequiredCount())
+                        .build());
+            }
+        }
+    }
+
+    @PostConstruct
+    public void initializeBadges() {
+        for (BadgeData badgeData : BadgeData.values()) {
+            if (!badgeRepository.existsByBadgeName(badgeData.name())) {
+                badgeRepository.save(Badge.builder()
+                        .badgeName(badgeData.name())
+                        .badgeType(badgeData.getBadgeType())
+                        .description(badgeData.getDescription())
+                        .unlockCondition(badgeData.getUnlockCondition())
                         .build());
             }
         }
