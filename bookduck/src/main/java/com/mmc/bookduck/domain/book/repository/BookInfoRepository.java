@@ -18,8 +18,10 @@ public interface BookInfoRepository extends JpaRepository<BookInfo, Long> {
     @Query("SELECT b " +
             "FROM BookInfo b " +
             "WHERE b.bookInfoId != :bookInfoId " +
-            "AND EXISTS (SELECT 1 FROM UserBook ub " +
-            "            WHERE ub.user IN (SELECT u.user FROM UserBook u WHERE u.bookInfo.bookInfoId = :bookInfoId)) " +
+            "   AND b.createdUserId IS NULL " +
+            "   AND EXISTS (SELECT 1 FROM UserBook ub " +
+            "       WHERE ub.bookInfo = b " +
+            "           AND ub.user IN (SELECT u.user FROM UserBook u WHERE u.bookInfo.bookInfoId = :bookInfoId)) " +
             "GROUP BY b " +
             "ORDER BY COUNT(b) DESC")
     List<BookInfo> findRelatedBooksByBookInfoId(@Param("bookInfoId") Long bookInfoId);
