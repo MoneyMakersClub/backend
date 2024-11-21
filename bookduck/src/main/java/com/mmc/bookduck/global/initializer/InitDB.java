@@ -51,10 +51,11 @@ public class InitDB {
     public void initializeBadges() {
         for (BadgeData badgeData : BadgeData.values()) {
             if (!badgeRepository.existsByBadgeName(badgeData.name())) {
+                String description = String.format(badgeData.getBadgeType().getDescription(), badgeData.getUnlockCondition());
                 badgeRepository.save(Badge.builder()
                         .badgeName(badgeData.name())
                         .badgeType(badgeData.getBadgeType())
-                        .description(badgeData.getDescription())
+                        .description(description)
                         .unlockCondition(badgeData.getUnlockCondition())
                         .build());
             }
