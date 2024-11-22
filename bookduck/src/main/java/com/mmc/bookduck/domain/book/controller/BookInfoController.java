@@ -62,10 +62,8 @@ public class BookInfoController {
 
     @Operation(summary = "사용자가 직접 추가한 도서 목록 검색", description = "현재 사용자가 직접 추가한 도서 중에서 특정 키워드에 해당하는 도서 목록을 검색합니다.")
     @GetMapping("/search/custom")
-    public ResponseEntity<BookListResponseDto<CustomBookUnitDto>> searchCustomBookList(@RequestParam(name = "keyword") final String keyword,
-                                                                                       @RequestParam final Long page,
-                                                                                       @RequestParam final Long size){
-        return ResponseEntity.ok(bookInfoService.searchCustomBookList(keyword, page, size));
+    public ResponseEntity<BookListResponseDto<CustomBookUnitDto>> searchCustomBookList(@RequestParam(name = "keyword") final String keyword){
+        return ResponseEntity.ok(bookInfoService.searchCustomBookList(keyword));
     }
 
 
