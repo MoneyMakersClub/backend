@@ -286,7 +286,7 @@ public class BookInfoService {
 
     // custom book 목록 검색
     @Transactional(readOnly = true)
-    public BookListResponseDto<CustomBookUnitDto> searchCustomBookList(String keyword, Long page, Long size) {
+    public BookListResponseDto<CustomBookUnitDto> searchCustomBookList(String keyword) {
 
         User user = userService.getCurrentUser();
         List<BookInfo> bookInfoList = bookInfoRepository.searchByCreatedUserIdAndKeyword(user.getUserId(), keyword);
