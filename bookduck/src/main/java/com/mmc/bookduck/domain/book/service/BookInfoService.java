@@ -252,6 +252,10 @@ public class BookInfoService {
 
     // api bookInfo 저장
     public BookInfo saveApiBookInfo (UserBookRequestDto dto) {
+        Optional<BookInfo> existingBookInfo = findBookInfoByProviderId(dto.providerId());
+        if(existingBookInfo.isPresent()){
+            throw new CustomException(ErrorCode.BOOK_ALREADY_EXISTS);
+        }
 
         String saveAuthor = dto.author();
         Genre genre = genreService.findGenreById(dto.genreId());
@@ -462,6 +466,9 @@ public class BookInfoService {
 
         Map<Long, Integer> bookInfoCountMap = new HashMap<>();
         for (UserBook userBook : userBookList) {
+            if( userBook.getBookInfo().getCreatedUserId() != null){
+                continue;
+            }
             Long bookInfoId = userBook.getBookInfo().getBookInfoId();
             bookInfoCountMap.put(bookInfoId, bookInfoCountMap.getOrDefault(bookInfoId, 0) + 1);
         }
@@ -559,6 +566,10 @@ public class BookInfoService {
 
         UserBook savedUserBook;
         if(bookInfo.isPresent()){
+            Optional<UserBook> existingUserBook = userBookRepository.findByUserAndBookInfo(user, bookInfo.get());
+            if(existingUserBook.isPresent()){
+                throw new CustomException(ErrorCode.USERBOOK_ALREADY_EXISTS);
+            }
             UserBook userBook = new UserBook(ReadStatus.NOT_STARTED, user, bookInfo.get());
             savedUserBook = userBookRepository.save(userBook);
         }
