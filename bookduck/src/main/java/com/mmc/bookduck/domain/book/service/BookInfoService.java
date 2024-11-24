@@ -462,6 +462,9 @@ public class BookInfoService {
 
         Map<Long, Integer> bookInfoCountMap = new HashMap<>();
         for (UserBook userBook : userBookList) {
+            if( userBook.getBookInfo().getCreatedUserId() != null){
+                continue;
+            }
             Long bookInfoId = userBook.getBookInfo().getBookInfoId();
             bookInfoCountMap.put(bookInfoId, bookInfoCountMap.getOrDefault(bookInfoId, 0) + 1);
         }
