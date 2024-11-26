@@ -36,8 +36,10 @@ public class User extends BaseTimeEntity {
 
     private String fcmToken;
 
+    @NotNull
     private Boolean isAnnouncementChecked;
 
+    @NotNull
     private Boolean isItemUnlockedChecked;
     
     @ColumnDefault("false")

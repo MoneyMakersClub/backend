@@ -115,4 +115,15 @@ public class FriendRequestService {
         request.setFriendRequestStatus(FriendRequestStatus.REJECTED);
         friendRequestRepository.save(request);
     }
+
+    @Transactional(readOnly = true)
+    public FriendRequest getPendingFriendRequestBetweenUsers(User currentUser, User targetUser) {
+        List<FriendRequest> existingRequests = friendRequestRepository.findAllFriendRequestsBetweenUsers(
+                currentUser.getUserId(), targetUser.getUserId(), FriendRequestStatus.PENDING);
+        if (existingRequests.isEmpty()) {
+            return null;  // 요청이 없다면 null 반환
+        }
+        // 친구 요청 1개(1개여야만 함)를 반환
+        return existingRequests.getFirst();
+    }
 }
