@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Transactional
@@ -29,7 +30,8 @@ public class AlarmService {
     private final UserService userService;
     private final FCMService fcmService;
 
-    // 최근 일반 Alarm 목록 읽기
+    // 최근 일반 Alarm 목록 가져오기
+    @Transactional(readOnly = true)
     public PaginatedResponseDto<AlarmUnitDto> getCommonAlarms(Pageable pageable){
         User user = userService.getCurrentUser();
 
@@ -38,17 +40,17 @@ public class AlarmService {
         return PaginatedResponseDto.from(alarmUnitDtos);
     }
 
-    // Alarm 읽음처리
+    // Alarm 읽음 처리
     public void checkCommonAlarm(AlarmReadRequestDto requestDto) {
         User user = userService.getCurrentUser();
         Alarm alarm = alarmRepository.findById(requestDto.alarmId())
                 .orElseThrow(()-> new CustomException(ErrorCode.ALARM_NOT_FOUND));
-        if (user.equals(alarm.getReceiver())) {
-            alarm.readAlarm();
-            alarmRepository.save(alarm);
-        } else {
+        if (!user.equals(alarm.getReceiver())) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
+        alarm.readAlarm();
+        alarmRepository.save(alarm);
+        emitterService.sendToClientIfNewAlarmExists(user);
     }
 
     // Alarm 생성
@@ -72,5 +74,17 @@ public class AlarmService {
     public void deleteAllAlarmsOfMember(User user){
         alarmRepository.deleteAllBySender(user);
         alarmRepository.deleteAllByReceiver(user);
+    }
+
+    // Alarm 전체 읽음처리
+    public void checkAllCommonAlarm() {
+        User user = userService.getCurrentUser();
+        List<Alarm> alarms = alarmRepository.findAllByReceiverAndIsReadFalse(user);
+
+        if (!alarms.isEmpty()) {
+            alarms.forEach(Alarm::readAlarm);
+            alarmRepository.saveAll(alarms);
+        }
+        emitterService.sendToClientIfNewAlarmExists(user);
     }
 }

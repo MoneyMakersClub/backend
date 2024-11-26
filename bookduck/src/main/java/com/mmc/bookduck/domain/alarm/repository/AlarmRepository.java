@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     Boolean existsByReceiverAndIsReadFalse(User user);
@@ -21,4 +22,6 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     void deleteAllBySender(User user);
     void deleteAllByReceiver(User user);
     void deleteByCreatedTimeBefore(LocalDateTime createdTime);
+
+    List<Alarm> findAllByReceiverAndIsReadFalse(User user);
 }
