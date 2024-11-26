@@ -260,16 +260,22 @@ public class ArchiveService {
             String title = (String) row[3];
             Visibility visibility = Visibility.valueOf((String) row[4]);
             LocalDateTime createdTime = ((Timestamp) row[5]).toLocalDateTime();
+            String bookTitle = (String) row[6];
+            String bookAuthor = (String) row[7];
 
             if ("EXCERPT".equals(type)) {
                 return new ArchiveSearchListResponseDto.ResultWithType(
                         EXCERPT,
-                        new ExcerptSearchUnitDto(id, content, visibility, createdTime)
+                        new ExcerptSearchUnitDto(id, content, visibility, createdTime),
+                        bookTitle,
+                        bookAuthor
                 );
             } else if ("REVIEW".equals(type)) {
                 return new ArchiveSearchListResponseDto.ResultWithType(
                         REVIEW,
-                        new ReviewSearchUnitDto(id, title, content, visibility, createdTime)
+                        new ReviewSearchUnitDto(id, title, content, visibility, createdTime),
+                        bookTitle,
+                        bookAuthor
                 );
             }
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);

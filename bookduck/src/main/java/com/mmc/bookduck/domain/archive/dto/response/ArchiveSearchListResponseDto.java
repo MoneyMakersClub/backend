@@ -14,9 +14,9 @@ public record ArchiveSearchListResponseDto(
 ) {
     public record ResultWithType(
             ArchiveType type, // EXCERPT, REVIEW
-            Object data // ExcerptSearchUnitDto, ReviewSearchUnitDto
-//            String title,
-//            String author
+            Object data, // ExcerptSearchUnitDto, ReviewSearchUnitDto
+            String title,
+            String author
     ) {}
 
     public static ArchiveSearchListResponseDto from(PaginatedResponseDto<ResultWithType> paginatedResponse) {
