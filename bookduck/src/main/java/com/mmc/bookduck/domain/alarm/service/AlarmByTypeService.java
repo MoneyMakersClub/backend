@@ -3,6 +3,7 @@ package com.mmc.bookduck.domain.alarm.service;
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
 import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 import com.mmc.bookduck.domain.badge.entity.BadgeType;
+import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,9 +47,9 @@ public class AlarmByTypeService {
         alarmService.createAlarm(alarm, receiver);
     }
     // 한줄평 좋아요 알림 생성
-    public void createOneLineLikeAlarm(User sender, User receiver, Long bookInfoId) {
+    public void createOneLineLikeAlarm(User sender, User receiver, BookInfo bookInfo) {
         AlarmType alarmType = AlarmType.ONELINELIKE_ADDED;
-        String message = MessageFormat.format(alarmType.getMessagePattern(), sender.getNickname());
+        String message = MessageFormat.format(alarmType.getMessagePattern(), bookInfo.getTitle());
 
         Alarm alarm = Alarm.builder()
                 .alarmType(alarmType)
@@ -56,7 +57,7 @@ public class AlarmByTypeService {
                 .receiver(receiver)
                 .message(message)
                 .resourceName("BookInfo")
-                .resourceId(bookInfoId)
+                .resourceId(bookInfo.getBookInfoId())
                 .build();
         alarmService.createAlarm(alarm, receiver);
     }
