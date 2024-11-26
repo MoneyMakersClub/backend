@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.archive.dto.response;
 
+import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import com.mmc.bookduck.global.common.PaginatedResponseDto;
 
 import java.util.List;
@@ -12,8 +13,10 @@ public record ArchiveSearchListResponseDto(
         List<ResultWithType> archiveList
 ) {
     public record ResultWithType(
-            String type, // EXCERPT, REVIEW
+            ArchiveType type, // EXCERPT, REVIEW
             Object data // ExcerptSearchUnitDto, ReviewSearchUnitDto
+//            String title,
+//            String author
     ) {}
 
     public static ArchiveSearchListResponseDto from(PaginatedResponseDto<ResultWithType> paginatedResponse) {
