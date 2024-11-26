@@ -23,7 +23,7 @@ public class EmitterService {
     private final AlarmRepository alarmRepository;
     private final UserService userService;
 
-    private static final Long DEFAULT_TIMEOUT = 5L * 60 * 1000;  // 5분
+    private static final Long DEFAULT_TIMEOUT = 3L * 60 * 1000;  // 3분
 
     public SseEmitter subscribe() {
         User user = userService.getCurrentUser();
@@ -37,18 +37,17 @@ public class EmitterService {
         return emitter;
     }
 
-    private void sendToClientIfNewAlarmExists(User user) {
-        Boolean isMissedAlarms = alarmRepository.existsByReceiverAndIsReadFalse(user);
-        Boolean isAnnouncementChecked = user.getIsAnnouncementChecked();
-        Boolean isItemUnlockedChecked = user.getIsItemUnlockedChecked();
-        String messsage;
+    // 알림 상태를 확인하고 클라이언트에 알림 전송
+    public void sendToClientIfNewAlarmExists(User user) {
+        boolean isMissedAlarms = alarmRepository.existsByReceiverAndIsReadFalse(user);
+        boolean isAnnouncementChecked = user.getIsAnnouncementChecked();
+        boolean isItemUnlockedChecked = user.getIsItemUnlockedChecked();
 
-        if (isMissedAlarms || isAnnouncementChecked || isItemUnlockedChecked) {
-            messsage = "new sse alarm exists";
-        } else {
-            messsage = "new sse alarm doesn't exists";
-        }
-        sendToClient(user.getUserId(), AlarmDefaultDataDto.from(!isMissedAlarms, isAnnouncementChecked, isItemUnlockedChecked), messsage);
+        String message = (isMissedAlarms || isAnnouncementChecked || isItemUnlockedChecked)
+                ? "new sse alarm exists"
+                : "new sse alarm doesn't exists";
+
+        sendToClient(user.getUserId(), AlarmDefaultDataDto.from(!isMissedAlarms, isAnnouncementChecked, isItemUnlockedChecked), message);
     }
 
     private void sendToClientIfBadgeUnlockedAlarmExists(User user) {
