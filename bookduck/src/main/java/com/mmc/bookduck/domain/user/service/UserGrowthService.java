@@ -8,6 +8,7 @@ import com.mmc.bookduck.domain.user.dto.response.UserGrowthInfoResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserInfoResponseDto;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.entity.UserGrowth;
+import com.mmc.bookduck.domain.user.entity.UserRelationshipStatus;
 import com.mmc.bookduck.domain.user.repository.UserGrowthRepository;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -25,7 +26,7 @@ public class UserGrowthService {
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
     private final UserService userService;
-    private final FriendService friendService;
+    private final UserRelationshipService userRelationshipService;
 
     @Transactional(readOnly = true)
     public UserGrowth getUserGrowthByUserId(Long userId)
@@ -44,11 +45,12 @@ public class UserGrowthService {
         long bookCount = (reviewCount + excerptCount);
         boolean isOfficial = user.isOfficial();
         User currentUser = userService.getCurrentUserOrNull();
-        Boolean isFriend = (currentUser == null || !currentUser.equals(user))
-                ? friendService.isFriendWithCurrentUserOrNull(user)
-                : null;
-        return new UserInfoResponseDto(user.getNickname(), bookCount, isOfficial, isFriend);
+
+        // 유저와의 관계 상태 계산
+        UserRelationshipStatus userRelationshipStatus = userRelationshipService.getUserRelationshipStatus(currentUser, user);
+        return new UserInfoResponseDto(user.getNickname(), bookCount, isOfficial, userRelationshipStatus);
     }
+
 
     @Transactional(readOnly = true)
     public UserGrowthInfoResponseDto getUserLevelInfo(Long userId) {
