@@ -37,10 +37,10 @@ public class EmitterService {
         return emitter;
     }
 
-    private void sendToClientIfNewAlarmExists(User user) {
-        Boolean isMissedAlarms = alarmRepository.existsByReceiverAndIsReadFalse(user);
-        Boolean isAnnouncementChecked = user.getIsAnnouncementChecked();
-        Boolean isItemUnlockedChecked = user.getIsItemUnlockedChecked();
+    public void sendToClientIfNewAlarmExists(User user) {
+        boolean isMissedAlarms = alarmRepository.existsByReceiverAndIsReadFalse(user);
+        boolean isAnnouncementChecked = user.getIsAnnouncementChecked();
+        boolean isItemUnlockedChecked = user.getIsItemUnlockedChecked();
         String messsage;
 
         if (isMissedAlarms || isAnnouncementChecked || isItemUnlockedChecked) {

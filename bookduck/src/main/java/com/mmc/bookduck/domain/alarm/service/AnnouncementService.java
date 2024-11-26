@@ -18,8 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AnnouncementService {
     private final AnnouncementRepository announcementRepository;
     private final UserService userService;
+    private final EmitterService emitterService;
 
-    @Transactional(readOnly = true)
     public PaginatedResponseDto<AnnouncementUnitDto> getRecentAnnouncements(Pageable pageable) {
         // user가 공지 읽음으로 표시
         User user = userService.getCurrentUser();
@@ -27,6 +27,7 @@ public class AnnouncementService {
 
         Page<Announcement> announcementPage = announcementRepository.findByOrderByCreatedTimeDesc(pageable);
         Page<AnnouncementUnitDto> annoucementUnitDtos = announcementPage.map(AnnouncementUnitDto::new);
+        emitterService.sendToClientIfNewAlarmExists(user);
         return PaginatedResponseDto.from(annoucementUnitDtos);
     }
 }
