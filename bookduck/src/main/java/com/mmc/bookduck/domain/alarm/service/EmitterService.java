@@ -37,18 +37,17 @@ public class EmitterService {
         return emitter;
     }
 
+    // 알림 상태를 확인하고 클라이언트에 알림 전송
     public void sendToClientIfNewAlarmExists(User user) {
         boolean isMissedAlarms = alarmRepository.existsByReceiverAndIsReadFalse(user);
         boolean isAnnouncementChecked = user.getIsAnnouncementChecked();
         boolean isItemUnlockedChecked = user.getIsItemUnlockedChecked();
-        String messsage;
 
-        if (isMissedAlarms || isAnnouncementChecked || isItemUnlockedChecked) {
-            messsage = "new sse alarm exists";
-        } else {
-            messsage = "new sse alarm doesn't exists";
-        }
-        sendToClient(user.getUserId(), AlarmDefaultDataDto.from(!isMissedAlarms, isAnnouncementChecked, isItemUnlockedChecked), messsage);
+        String message = (isMissedAlarms || isAnnouncementChecked || isItemUnlockedChecked)
+                ? "new sse alarm exists"
+                : "new sse alarm doesn't exists";
+
+        sendToClient(user.getUserId(), AlarmDefaultDataDto.from(!isMissedAlarms, isAnnouncementChecked, isItemUnlockedChecked), message);
     }
 
     private void sendToClientIfBadgeUnlockedAlarmExists(User user) {

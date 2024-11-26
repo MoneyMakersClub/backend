@@ -2,7 +2,6 @@ package com.mmc.bookduck.domain.alarm.service;
 
 import com.mmc.bookduck.domain.alarm.dto.request.AlarmReadRequestDto;
 import com.mmc.bookduck.domain.alarm.dto.common.AlarmUnitDto;
-import com.mmc.bookduck.domain.alarm.dto.ssedata.AlarmDefaultDataDto;
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
 import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -61,14 +60,16 @@ public class AlarmService {
 
     // Alarm 생성
     public void createAlarm(Alarm alarm, User receiver) {
+        // 알림 저장
         alarmRepository.save(alarm);
-        emitterService.notify(
-                receiver.getUserId(),
-                AlarmDefaultDataDto.from(false, receiver.getIsAnnouncementChecked(), receiver.getIsItemUnlockedChecked()),
-                "new alarm"
-        );
+        // SSE 알림을 클라이언트로 전송
+        emitterService.sendToClientIfNewAlarmExists(receiver);
+        // 푸시 알림 전송
+        sendPushNotificationIfEnabled(receiver, alarm);
+    }
 
-        // 푸시알림 전송
+    // 푸시 알림 전송
+    private void sendPushNotificationIfEnabled(User receiver, Alarm alarm) {
         UserSetting userSetting = userSettingService.getUserSettingByUser(receiver);
         if (userSetting.isPushAlarmEnabled() && alarm.getAlarmType().isSendPush()) {
             String fcmToken = receiver.getFcmToken();
@@ -78,7 +79,7 @@ public class AlarmService {
         }
     }
 
-    public void deleteAllAlarmsOfMember(User user){
+    public void deleteAllAlarmsOfUser(User user){
         alarmRepository.deleteAllBySender(user);
         alarmRepository.deleteAllByReceiver(user);
     }
