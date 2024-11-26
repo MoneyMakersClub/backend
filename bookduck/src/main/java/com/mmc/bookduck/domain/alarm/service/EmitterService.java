@@ -23,7 +23,7 @@ public class EmitterService {
     private final AlarmRepository alarmRepository;
     private final UserService userService;
 
-    private static final Long DEFAULT_TIMEOUT = 5L * 60 * 1000;  // 5분
+    private static final Long DEFAULT_TIMEOUT = 3L * 60 * 1000;  // 3분
 
     public SseEmitter subscribe() {
         User user = userService.getCurrentUser();

@@ -3,6 +3,8 @@ package com.mmc.bookduck.domain.alarm.entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.text.MessageFormat;
+
 @Getter
 @AllArgsConstructor
 public enum AlarmType {
@@ -19,14 +21,14 @@ public enum AlarmType {
     private final String messagePattern;
     private final boolean sendPush;
 
-    // 메시지 생성 메서드
-//    public String generateMessage(Alarm alarm) {
-//        return switch (this) {
-//            case FRIEND_REQUEST, FRIEND_APPROVED, ONELINELIKE_ADDED, BADGE_UNLOCKED ->
-//                    MessageFormat.format(messagePattern, alarm.getSender().getNickname());
-//            case LEVEL_UP ->
-//                    MessageFormat.format(messagePattern, alarm.getResourceValue());
-//            default -> messagePattern;
-//        };
-//    }
+    // boldText 생성 메서드
+    public String extractBoldText(Alarm alarm) {
+        return switch (this) {
+            case FRIEND_REQUEST, FRIEND_APPROVED, ONELINELIKE_ADDED, BADGE_UNLOCKED ->
+                    MessageFormat.format("{0}", alarm.getSender().getNickname());
+            case LEVEL_UP ->
+                    MessageFormat.format("{0}", alarm.getResourceValue());
+            default -> "";
+        };
+    }
 }
