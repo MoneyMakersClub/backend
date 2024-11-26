@@ -6,7 +6,9 @@ import com.mmc.bookduck.domain.alarm.dto.ssedata.AlarmDefaultDataDto;
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
 import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.entity.UserSetting;
 import com.mmc.bookduck.domain.user.service.UserService;
+import com.mmc.bookduck.domain.user.service.UserSettingService;
 import com.mmc.bookduck.global.common.PaginatedResponseDto;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -18,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,6 +30,7 @@ public class AlarmService {
     private final EmitterService emitterService;
     private final UserService userService;
     private final FCMService fcmService;
+    private final UserSettingService userSettingService;
 
     // 최근 일반 Alarm 목록 가져오기
     @Transactional(readOnly = true)
@@ -45,12 +47,16 @@ public class AlarmService {
         User user = userService.getCurrentUser();
         Alarm alarm = alarmRepository.findById(requestDto.alarmId())
                 .orElseThrow(()-> new CustomException(ErrorCode.ALARM_NOT_FOUND));
+        // 알림 수신자 확인
         if (!user.equals(alarm.getReceiver())) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
-        alarm.readAlarm();
-        alarmRepository.save(alarm);
-        emitterService.sendToClientIfNewAlarmExists(user);
+        // 알림 새롭게 읽은 경우만 업데이트 및 SSE 알림 전송
+        if (!alarm.isRead()) {
+            alarm.readAlarm();
+            alarmRepository.save(alarm);
+            emitterService.sendToClientIfNewAlarmExists(user);
+        }
     }
 
     // Alarm 생성
@@ -63,7 +69,8 @@ public class AlarmService {
         );
 
         // 푸시알림 전송
-        if (alarm.getAlarmType().isSendPush()) {
+        UserSetting userSetting = userSettingService.getUserSettingByUser(receiver);
+        if (userSetting.isPushAlarmEnabled() && alarm.getAlarmType().isSendPush()) {
             String fcmToken = receiver.getFcmToken();
             if (fcmToken != null) {
                 fcmService.sendPushMessage(fcmToken, alarm.getMessage());
@@ -85,6 +92,7 @@ public class AlarmService {
             alarms.forEach(Alarm::readAlarm);
             alarmRepository.saveAll(alarms);
         }
+        // SSE 알림 전송
         emitterService.sendToClientIfNewAlarmExists(user);
     }
 }
