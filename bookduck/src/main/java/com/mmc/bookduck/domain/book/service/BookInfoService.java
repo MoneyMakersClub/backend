@@ -62,6 +62,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mmc.bookduck.domain.archive.entity.ArchiveType.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -502,10 +504,10 @@ public class BookInfoService {
         List<Excerpt> excerpts = excerptRepository.findExcerptsByUserBookWithPublic(userBook);
         List<Review> reviews = reviewRepository.findReviewsByUserBookWithPublic(userBook);
         for(Excerpt excerpt : excerpts){
-            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor("EXCERPT", ExcerptResponseDto.from(excerpt)));
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor(EXCERPT, ExcerptResponseDto.from(excerpt)));
         }
         for(Review review : reviews){
-            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor("REVIEW", ReviewResponseDto.from(review)));
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor(REVIEW, ReviewResponseDto.from(review)));
         }
 
         List<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> sortedArchiveList = sortByCreatedTime(archiveList);
@@ -524,10 +526,10 @@ public class BookInfoService {
         List<Excerpt> excerpts = excerptRepository.findExcerptByUserBookOrderByCreatedTimeDesc(userBook);
         List<Review> reviews = reviewRepository.findReviewByUserBookOrderByCreatedTimeDesc(userBook);
         for(Excerpt excerpt : excerpts){
-            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor("EXCERPT", ExcerptResponseDto.from(excerpt)));
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor(EXCERPT, ExcerptResponseDto.from(excerpt)));
         }
         for(Review review : reviews){
-            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor("REVIEW", ReviewResponseDto.from(review)));
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor(REVIEW, ReviewResponseDto.from(review)));
         }
 
         List<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> sortedArchiveList = sortByCreatedTime(archiveList);
