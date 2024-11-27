@@ -3,7 +3,9 @@ package com.mmc.bookduck.domain.user.service;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.entity.UserBook;
+import com.mmc.bookduck.domain.friend.entity.Friend;
 import com.mmc.bookduck.domain.friend.service.FriendService;
+import com.mmc.bookduck.domain.user.dto.UserRelationshipStatusDto;
 import com.mmc.bookduck.domain.user.dto.response.UserGrowthInfoResponseDto;
 import com.mmc.bookduck.domain.user.dto.response.UserInfoResponseDto;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Year;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -38,17 +41,17 @@ public class UserGrowthService {
 
     @Transactional(readOnly = true)
     public UserInfoResponseDto getUserInfo(Long userId) {
-        User user = userService.getActiveUserByUserId(userId);
+        User targetUser = userService.getActiveUserByUserId(userId);
         int currentYear = Year.now().getValue();
-        long reviewCount = reviewRepository.countByUserAndCreatedTimeThisYear(user, currentYear);
-        long excerptCount = excerptRepository.countByUserAndCreatedTimeThisYear(user, currentYear);
+        long reviewCount = reviewRepository.countByUserAndCreatedTimeThisYear(targetUser, currentYear);
+        long excerptCount = excerptRepository.countByUserAndCreatedTimeThisYear(targetUser, currentYear);
         long bookCount = (reviewCount + excerptCount);
-        boolean isOfficial = user.isOfficial();
+        boolean isOfficial = targetUser.isOfficial();
         User currentUser = userService.getCurrentUserOrNull();
 
-        // 유저와의 관계 상태 계산
-        UserRelationshipStatus userRelationshipStatus = userRelationshipService.getUserRelationshipStatus(currentUser, user);
-        return new UserInfoResponseDto(user.getNickname(), bookCount, isOfficial, userRelationshipStatus);
+        // 유저와의 관계 상태
+        UserRelationshipStatusDto userRelationshipStatusDto = userRelationshipService.getUserRelationshipStatus(currentUser, targetUser);
+        return new UserInfoResponseDto(targetUser.getNickname(), bookCount, isOfficial, userRelationshipStatusDto);
     }
 
 
