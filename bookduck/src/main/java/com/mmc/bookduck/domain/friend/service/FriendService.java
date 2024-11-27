@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -105,6 +106,11 @@ public class FriendService {
             return false;
         }
         return friendRepository.findFriendBetweenUsers(currentUser.getUserId(), otherUser.getUserId()).isPresent();
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Friend> getFriendBetweenUsers(User user, User otherUser) {
+        return friendRepository.findFriendBetweenUsers(user.getUserId(), otherUser.getUserId());
     }
 
     @Transactional(readOnly = true)
