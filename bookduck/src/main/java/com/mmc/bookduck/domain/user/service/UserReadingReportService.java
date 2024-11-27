@@ -38,6 +38,7 @@ public class UserReadingReportService {
         User user = userService.getActiveUserByUserId(userId);
 
         // 상/하반기 체크
+        int currentYear = java.time.LocalDate.now().getYear();
         int currentMonth = java.time.LocalDate.now().getMonthValue();
         boolean isFirstHalfOfYear = (currentMonth <= 6);
 
@@ -49,13 +50,13 @@ public class UserReadingReportService {
         String duckTitle = mostReadGenres.isEmpty() ? null : mostReadGenres.getFirst().genreName().name();
 
         // 2. 발췌 수, 감상평 수, 완독한 책 수
-        long excerptCount = excerptRepository.countByUserAndCreatedInHalf(user, isFirstHalfOfYear);
-        long reviewCount = reviewRepository.countByUserAndCreatedInHalf(user, isFirstHalfOfYear);
+        long excerptCount = excerptRepository.countByUserAndCreatedInYearAndHalf(user, currentYear, isFirstHalfOfYear);
+        long reviewCount = reviewRepository.countByUserAndCreatedInYearAndHalf(user, currentYear, isFirstHalfOfYear);
         long finishedBookCount = userBookRepository.countByUserAndReadStatus(user, ReadStatus.FINISHED);
 
         // 3. 올해 현재 분기(상반기/하반기) 월별 독서 수
         // 해당 기간의 UserBook 조회 및 월별 책 권수 카운트
-        List<UserBook> userBooksForCurrentYearHalf = userBookRepository.findAllByUserAndCreatedInHalf(user, isFirstHalfOfYear);
+        List<UserBook> userBooksForCurrentYearHalf = userBookRepository.findAllByUserAndCreatedInYearAndHalf(user, currentYear, isFirstHalfOfYear);
         Map<Integer, Long> monthlyCounts = new HashMap<>();
         for (UserBook userBook : userBooksForCurrentYearHalf) {
             int month = userBook.getCreatedTime().getMonthValue();
