@@ -75,4 +75,8 @@ public class User extends BaseTimeEntity {
     public void setIsItemUnlockedChecked(boolean isItemUnlockedChecked) {
         this.isItemUnlockedChecked = isItemUnlockedChecked;
     }
+
+    public void updateStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+    }
 }
