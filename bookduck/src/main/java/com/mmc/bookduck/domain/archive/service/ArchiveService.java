@@ -34,6 +34,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static com.mmc.bookduck.domain.archive.entity.ArchiveType.*;
 import static com.mmc.bookduck.global.common.EscapeSpecialCharactersService.escapeSpecialCharacters;
 
 @Slf4j
@@ -202,7 +204,7 @@ public class ArchiveService {
         }
         List<UserArchiveResponseDto.ArchiveWithType> archiveList = new ArrayList<>();
         // 발췌 조회
-        if (archiveType == ArchiveType.EXCERPT || archiveType == ArchiveType.ALL) {
+        if (archiveType == EXCERPT || archiveType == ArchiveType.ALL) {
             List<Excerpt> excerpts = excerptRepository.findByUserId(userId);
             for (Excerpt excerpt : excerpts) {
                 if (!userId.equals(currentUserId) && excerpt.getVisibility() != Visibility.PUBLIC) {
@@ -210,7 +212,7 @@ public class ArchiveService {
                 }
                 String title = excerpt.getUserBook().getBookInfo().getTitle();
                 String author = excerpt.getUserBook().getBookInfo().getAuthor();
-                archiveList.add(new UserArchiveResponseDto.ArchiveWithType("EXCERPT", ExcerptResponseDto.from(excerpt), title, author));
+                archiveList.add(new UserArchiveResponseDto.ArchiveWithType(EXCERPT, ExcerptResponseDto.from(excerpt), title, author));
             }
         }
         // 리뷰 조회
@@ -222,7 +224,7 @@ public class ArchiveService {
                 }
                 String title = review.getUserBook().getBookInfo().getTitle();
                 String author = review.getUserBook().getBookInfo().getAuthor();
-                archiveList.add(new UserArchiveResponseDto.ArchiveWithType("REVIEW", ReviewResponseDto.from(review), title, author));
+                archiveList.add(new UserArchiveResponseDto.ArchiveWithType(REVIEW, ReviewResponseDto.from(review), title, author));
             }
         }
         // 데이터 합친 후 최신순 정렬
@@ -258,16 +260,22 @@ public class ArchiveService {
             String title = (String) row[3];
             Visibility visibility = Visibility.valueOf((String) row[4]);
             LocalDateTime createdTime = ((Timestamp) row[5]).toLocalDateTime();
+            String bookTitle = (String) row[6];
+            String bookAuthor = (String) row[7];
 
             if ("EXCERPT".equals(type)) {
                 return new ArchiveSearchListResponseDto.ResultWithType(
-                        "EXCERPT",
-                        new ExcerptSearchUnitDto(id, content, visibility, createdTime)
+                        EXCERPT,
+                        new ExcerptSearchUnitDto(id, content, visibility, createdTime),
+                        bookTitle,
+                        bookAuthor
                 );
             } else if ("REVIEW".equals(type)) {
                 return new ArchiveSearchListResponseDto.ResultWithType(
-                        "REVIEW",
-                        new ReviewSearchUnitDto(id, title, content, visibility, createdTime)
+                        REVIEW,
+                        new ReviewSearchUnitDto(id, title, content, visibility, createdTime),
+                        bookTitle,
+                        bookAuthor
                 );
             }
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
