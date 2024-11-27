@@ -46,7 +46,13 @@ public class EmitterService {
         String message = (isMissedAlarms || isAnnouncementChecked || isItemUnlockedChecked)
                 ? "new sse alarm exists"
                 : "new sse alarm doesn't exists";
-
+        
+        // 아이템 잠금 해제를 확인한 것으로 저장
+        if (isItemUnlockedChecked) {
+            user.setIsItemUnlockedChecked(true);
+            userService.saveUser(user);
+        }
+        
         sendToClient(user.getUserId(), AlarmDefaultDataDto.from(!isMissedAlarms, isAnnouncementChecked, isItemUnlockedChecked), message);
     }
 
