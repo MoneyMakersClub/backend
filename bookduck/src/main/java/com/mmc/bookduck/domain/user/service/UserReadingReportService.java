@@ -35,28 +35,25 @@ public class UserReadingReportService {
     private final KomoranService komoranService;
 
     public UserStatisticsResponseDto getUserStatistics(Long userId) {
-        // UserBook이 0권이라면 조회 불가능
         User user = userService.getActiveUserByUserId(userId);
-        long userBookCount = userBookRepository.countByUser(user);
-        if (userBookCount == 0) {
-            throw new CustomException(ErrorCode.READINGREPORT_NOT_VIEWABLE);
-        }
+
+        // 상/하반기 체크
+        int currentMonth = java.time.LocalDate.now().getMonthValue();
+        boolean isFirstHalfOfYear = (currentMonth <= 6);
 
         // 1. 가장 많이 읽은 장르, Top3 장르
         List<Object[]> topGenres = userBookRepository.findTopGenresByUser(user, Pageable.ofSize(3));
         List<MostReadGenreUnitDto> mostReadGenres = topGenres.stream()
                 .map(result -> new MostReadGenreUnitDto((GenreName) result[0], (Long) result[1]))
                 .toList();
-        String duckTitle = mostReadGenres.isEmpty() ? null : mostReadGenres.get(0).genreName().name();
+        String duckTitle = mostReadGenres.isEmpty() ? null : mostReadGenres.getFirst().genreName().name();
 
         // 2. 발췌 수, 감상평 수, 완독한 책 수
-        long excerptCount = excerptRepository.countByUser(user);
-        long reviewCount = reviewRepository.countByUser(user);
+        long excerptCount = excerptRepository.countByUserAndCreatedInHalf(user, isFirstHalfOfYear);
+        long reviewCount = reviewRepository.countByUserAndCreatedInHalf(user, isFirstHalfOfYear);
         long finishedBookCount = userBookRepository.countByUserAndReadStatus(user, ReadStatus.FINISHED);
 
         // 3. 올해 현재 분기(상반기/하반기) 월별 독서 수
-        int currentMonth = java.time.LocalDate.now().getMonthValue();
-        boolean isFirstHalfOfYear = (currentMonth <= 6);
         // 해당 기간의 UserBook 조회 및 월별 책 권수 카운트
         List<UserBook> userBooksForCurrentYearHalf = userBookRepository.findAllByUserAndCreatedInHalf(user, isFirstHalfOfYear);
         Map<Integer, Long> monthlyCounts = new HashMap<>();
@@ -79,7 +76,14 @@ public class UserReadingReportService {
                 .map(userBook -> userBook.getBookInfo().getImgPath())
                 .toList();
 
+        boolean hasTopGenres = !mostReadGenres.isEmpty();
+        boolean hasMonthlyBookCounts = !monthlyBookCounts.isEmpty();
+        boolean hasMostReadAuthor = mostReadAuthor != null;
+
         return new UserStatisticsResponseDto(
+                hasTopGenres,
+                hasMonthlyBookCounts,
+                hasMostReadAuthor,
                 user.getNickname(),
                 duckTitle,
                 excerptCount + reviewCount,
