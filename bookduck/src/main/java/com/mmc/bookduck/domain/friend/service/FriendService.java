@@ -89,13 +89,11 @@ public class FriendService {
         // 친구 요청 상태를 BREAKUP로 변경
         List<FriendRequest> requests = friendRequestRepository.findAllFriendRequestsBetweenUsers(
                 friend.getUser1().getUserId(), friend.getUser2().getUserId(), FriendRequestStatus.ACCEPTED);
-        if (requests.isEmpty()) {
-            throw new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND);
+        if (!requests.isEmpty()) {
+            FriendRequest request = requests.get(0);  // 여러 개가 있을 경우, 가장 최근 요청을 처리
+            request.setFriendRequestStatus(FriendRequestStatus.BREAKUP);
+            friendRequestRepository.save(request);
         }
-        FriendRequest request = requests.get(0);  // 여러 개가 있을 경우, 가장 최근 요청을 처리
-        request.setFriendRequestStatus(FriendRequestStatus.BREAKUP);
-        friendRequestRepository.save(request);
-
         friendRepository.delete(friend);
     }
 
