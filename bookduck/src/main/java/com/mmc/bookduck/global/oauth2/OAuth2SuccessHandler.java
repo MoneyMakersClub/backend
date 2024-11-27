@@ -20,6 +20,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JwtUtil jwtUtil;
     private final CookieUtil cookieUtil;
     private static final String OAUTH_PATH = "/api/oauth";
+    private static final String DEPLOYED_REDIRECT_URL = "https://main.d2upl1xcgysyb.amplifyapp.com";
+    private static final String LOCAL_REDIRECT_URL = "http://localhost:3000";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -29,17 +31,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             String origin = request.getHeader("origin");
             String referer = request.getHeader("referer");
 
-            // origin이나 referer 헤더가 있는 경우 이를 기준으로 redirectUrl 설정
             String baseRedirectUrl;
-            if (origin != null) {
-                baseRedirectUrl = origin;
-            } else if (referer != null) {
-                baseRedirectUrl = referer.split("/")[0] + "//" + referer.split("/")[2]; // 프로토콜 및 호스트만 사용
+            if (origin != null && origin.equals(LOCAL_REDIRECT_URL)) {
+                baseRedirectUrl = LOCAL_REDIRECT_URL;
+            } else if (referer != null && LOCAL_REDIRECT_URL.equals(referer.split("/")[0] + "//" + referer.split("/")[2])) {
+                baseRedirectUrl = LOCAL_REDIRECT_URL;
             } else {
-                // 기본값을 로컬호스트로 설정
-                baseRedirectUrl = "http://localhost:3000";
+                baseRedirectUrl = DEPLOYED_REDIRECT_URL;
             }
-            String redirectUrl = baseRedirectUrl + OAUTH_PATH;
 
             // 액세스 토큰 및 리프레시 토큰 발급, 리프레시 토큰을 쿠키에 저장
             String accessToken = jwtUtil.generateAccessToken(authentication);
@@ -55,7 +54,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             log.info("소셜 로그인 {}에 성공하였습니다. 발급된 accessToken: {}", isNewUser ? "회원 가입" : "로그인", accessToken);
 
             // 액세스 토큰을 쿼리 파라미터로 전달하여 리디렉션
-            String redirectUrlWithParams = UriComponentsBuilder.fromUriString(redirectUrl)
+            String redirectUrlWithParams = UriComponentsBuilder.fromUriString(baseRedirectUrl + OAUTH_PATH)
                     .queryParam("accessToken", accessToken)
                     .queryParam("expiresIn", expiresIn)
                     .queryParam("isNewUser", isNewUser)
