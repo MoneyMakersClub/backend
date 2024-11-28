@@ -67,4 +67,8 @@ public class User extends BaseTimeEntity {
     public void setIsAnnouncementChecked(boolean isAnnouncementChecked) {
         this.isAnnouncementChecked = isAnnouncementChecked;
     }
+
+    public void updateStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+    }
 }

@@ -5,6 +5,7 @@ import com.mmc.bookduck.domain.user.dto.request.UserSettingUpdateRequestDto;
 import com.mmc.bookduck.domain.user.service.UserSettingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,13 @@ public class UserSettingController {
     @PatchMapping("/options")
     public ResponseEntity<?> updateOptions(@RequestBody @Valid UserSettingUpdateRequestDto requestDto) {
         userSettingService.updateOptions(requestDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "회원 탈퇴", description = "회원을 탈퇴합니다.")
+    @PatchMapping("/status")
+    public ResponseEntity<?> deactivate(HttpServletResponse response) {
+        userSettingService.deactivate(response);
         return ResponseEntity.ok().build();
     }
 }

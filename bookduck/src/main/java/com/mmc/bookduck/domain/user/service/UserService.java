@@ -43,14 +43,6 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User getActiveUserByEmail(String email) throws CustomException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        validateActiveUserStatus(user);
-        return user;
-    }
-
-    @Transactional(readOnly = true)
     public User getActiveUserByUserId(Long userId) throws CustomException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
