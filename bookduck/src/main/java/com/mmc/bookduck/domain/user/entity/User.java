@@ -38,9 +38,6 @@ public class User extends BaseTimeEntity {
 
     @NotNull
     private Boolean isAnnouncementChecked;
-
-    @NotNull
-    private Boolean isItemUnlockedChecked;
     
     @ColumnDefault("false")
     private boolean isOfficial;
@@ -54,7 +51,6 @@ public class User extends BaseTimeEntity {
         this.role = role;
         this.userStatus = UserStatus.ACTIVE;
         this.isAnnouncementChecked = true;
-        this.isItemUnlockedChecked = true;
         this.isOfficial = isOfficial;
     }
 
@@ -72,7 +68,7 @@ public class User extends BaseTimeEntity {
         this.isAnnouncementChecked = isAnnouncementChecked;
     }
 
-    public void setIsItemUnlockedChecked(boolean isItemUnlockedChecked) {
-        this.isItemUnlockedChecked = isItemUnlockedChecked;
+    public void updateStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
     }
 }

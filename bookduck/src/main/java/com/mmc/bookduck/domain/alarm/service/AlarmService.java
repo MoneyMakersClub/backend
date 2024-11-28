@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.alarm.service;
 
 import com.mmc.bookduck.domain.alarm.dto.request.AlarmReadRequestDto;
 import com.mmc.bookduck.domain.alarm.dto.common.AlarmUnitDto;
+import com.mmc.bookduck.domain.alarm.dto.ssedata.BadgeModalInfo;
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
 import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
 import com.mmc.bookduck.domain.user.entity.User;
@@ -54,7 +55,7 @@ public class AlarmService {
         if (!alarm.isRead()) {
             alarm.readAlarm();
             alarmRepository.save(alarm);
-            emitterService.sendToClientIfNewAlarmExists(user);
+            emitterService.sendToClientDefaultAlarm(user);
         }
     }
 
@@ -63,9 +64,25 @@ public class AlarmService {
         // 알림 저장
         alarmRepository.save(alarm);
         // SSE 알림을 클라이언트로 전송
-        emitterService.sendToClientIfNewAlarmExists(receiver);
+        emitterService.sendToClientDefaultAlarm(receiver);
         // 푸시 알림 전송
         sendPushNotificationIfEnabled(receiver, alarm);
+    }
+
+    // Alarm 생성
+    public void createLevelUpAlarm(Alarm alarm, User receiver, int level) {
+        // 알림 저장
+        alarmRepository.save(alarm);
+        // SSE 알림을 클라이언트로 전송
+        emitterService.sendToClientLevelUpAlarm(receiver, level);
+    }
+
+    // Alarm 생성
+    public void createBadgeUnlockedAlarm(Alarm alarm, User receiver, BadgeModalInfo badgeModalInfo) {
+        // 알림 저장
+        alarmRepository.save(alarm);
+        // SSE 알림을 클라이언트로 전송
+        emitterService.sendToClientBadgeUnlockedAlarm(receiver, badgeModalInfo);
     }
 
     // 푸시 알림 전송
@@ -94,6 +111,6 @@ public class AlarmService {
             alarmRepository.saveAll(alarms);
         }
         // SSE 알림 전송
-        emitterService.sendToClientIfNewAlarmExists(user);
+        emitterService.sendToClientDefaultAlarm(user);
     }
 }
