@@ -42,9 +42,8 @@ public class UserGrowthService {
     @Transactional(readOnly = true)
     public UserInfoResponseDto getUserInfo(Long userId) {
         User targetUser = userService.getActiveUserByUserId(userId);
-        int currentYear = Year.now().getValue();
-        long reviewCount = reviewRepository.countByUserAndCreatedTimeThisYear(targetUser, currentYear);
-        long excerptCount = excerptRepository.countByUserAndCreatedTimeThisYear(targetUser, currentYear);
+        long reviewCount = reviewRepository.countByUser(targetUser);
+        long excerptCount = excerptRepository.countByUser(targetUser);
         long bookCount = (reviewCount + excerptCount);
         boolean isOfficial = targetUser.isOfficial();
         User currentUser = userService.getCurrentUserOrNull();
