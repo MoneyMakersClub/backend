@@ -26,7 +26,7 @@ public class AnnouncementService {
         // 공지를 안 읽었던 경우만, 상태 업데이트 및 SSE 알림 전송
         if (!user.getIsAnnouncementChecked()) {
             user.setIsAnnouncementChecked(true);
-            emitterService.sendToClientIfNewAlarmExists(user);
+            emitterService.sendToClientDefaultAlarm(user);
         }
         Page<Announcement> announcementPage = announcementRepository.findByOrderByCreatedTimeDesc(pageable);
         Page<AnnouncementUnitDto> annoucementUnitDtos = announcementPage.map(AnnouncementUnitDto::new);
