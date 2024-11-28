@@ -42,7 +42,7 @@ public class EmitterService {
     public void sendToClientDefaultAlarm(User user) {
         boolean isCommonAlarmChecked = !alarmRepository.existsByReceiverAndIsReadFalse(user);
         AlarmDefaultDataDto alarmDataDto = AlarmDefaultDataDto
-                .fromDefault(isCommonAlarmChecked, user.getIsAnnouncementChecked(), false);
+                .fromDefault(isCommonAlarmChecked, user.getIsAnnouncementChecked(), true);
         sendToClient(user.getUserId(), alarmDataDto, "new sse alarm exists");
     }
 
@@ -50,7 +50,7 @@ public class EmitterService {
     public void sendToClientItemUnlockedAlarm(User user) {
         boolean isCommonAlarmChecked = !alarmRepository.existsByReceiverAndIsReadFalse(user);
         AlarmDefaultDataDto alarmDataDto = AlarmDefaultDataDto
-                .fromDefault(isCommonAlarmChecked, user.getIsAnnouncementChecked(), true);
+                .fromDefault(isCommonAlarmChecked, user.getIsAnnouncementChecked(), false);
         sendToClient(user.getUserId(), alarmDataDto, "item unlocked alarm exists");
     }
 
