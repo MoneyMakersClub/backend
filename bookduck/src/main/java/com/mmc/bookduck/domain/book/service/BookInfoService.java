@@ -32,7 +32,7 @@ import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.BookInfoRepository;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
-import com.mmc.bookduck.domain.friend.service.FriendService;
+import com.mmc.bookduck.domain.friend.repository.FriendRepository;
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto;
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingUnitDto;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
@@ -77,7 +77,7 @@ public class BookInfoService {
     private final UserService userService;
     private final OneLineRepository oneLineRepository;
     private final S3Service s3Service;
-    private final FriendService friendService;
+    private final FriendRepository friendRepository;
 
     // api 도서 목록 조회
     public BookListResponseDto<BookUnitResponseDto> searchBookList(String keyword, Long page, Long size) {
@@ -342,7 +342,7 @@ public class BookInfoService {
         if(bookInfo.getCreatedUserId().equals(user.getUserId())){ // 내 customBook
             MyRatingOneLineReadStatusDto myRatingOneLine = getMyRatingOneLineReadStatus(bookInfo, user);
             return new CustomBookResponseDto(userBook, myRatingOneLine.myRating(),myRatingOneLine.oneLineId(), myRatingOneLine.myOneLine(), true);
-        }else if(friendService.isFriendWithCurrentUserOrNull(bookInfoCreaterUser)){ //친구 customBook
+        }else if(isFriend(user,bookInfoCreaterUser)){ //친구 customBook
             return new CustomBookResponseDto(userBook, false);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST); //내것도 아니고 친구것도 아닌 경우
@@ -492,8 +492,9 @@ public class BookInfoService {
     @Transactional(readOnly = true)
     public UserArchiveResponseDto getAllUserBookArchive(Long bookInfoId, Long userId, Pageable pageable) {
         User bookUser = userService.getActiveUserByUserId(userId);
+        User currentUser = userService.getCurrentUser();
 
-        if(!friendService.isFriendWithCurrentUserOrNull(bookUser)){
+        if(!isFriend(currentUser,bookUser)){
             throw new CustomException(ErrorCode.FRIENDSHIP_REQUIRED);
         }
         BookInfo bookInfo = getBookInfoById(bookInfoId);
@@ -513,6 +514,11 @@ public class BookInfoService {
         List<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> sortedArchiveList = sortByCreatedTime(archiveList);
         Page<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> dtoPage = new PageImpl<>(sortedArchiveList, pageable, sortedArchiveList.size());
         return UserArchiveResponseDto.fromWithoutTitleAuthor(dtoPage);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isFriend(User currentUser, User otherUser){
+        return friendRepository.findFriendBetweenUsers(currentUser.getUserId(), otherUser.getUserId()).isPresent();
     }
 
     @Transactional(readOnly = true)
@@ -600,4 +606,15 @@ public class BookInfoService {
         return new BookListResponseDto<>(topSixBooks);
     }
 
+    // 사용자 customBook 삭제
+    public void deleteUserCustomBook(User user) {
+        List<BookInfo> customBookList = bookInfoRepository.findCustomBookByCreatedUserId(user.getUserId());
+        for(BookInfo customBook : customBookList){
+            Optional<UserBook> customUserBook = userBookRepository.findByUserAndBookInfo(user, customBook);
+            if(customUserBook.isPresent()){
+                userBookRepository.delete(customUserBook.get());
+            }
+            bookInfoRepository.delete(customBook);
+        }
+    }
 }
