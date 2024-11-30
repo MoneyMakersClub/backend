@@ -518,9 +518,6 @@ public class BookInfoService {
 
     @Transactional(readOnly = true)
     public boolean isFriend(User currentUser, User otherUser){
-        if (currentUser == null) {
-            return false;
-        }
         return friendRepository.findFriendBetweenUsers(currentUser.getUserId(), otherUser.getUserId()).isPresent();
     }
 
