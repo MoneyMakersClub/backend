@@ -1,5 +1,7 @@
 package com.mmc.bookduck.domain.user.service;
 
+import com.mmc.bookduck.domain.book.service.BookInfoService;
+import com.mmc.bookduck.domain.folder.service.FolderService;
 import com.mmc.bookduck.domain.user.dto.request.UserNicknameRequestDto;
 import com.mmc.bookduck.domain.user.dto.request.UserSettingUpdateRequestDto;
 import com.mmc.bookduck.domain.user.dto.response.UserNicknameResponseDto;
@@ -30,6 +32,8 @@ public class UserSettingService {
     private final UserSettingRepository userSettingRepository;
     private final RedisService redisService;
     private final CookieUtil cookieUtil;
+    private final FolderService folderService;
+    private final BookInfoService bookInfoService;
 
     @Transactional(readOnly = true)
     public UserSettingInfoResponseDto getUserSettingInfo() {
@@ -84,6 +88,10 @@ public class UserSettingService {
 
     public void deactivate(HttpServletResponse response) {
         User user = userService.getCurrentUser();
+
+        // 폴더 & 커스텀책 삭제
+        folderService.deleteUserFolder(user);
+        bookInfoService.deleteUserCustomBook(user);
 
         String nickname = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8);
         user.updateNickname(nickname);
