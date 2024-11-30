@@ -26,4 +26,6 @@ public interface BookInfoRepository extends JpaRepository<BookInfo, Long> {
             "ORDER BY COUNT(b) DESC")
     List<BookInfo> findRelatedBooksByBookInfoId(@Param("bookInfoId") Long bookInfoId);
 
+    @Query("SELECT b FROM BookInfo b WHERE b.createdUserId = :userId")
+    List<BookInfo> findCustomBookByCreatedUserId(@Param("userId") Long userId);
 }
