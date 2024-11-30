@@ -295,4 +295,12 @@ public class FolderService {
             return true;
         }
     }
+
+    // 사용자 폴더 삭제
+    public void deleteUserFolder(User user) {
+        List<Folder> folders = folderRepository.findAllByUser(user);
+        for (Folder folder : folders) {
+            deleteFolder(folder.getFolderId());
+        }
+    }
 }
