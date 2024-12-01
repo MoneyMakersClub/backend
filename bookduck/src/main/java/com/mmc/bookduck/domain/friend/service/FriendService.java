@@ -115,4 +115,9 @@ public class FriendService {
     public User getFriendUser(Friend friend, User currentUser) {
         return friend.getUser1().equals(currentUser) ? friend.getUser2() : friend.getUser1();
     }
+
+    public void deleteFriendsOfUser(User user) {
+        friendRepository.deleteByUser1(user);
+        friendRepository.deleteByUser2(user);
+    }
 }
