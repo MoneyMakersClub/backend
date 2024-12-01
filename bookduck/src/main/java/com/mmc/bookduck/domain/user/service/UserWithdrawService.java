@@ -13,9 +13,11 @@ import com.mmc.bookduck.global.security.CookieUtil;
 import com.mmc.bookduck.global.security.RedisService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -34,6 +36,8 @@ public class UserWithdrawService {
 
     public void withdrawUser(HttpServletResponse response) {
         User user = userService.getCurrentUser();
+
+        log.info("userId: " + user.getUserId() +" | 이메일: " + user.getEmail() + " 회원이 탈퇴했습니다.");
 
         // 폴더 & 커스텀책 삭제
         folderService.deleteUserFolder(user);
