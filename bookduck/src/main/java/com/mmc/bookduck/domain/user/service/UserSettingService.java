@@ -1,7 +1,10 @@
 package com.mmc.bookduck.domain.user.service;
 
+import com.mmc.bookduck.domain.badge.service.UserBadgeService;
 import com.mmc.bookduck.domain.book.service.BookInfoService;
 import com.mmc.bookduck.domain.folder.service.FolderService;
+import com.mmc.bookduck.domain.homecard.service.HomeCardService;
+import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.dto.request.UserNicknameRequestDto;
 import com.mmc.bookduck.domain.user.dto.request.UserSettingUpdateRequestDto;
 import com.mmc.bookduck.domain.user.dto.response.UserNicknameResponseDto;
@@ -34,6 +37,9 @@ public class UserSettingService {
     private final CookieUtil cookieUtil;
     private final FolderService folderService;
     private final BookInfoService bookInfoService;
+    private final UserBadgeService userBadgeService;
+    private final HomeCardService homeCardService;
+    private final UserItemService userItemService;
 
     @Transactional(readOnly = true)
     public UserSettingInfoResponseDto getUserSettingInfo() {
@@ -92,10 +98,12 @@ public class UserSettingService {
         // 폴더 & 커스텀책 삭제
         folderService.deleteUserFolder(user);
         bookInfoService.deleteUserCustomBook(user);
+        userBadgeService.deleteUserBadgesByUser(user);
+        userItemService.deletUserItemsByUser(user);
+        homeCardService.deleteHomeCardsByUser(user);
 
-        String nickname = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 8);
-        user.updateNickname(nickname);
-        user.updateStatus(UserStatus.DELETED);
+
+        user.clearUserData();;
         userService.saveUser(user);
 
         // TODO: 추후 폴더 책들, 커스텀 책들, 친구 등 삭제 로직 작성

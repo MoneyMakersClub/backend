@@ -108,5 +108,9 @@ public class UserItemService {
                 .map(entry -> new ItemEquippedUnitDto(entry.getKey(), entry.getValue() != null ? entry.getValue().getItem().getItemName() : null))
                 .collect(Collectors.toList());
     }
+
+    public void deletUserItemsByUser(User user) {
+        userItemRepository.deleteAllByUser(user);
+    }
 }
 

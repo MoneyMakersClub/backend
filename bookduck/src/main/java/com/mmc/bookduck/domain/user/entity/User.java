@@ -71,4 +71,13 @@ public class User extends BaseTimeEntity {
     public void updateStatus(UserStatus userStatus) {
         this.userStatus = userStatus;
     }
+
+    public void clearUserData() {
+        this.email = "[deleted]";
+        this.nickname = "알 수 없는 사용자";
+        this.userStatus = UserStatus.DELETED;
+        this.fcmToken = null;
+        this.isOfficial = false;
+        this.isAnnouncementChecked = true;
+    }
 }

@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface UserBadgeRepository extends JpaRepository<UserBadge, Long> {
     List<UserBadge> findAllByUser(User user);
+    void deleteAllByUser(User user);
 }
