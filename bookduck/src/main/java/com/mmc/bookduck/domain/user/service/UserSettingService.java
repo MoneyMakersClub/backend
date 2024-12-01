@@ -33,13 +33,6 @@ import java.util.function.Consumer;
 public class UserSettingService {
     private final UserService userService;
     private final UserSettingRepository userSettingRepository;
-    private final RedisService redisService;
-    private final CookieUtil cookieUtil;
-    private final FolderService folderService;
-    private final BookInfoService bookInfoService;
-    private final UserBadgeService userBadgeService;
-    private final HomeCardService homeCardService;
-    private final UserItemService userItemService;
 
     @Transactional(readOnly = true)
     public UserSettingInfoResponseDto getUserSettingInfo() {
@@ -90,25 +83,5 @@ public class UserSettingService {
     // value가 null이 아닐 경우 updateFunction을 실행
     private <T> void updateSetting(T value, Consumer<T> updateFunction) {
         Optional.ofNullable(value).ifPresent(updateFunction);
-    }
-
-    public void deactivate(HttpServletResponse response) {
-        User user = userService.getCurrentUser();
-
-        // 폴더 & 커스텀책 삭제
-        folderService.deleteUserFolder(user);
-        bookInfoService.deleteUserCustomBook(user);
-        userBadgeService.deleteUserBadgesByUser(user);
-        userItemService.deletUserItemsByUser(user);
-        homeCardService.deleteHomeCardsByUser(user);
-
-
-        user.clearUserData();;
-        userService.saveUser(user);
-
-        // TODO: 추후 폴더 책들, 커스텀 책들, 친구 등 삭제 로직 작성
-
-        redisService.deleteValues(user.getEmail());
-        cookieUtil.deleteCookie(response, "refreshToken");
     }
 }

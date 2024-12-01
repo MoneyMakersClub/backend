@@ -96,9 +96,9 @@ public class AlarmService {
         }
     }
 
-    public void deleteAllAlarmsOfUser(User user){
-        alarmRepository.deleteAllBySender(user);
-        alarmRepository.deleteAllByReceiver(user);
+    public void deleteAlarmsOfUser(User user){
+        alarmRepository.deleteBySender(user);
+        alarmRepository.deleteByReceiver(user);
     }
 
     // Alarm 전체 읽음처리
