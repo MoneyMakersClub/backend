@@ -9,7 +9,6 @@ import com.mmc.bookduck.domain.friend.service.FriendService;
 import com.mmc.bookduck.domain.homecard.service.HomeCardService;
 import com.mmc.bookduck.domain.item.service.UserItemService;
 import com.mmc.bookduck.domain.user.entity.User;
-import com.mmc.bookduck.domain.user.repository.UserSettingRepository;
 import com.mmc.bookduck.global.security.CookieUtil;
 import com.mmc.bookduck.global.security.RedisService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class UserDeleteService {
+public class UserWithdrawService {
     private final UserService userService;
     private final RedisService redisService;
     private final CookieUtil cookieUtil;
