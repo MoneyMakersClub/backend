@@ -77,8 +77,8 @@ public class ArchiveService {
 
     // 조회
     @Transactional(readOnly = true)
-    public ArchiveResponseDto getArchive(Long id, ArchiveType archiveType) {
-        Archive archive = findArchiveByType(id, archiveType);
+    public ArchiveResponseDto getArchive(Long archiveId) {
+        Archive archive = getArchiveById(archiveId);
         UserBook userBook = getUserBookFromExcerptOrReview(archive);
         // currentUser와 creatorUser 사이의 관계에 따른 response 필터링
         Long currentUserId = userService.getCurrentUser().getUserId();
@@ -118,8 +118,8 @@ public class ArchiveService {
     }
 
     // 수정
-    public ArchiveResponseDto updateArchive(Long id, ArchiveType archiveType, ArchiveUpdateRequestDto requestDto) {
-        Archive archive = findArchiveByType(id, archiveType);
+    public ArchiveResponseDto updateArchive(Long archiveId, ArchiveUpdateRequestDto requestDto) {
+        Archive archive = getArchiveById(archiveId);
         UserBook userBook = getUserBookFromExcerptOrReview(archive);
         // 생성자 검증
         userBookService.validateUserBookOwner(userBook);
@@ -210,9 +210,10 @@ public class ArchiveService {
                 if (!userId.equals(currentUserId) && excerpt.getVisibility() != Visibility.PUBLIC) {
                     continue;
                 }
+                Long archiveId = findArchiveByType(excerpt.getExcerptId(), EXCERPT).getArchiveId();
                 String title = excerpt.getUserBook().getBookInfo().getTitle();
                 String author = excerpt.getUserBook().getBookInfo().getAuthor();
-                archiveList.add(new UserArchiveResponseDto.ArchiveWithType(EXCERPT, ExcerptResponseDto.from(excerpt), title, author));
+                archiveList.add(new UserArchiveResponseDto.ArchiveWithType(EXCERPT, ExcerptResponseDto.from(excerpt), archiveId, title, author));
             }
         }
         // 리뷰 조회
@@ -222,9 +223,10 @@ public class ArchiveService {
                 if (!userId.equals(currentUserId) && review.getVisibility() != Visibility.PUBLIC) {
                     continue;
                 }
+                Long archiveId = findArchiveByType(review.getReviewId(), REVIEW).getArchiveId();
                 String title = review.getUserBook().getBookInfo().getTitle();
                 String author = review.getUserBook().getBookInfo().getAuthor();
-                archiveList.add(new UserArchiveResponseDto.ArchiveWithType(REVIEW, ReviewResponseDto.from(review), title, author));
+                archiveList.add(new UserArchiveResponseDto.ArchiveWithType(REVIEW, ReviewResponseDto.from(review), archiveId,title, author));
             }
         }
         // 데이터 합친 후 최신순 정렬
