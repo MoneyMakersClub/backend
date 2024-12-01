@@ -19,6 +19,7 @@ public record UserArchiveResponseDto(
     public record ArchiveWithType(
             ArchiveType type, // EXCERPT, REVIEW
             Object data, // ExcerptResponseDto, ReviewResponseDto
+            Long archiveId,
             String title,
             String author
     ) {}

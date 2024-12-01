@@ -43,18 +43,18 @@ public class ArchiveController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{archiveId}")
     @Operation(summary = "발췌 및 감상평 통합 조회", description = "발췌와 감상평을 조회합니다.")
-    public ResponseEntity<?> getArchive(@PathVariable("id") final Long id, @RequestParam("type") final ArchiveType archiveType) {
-        ArchiveResponseDto responseDto = archiveService.getArchive(id, archiveType);
+    public ResponseEntity<?> getArchive(@PathVariable("archiveId") final Long archiveId) {
+        ArchiveResponseDto responseDto = archiveService.getArchive(archiveId);
         return ResponseEntity.ok(responseDto);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{archiveId}")
     @Operation(summary = "발췌 및 감상평 통합 수정", description = "발췌와 감상평을 수정합니다.(없던 종류의 독서기록을 남기는 것 역시 가능함)")
-    public ResponseEntity<?> updateArchive(@PathVariable("id") final Long id, @RequestParam("type") final ArchiveType archiveType,
+    public ResponseEntity<?> updateArchive(@PathVariable("archiveId") final Long archiveId,
                                            @Valid @RequestBody ArchiveUpdateRequestDto requestDto) {
-        ArchiveResponseDto responseDto = archiveService.updateArchive(id, archiveType, requestDto);
+        ArchiveResponseDto responseDto = archiveService.updateArchive(archiveId, requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
