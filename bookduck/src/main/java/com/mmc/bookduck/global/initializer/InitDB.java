@@ -41,7 +41,7 @@ public class InitDB {
                         .itemType(itemData.getItemType())
                         .description(itemData.getDescription())
                         .unlockCondition(itemData.getUnlockCondition().getGenres()
-                                + "%" + itemData.getUnlockCondition().getRequiredCount())
+                                + "%" + itemData.getRequiredCount())
                         .build());
             }
         }

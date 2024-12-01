@@ -126,4 +126,10 @@ public class FriendRequestService {
         // 친구 요청 1개(1개여야만 함)를 반환
         return existingRequests.getFirst();
     }
+
+    public void deleteFriendRequestsByUser(User user) {
+        friendRequestRepository.deleteBySender(user);
+        friendRequestRepository.deleteByReceiver(user);
+    }
+
 }

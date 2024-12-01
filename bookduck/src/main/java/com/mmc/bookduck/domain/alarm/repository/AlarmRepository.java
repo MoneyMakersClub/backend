@@ -17,8 +17,8 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     @Query("SELECT a FROM Alarm a WHERE a.receiver = :user ORDER BY a.createdTime DESC")
     Page<Alarm> findByReceiverOrderByCreatedTimeDesc(@Param("user") User user, Pageable pageable);
 
-    void deleteAllBySender(User user);
-    void deleteAllByReceiver(User user);
+    void deleteBySender(User user);
+    void deleteByReceiver(User user);
     void deleteByCreatedTimeBefore(LocalDateTime createdTime);
 
     List<Alarm> findAllByReceiverAndIsReadFalse(User user);

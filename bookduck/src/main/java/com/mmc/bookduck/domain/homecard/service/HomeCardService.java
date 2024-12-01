@@ -92,4 +92,8 @@ public class HomeCardService {
         homeCardRepository.deleteAll(cardsToDelete);
         homeCardRepository.saveAll(cardsToUpdate);
     }
+
+    public void deleteHomeCardsByUser(User user) {
+        homeCardRepository.deleteAllByUser(user);
+    }
 }

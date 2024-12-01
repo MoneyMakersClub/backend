@@ -111,4 +111,9 @@ public class UserBadgeService {
 
         return new ArrayList<>(badgeIdToUniqueUserBadgeMap.values());
     }
+
+    public void deleteUserBadgesByUser(User user) {
+        userBadgeRepository.deleteAllByUser(user);
+    }
+
 }
