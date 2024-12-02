@@ -308,6 +308,7 @@ public class ArchiveService {
     public ArchiveResponseDto createArchiveResponseDto(Archive archive, Excerpt excerpt, Review review, UserBook userBook) {
         Long creatorUserId = userBook.getUser().getUserId();
         Long bookInfoId = userBook.getBookInfo().getBookInfoId();
+        boolean isCustom = userBook.getBookInfo().getCreatedUserId() != null;
         String title = userBook.getBookInfo().getTitle();
         String author = userBook.getBookInfo().getAuthor();
         String imgPath = userBook.getBookInfo().getImgPath();
@@ -317,6 +318,7 @@ public class ArchiveService {
                 excerpt != null ? ExcerptResponseDto.from(excerpt) : null,
                 review != null ? ReviewResponseDto.from(review) : null,
                 bookInfoId,
+                isCustom,
                 title,
                 author,
                 imgPath
