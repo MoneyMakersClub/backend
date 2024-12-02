@@ -23,7 +23,6 @@ public class User extends BaseTimeEntity {
     private LoginType loginType;
 
     @Column(unique = true)
-    @NotNull
     private String nickname;
 
     @Enumerated(EnumType.STRING)
@@ -71,7 +70,7 @@ public class User extends BaseTimeEntity {
 
     public void clearUserData() {
         this.email = "[deleted] userId: " + userId;
-        this.nickname = "알 수 없는 사용자";
+        this.nickname = null;
         this.userStatus = UserStatus.DELETED;
         this.fcmToken = null;
         this.isOfficial = false;
