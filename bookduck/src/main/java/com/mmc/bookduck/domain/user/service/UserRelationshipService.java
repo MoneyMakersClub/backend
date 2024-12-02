@@ -8,6 +8,7 @@ import com.mmc.bookduck.domain.friend.service.FriendService;
 import com.mmc.bookduck.domain.user.dto.UserRelationshipStatusDto;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.entity.UserRelationshipStatus;
+import com.mmc.bookduck.domain.user.entity.UserSetting;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.util.Optional;
 public class UserRelationshipService {
     private final FriendService friendService;
     private final FriendRequestService friendRequestService;
+    private final UserSettingService userSettingService;
 
     @Transactional(readOnly = true)
     public UserRelationshipStatusDto getUserRelationshipStatus(User currentUser, User targetUser) {
@@ -49,7 +51,10 @@ public class UserRelationshipService {
                         friendRequest.getRequestId());
             }
         }
-
+        boolean isFriendRequestDisabled = !userSettingService.getUserSettingByUser(targetUser).isFriendRequestEnabled();
+        if (isFriendRequestDisabled) {
+            return new UserRelationshipStatusDto(UserRelationshipStatus.REQUEST_DISABLED, null, null);  // 관계 없음
+        }
         return new UserRelationshipStatusDto(UserRelationshipStatus.NONE, null, null);  // 관계 없음
     }
 }
