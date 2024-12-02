@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.badge.service;
 
+import com.mmc.bookduck.domain.alarm.service.AlarmByTypeService;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.badge.dto.common.UserBadgeUnitDto;
@@ -34,6 +35,7 @@ public class UserBadgeService {
     private final BadgeService badgeService;
     private final UserBookService userBookService;
     private final UserGrowthService userGrowthService;
+    private final AlarmByTypeService alarmByTypeService;
 
     @Transactional(readOnly = true)
     public UserBadgeListResponseDto getCurrentUserBadges() {
@@ -76,6 +78,7 @@ public class UserBadgeService {
         );
     }
 
+    // 뱃지 잠금해제 조건을 int로 가져옴
     private int getBadgeUnlockValue(Badge badge) {
         try {
             return Integer.parseInt(badge.getUnlockCondition());
@@ -116,4 +119,51 @@ public class UserBadgeService {
         userBadgeRepository.deleteAllByUser(user);
     }
 
+
+    public void checkAndUnlockBadges(User user) {
+        // 사용자의 상태 가져오기
+        long currentReadCount = userBookService.countFinishedUserBooksByUser(user);
+        long currentArchiveCount = reviewRepository.countByUser(user) + excerptRepository.countByUser(user);
+        long currentOneLineCount = oneLineRepository.countAllByUser(user);
+        long currentLevel = userGrowthService.getUserGrowthByUserId(user.getUserId()).getLevel();
+
+        // 현재 사용자가 이미 보유한 뱃지
+        List<Long> ownedBadgeIds = userBadgeRepository.findAllByUser(user).stream()
+                .map(userBadge -> userBadge.getBadge().getBadgeId())
+                .toList();
+
+        // 전체 뱃지 가져오기
+        List<Badge> allBadges = badgeService.getAllBadges();
+
+        for (Badge badge : allBadges) {
+            if (ownedBadgeIds.contains(badge.getBadgeId())) {
+                continue; // 이미 보유한 뱃지는 스킵
+            }
+
+            // 조건 확인
+            boolean isConditionMet = isBadgeConditionMet(badge, currentReadCount, currentArchiveCount, currentOneLineCount, currentLevel);
+
+            if (isConditionMet) {
+                // UserBadge 생성
+                UserBadge userBadge = UserBadge.builder()
+                        .user(user)
+                        .badge(badge)
+                        .build();
+                userBadgeRepository.save(userBadge);
+                // 뱃지 알림 생성
+                alarmByTypeService.createBadgeUnlockedAlarm(user, userBadge);
+            }
+        }
+    }
+
+    private boolean isBadgeConditionMet(Badge badge, long currentReadCount, long currentArchiveCount, long currentOneLineCount, long currentLevel) {
+        int unlockValue = getBadgeUnlockValue(badge);
+
+        return switch (badge.getBadgeType()) {
+            case READ -> currentReadCount >= unlockValue;
+            case ARCHIVE -> currentArchiveCount >= unlockValue;
+            case ONELINE -> currentOneLineCount >= unlockValue;
+            case LEVEL -> currentLevel >= unlockValue;
+        };
+    }
 }
