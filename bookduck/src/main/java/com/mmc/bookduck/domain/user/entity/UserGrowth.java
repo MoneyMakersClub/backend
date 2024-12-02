@@ -65,7 +65,9 @@ public class UserGrowth {
         if (level < 1) {
             throw new IllegalArgumentException("레벨이 1 미만입니다.");
         }
-        long incrementBase = 10L; // 증가폭 기본값
-        return level * incrementBase;
+        // 등차수열 합
+        int BASE_EXP = 10; // Lv.1->2
+        int INCREMENT = 10;
+        return (level * (2 * BASE_EXP + (long) (level - 1) * INCREMENT)) / 2;
     }
 }
