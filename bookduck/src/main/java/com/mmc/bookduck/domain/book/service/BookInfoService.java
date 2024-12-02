@@ -600,15 +600,14 @@ public class BookInfoService {
             UserBook userBook = requestDto.toEntity(user, newBookInfo, ReadStatus.valueOf(requestDto.readStatus()));
             savedUserBook = userBookRepository.save(userBook);
         }
-        checkExpAndBadgeAndItemForFinishedBook(savedUserBook);
+        checkExpAndBadgeForFinishedBook(savedUserBook);
         return new AddUserBookResponseDto(savedUserBook);
     }
 
     // 경험치 획득, READ 뱃지 unlock 확인
-    public void checkExpAndBadgeAndItemForFinishedBook(UserBook userBook) {
+    public void checkExpAndBadgeForFinishedBook(UserBook userBook) {
         userGrowthService.gainExpForFinishedBook(userBook);
         badgeUnlockService.checkAndUnlockBadges(userBook.getUser());
-        itemUnlockService.createUserItemForUnlockableItems(userBook.getUser());
     }
 
     // 연관 추천 도서 조회
