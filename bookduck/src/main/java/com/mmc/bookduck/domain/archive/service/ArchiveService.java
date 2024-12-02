@@ -20,6 +20,8 @@ import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.friend.entity.Friend;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
+import com.mmc.bookduck.domain.item.service.ItemUnlockService;
+import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.common.PaginatedResponseDto;
@@ -55,6 +57,7 @@ public class ArchiveService {
     private final FriendRepository friendRepository;
     private final UserGrowthService userGrowthService;
     private final BadgeUnlockService badgeUnlockService;
+    private final ItemUnlockService itemUnlockService;
 
     // 생성
     public ArchiveResponseDto createArchive(ArchiveCreateRequestDto requestDto) {
@@ -76,7 +79,9 @@ public class ArchiveService {
                 .orElse(null);
         Archive archive = requestDto.toEntity(excerpt, review);
         archiveRepository.save(archive);
+
         checkExpAndBadgeForArchive(userBook);
+        itemUnlockService.createUserItemForUnlockableItems(userBook.getUser());
         return createArchiveResponseDto(archive, excerpt, review, userBook);
     }
 
