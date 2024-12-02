@@ -6,6 +6,7 @@ import com.mmc.bookduck.domain.oneline.service.OneLineService;
 import com.mmc.bookduck.domain.onelineLike.entity.OneLineLike;
 import com.mmc.bookduck.domain.onelineLike.repository.OneLineLikeRepository;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.entity.UserStatus;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
@@ -28,7 +29,7 @@ public class OneLineLikeService {
     public void createOneLineLike(Long oneLineId) {
         OneLine oneLine = oneLineService.getOneLineById(oneLineId);
         User currentUser = userService.getCurrentUser();
-        User oneLineCreator = userService.getActiveUserByUserId(oneLine.getUser().getUserId());
+        User oneLineCreator = oneLine.getUser();
         Optional<OneLineLike> existingLike = oneLineLikeRepository.findByOneLineAndUser(oneLine, currentUser);
         if (existingLike.isPresent()) {
             throw new CustomException(ErrorCode.ONELINELIKE_ALREADY_EXISTS);
@@ -36,7 +37,7 @@ public class OneLineLikeService {
         OneLineLike oneLineLike = new OneLineLike(oneLine, currentUser);
         oneLine.addOneLineLike(oneLineLike);
         // 타 사용자이고 ACTIVE 상태일 때만 알림 전송
-        if (!currentUser.equals(oneLineCreator))
+        if (!currentUser.equals(oneLineCreator) && oneLineCreator.getUserStatus().equals(UserStatus.ACTIVE) )
             alarmByTypeService.createOneLineLikeAlarm(currentUser, oneLineCreator, oneLine.getUserBook().getBookInfo());
         oneLineLikeRepository.save(oneLineLike);
     }
