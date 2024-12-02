@@ -10,6 +10,8 @@ import com.mmc.bookduck.domain.item.entity.UserItem;
 import com.mmc.bookduck.domain.item.repository.ItemRepository;
 import com.mmc.bookduck.domain.item.repository.UserItemRepository;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.entity.UserGrowth;
+import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,11 +31,17 @@ public class ItemUnlockService {
     private final ItemRepository itemRepository;
     private final UserItemRepository userItemRepository;
     private final AlarmByTypeService alarmByTypeService;
+    private final UserGrowthService userGrowthService;
 
     // 사용자가 획득할 수 있는 아이템을 UserItem으로 생성하는 메서드
     public void createUserItemForUnlockableItems(User user) {
-        List<Item> unlockableItems = getUnlockableItemsForUser();
+        // 레벨이 4이상일 때만 아이템을 획득 가능
+        UserGrowth userGrowth = userGrowthService.getUserGrowthByUser(user);
+        if (userGrowth.getLevel() < 4) {
+            return;
+        }
 
+        List<Item> unlockableItems = getUnlockableItemsForUser();
         for (Item item : unlockableItems) {
             // UserItem 생성
             UserItem userItem = UserItem.builder()
