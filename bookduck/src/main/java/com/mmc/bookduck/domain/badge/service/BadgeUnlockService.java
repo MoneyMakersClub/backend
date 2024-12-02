@@ -37,7 +37,7 @@ public class BadgeUnlockService {
         long readCount = userBookRepository.countByUserAndReadStatus(user, ReadStatus.FINISHED);
         long archiveCount = reviewRepository.countByUser(user) + excerptRepository.countByUser(user);
         long oneLineCount = oneLineRepository.countAllByUser(user);
-        long level = userGrowthService.getUserGrowthByUserId(user.getUserId()).getLevel();
+        long level = userGrowthService.getUserGrowthByUser(user).getLevel();
 
         // 결과 반환
         return new UserActivity(readCount, archiveCount, oneLineCount, level);

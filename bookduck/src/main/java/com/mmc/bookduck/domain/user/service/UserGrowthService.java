@@ -36,9 +36,7 @@ public class UserGrowthService {
     private final BadgeUnlockService badgeUnlockService;
 
     @Transactional(readOnly = true)
-    public UserGrowth getUserGrowthByUserId(Long userId)
-    {
-        User user = userService.getActiveUserByUserId(userId);
+    public UserGrowth getUserGrowthByUser(User user) {
         return userGrowthRepository.findByUser(user)
                 .orElseThrow(()-> new CustomException(ErrorCode.USERGROWTH_NOT_FOUND));
     }
@@ -59,7 +57,8 @@ public class UserGrowthService {
 
     @Transactional(readOnly = true)
     public UserGrowthInfoResponseDto getUserLevelInfo(Long userId) {
-        UserGrowth userGrowth = getUserGrowthByUserId(userId);
+        User targetUser = userService.getActiveUserByUserId(userId);
+        UserGrowth userGrowth = getUserGrowthByUser(targetUser);
         long expInCurrentLevel = userGrowth.getCumulativeExp(); // 현재 레벨의 경험치
 
         int level = 1;
@@ -76,21 +75,29 @@ public class UserGrowthService {
     }
 
     // 경험치 증가 메소드
-    public void gainFinishedExp(UserBook userBook) {
-        gainExpForUser(userBook, 20, "Finished");
+    public void gainExpForFinishedBook(UserBook userBook) {
+        if (!userBook.isFinishedExpGiven()) {
+            gainExpForUser(userBook.getUser(), 20);
+            userBook.markFinishedExpGiven();
+        }
     }
 
-    public void gainArchiveExp(UserBook userBook) {
-        gainExpForUser(userBook, 30, "Archive");
+    public void gainExpForArchive(UserBook userBook) {
+        if (!userBook.isArchiveExpGiven()) {
+            gainExpForUser(userBook.getUser(), 30);
+            userBook.markArchiveExpGiven();
+        }
     }
 
-    public void gainOneLineExp(UserBook userBook) {
-        gainExpForUser(userBook, 50, "OneLine");
+    public void gainExpForOneLine(UserBook userBook) {
+        if (!userBook.isOneLineExpGiven()) {
+            gainExpForUser(userBook.getUser(), 50);
+            userBook.markOneLineExpGiven();
+        }
     }
 
-    private void gainExpForUser(UserBook userBook, int expToAdd, String experienceType) {
-        User user = userBook.getUser();
-        UserGrowth userGrowth = getUserGrowthByUserId(user.getUserId());
+    private void gainExpForUser(User user, int expToAdd) {
+        UserGrowth userGrowth = getUserGrowthByUser(user);
 
         boolean isLevelUp = userGrowth.gainExp(expToAdd);
         if (isLevelUp) {
@@ -98,15 +105,5 @@ public class UserGrowthService {
             badgeUnlockService.checkAndUnlockBadges(user);
         }
         userGrowthRepository.save(userGrowth);
-        markExpGiven(userBook, experienceType);
-    }
-
-    private void markExpGiven(UserBook userBook, String experienceType) {
-        switch (experienceType) {
-            case "Finished" -> userBook.markFinishedExpGiven();
-            case "Archive" -> userBook.markArchiveExpGiven();
-            case "OneLine" -> userBook.markOneLineExpGiven();
-            default -> throw new IllegalArgumentException("Unsupported experience type: " + experienceType);
-        }
     }
 }
