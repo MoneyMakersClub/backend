@@ -6,6 +6,7 @@ import com.mmc.bookduck.domain.alarm.dto.ssedata.BadgeModalInfo;
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
 import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
+import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.entity.UserSetting;
 import com.mmc.bookduck.domain.user.service.UserService;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 @Service
@@ -39,8 +41,24 @@ public class AlarmService {
         User user = userService.getCurrentUser();
 
         Page<Alarm> alarmPage = alarmRepository.findByReceiverOrderByCreatedTimeDesc(user, pageable);
-        Page<AlarmUnitDto> alarmUnitDtos =  alarmPage.map(AlarmUnitDto::new);
+        Page<AlarmUnitDto> alarmUnitDtos =  alarmPage.map(alarm -> new AlarmUnitDto(alarm, extractBoldText(alarm)));
         return PaginatedResponseDto.from(alarmUnitDtos);
+    }
+
+    // boldText 생성 메서드
+    public String extractBoldText(Alarm alarm) {
+        AlarmType alarmType = alarm.getAlarmType();
+        return switch (alarmType) {
+            case FRIEND_REQUEST, FRIEND_APPROVED -> {
+                // sender가 null이거나 sender의 nickname이 null인 경우 "알 수 없는 사용자"를 반환
+                User sender = alarm.getSender();
+                String nickname = (sender != null && sender.getNickname() != null) ? sender.getNickname() : "알 수 없는 사용자";
+                yield MessageFormat.format("{0}", nickname);
+            }
+            case ONELINELIKE_ADDED, BADGE_UNLOCKED, LEVEL_UP ->
+                    MessageFormat.format("{0}", alarm.getResourceValue());
+            default -> "";
+        };
     }
 
     // Alarm 읽음 처리

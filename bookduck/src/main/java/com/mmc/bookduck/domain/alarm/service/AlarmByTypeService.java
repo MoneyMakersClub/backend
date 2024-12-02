@@ -61,6 +61,7 @@ public class AlarmByTypeService {
                 .message(message)
                 .resourceName("BookInfo")
                 .resourceId(bookInfo.getBookInfoId())
+                .resourceValue(bookInfo.getTitle())
                 .build();
         alarmService.createAlarm(alarm, receiver);
     }
@@ -93,6 +94,7 @@ public class AlarmByTypeService {
                 .receiver(receiver)
                 .message(message)
                 .resourceName("Badge")
+                .resourceValue(badgeType.getTitle())
                 .build();
         alarm.readAlarm();
 
