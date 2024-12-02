@@ -14,14 +14,14 @@ import lombok.*;
 public class ExcerptCreateRequestDto {
     @NotNull private String excerptContent;
     @NotNull private Long pageNumber;
-    private Visibility visibility;
-    private Long userBookId;
+    @NotNull private Visibility visibility;
+    @NotNull private Long userBookId;
 
     public void setUserBookId(Long userBookId) {
         this.userBookId = userBookId;
     }
 
-    public Excerpt toEntity(User user, UserBook userBook, Visibility visibility) {
+    public Excerpt toEntity(User user, UserBook userBook) {
         return Excerpt.builder()
                 .excerptContent(excerptContent)
                 .visibility(visibility)
