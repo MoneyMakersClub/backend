@@ -1,6 +1,10 @@
 package com.mmc.bookduck.domain.item.service;
 
 import com.mmc.bookduck.domain.alarm.service.AlarmByTypeService;
+import com.mmc.bookduck.domain.archive.entity.Excerpt;
+import com.mmc.bookduck.domain.archive.entity.Review;
+import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
+import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.entity.Genre;
 import com.mmc.bookduck.domain.book.entity.GenreName;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
@@ -10,11 +14,14 @@ import com.mmc.bookduck.domain.item.entity.UserItem;
 import com.mmc.bookduck.domain.item.repository.ItemRepository;
 import com.mmc.bookduck.domain.item.repository.UserItemRepository;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.entity.UserGrowth;
+import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,11 +36,19 @@ public class ItemUnlockService {
     private final ItemRepository itemRepository;
     private final UserItemRepository userItemRepository;
     private final AlarmByTypeService alarmByTypeService;
+    private final UserGrowthService userGrowthService;
+    private final ExcerptRepository excerptRepository;
+    private final ReviewRepository reviewRepository;
 
     // 사용자가 획득할 수 있는 아이템을 UserItem으로 생성하는 메서드
     public void createUserItemForUnlockableItems(User user) {
-        List<Item> unlockableItems = getUnlockableItemsForUser();
+        // 레벨이 4이상일 때만 아이템을 획득 가능
+        UserGrowth userGrowth = userGrowthService.getUserGrowthByUser(user);
+        if (userGrowth.getLevel() < 4) {
+            return;
+        }
 
+        List<Item> unlockableItems = getUnlockableItemsForUser();
         for (Item item : unlockableItems) {
             // UserItem 생성
             UserItem userItem = UserItem.builder()
@@ -79,7 +94,7 @@ public class ItemUnlockService {
             log.info("item 테이블에 requireCount를 확인해주세요.");
         }
 
-        Map<GenreName, Integer> userBookCountByGenre = getUserBookCountByGenre(user);
+        Map<GenreName, Integer> userBookCountByGenre = getBookRecordCountByGenre(user);
 
         String[] genreNameList = genreNames.split("\\+");
         int totalReadCount = 0;
@@ -87,17 +102,33 @@ public class ItemUnlockService {
         for (String genreName : genreNameList) {
             totalReadCount += userBookCountByGenre.getOrDefault(genreName, 0);
         }
-
         return totalReadCount >= requiredCount;
     }
 
-    // 현시점 기준 사용자가 완독한 UserBok만 가져와서 장르별로 그룹화
-    private Map<GenreName, Integer> getUserBookCountByGenre(User user) {
-        return userBookRepository.findByUserAndReadStatus(user, ReadStatus.FINISHED).stream()
-                .map(userBook -> userBook.getBookInfo().getGenre())
+    // 독서기록 갯수 가져와서 장르별로 그룹화
+    private Map<GenreName, Integer> getBookRecordCountByGenre(User user) {
+        // Group reviews by genre name and count them
+        Map<GenreName, Integer> reviewCounts = reviewRepository.findByUserId(user.getUserId()).stream()
+                .map(review -> review.getUserBook().getBookInfo().getGenre().getGenreName()) // Extract GenreName
+                .collect(Collectors.groupingBy(
+                        genreName -> genreName, // Use GenreName as the key
+                        Collectors.summingInt(genreName -> 1) // Count occurrences
+                ));
+
+        // 발췌 데이터에서 장르별 개수 계산
+        Map<GenreName, Integer> excerptCounts = excerptRepository.findByUserId(user.getUserId()).stream()
+                .map(excerpt -> excerpt.getUserBook().getBookInfo().getGenre())
                 .collect(Collectors.groupingBy(
                         Genre::getGenreName,
-                        Collectors.summingInt(genre -> 1)
+                        Collectors.summingInt(genre -> 1) // 장르별 발췌 개수
                 ));
+
+        // 두 맵 병합
+        Map<GenreName, Integer> combinedCounts = new HashMap<>(reviewCounts);
+        excerptCounts.forEach(
+                (genre, count) -> combinedCounts.merge(genre, count, Integer::sum)
+        );
+
+        return combinedCounts;
     }
 }

@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 public enum ItemData {
     PROP_01(ItemType.PROP, "책", ItemUnlockCondition.OTHERS, 0),
     PROP_02(ItemType.PROP, "아령", ItemUnlockCondition.HEALTH, 5),
-    PROP_03(ItemType.PROP, "깃펜", ItemUnlockCondition.FICTION_LITERARY_HUMANITIES_SCIENCE, 5),
+    PROP_03(ItemType.PROP, "깃펜", ItemUnlockCondition.FICTION_LITERARY_HUMANITIES, 5),
     PROP_04(ItemType.PROP, "몽키스패너", ItemUnlockCondition.ARCHITECTURE_TECHNOLOGY, 5),
     PROP_05(ItemType.PROP, "노트북", ItemUnlockCondition.COMPUTER, 5),
     PROP_06(ItemType.PROP, "물감붓", ItemUnlockCondition.ART_COMICS, 5),
@@ -23,7 +23,7 @@ public enum ItemData {
     HAT_05(ItemType.HAT, "빵모자", ItemUnlockCondition.ART_COMICS, 5),
     HAT_06(ItemType.HAT, "요리사 모자", ItemUnlockCondition.HOME_COOKING, 5),
     HAT_07(ItemType.HAT, "익선관", ItemUnlockCondition.HISTORY, 5),
-    FACE_01(ItemType.FACE, "안경", ItemUnlockCondition.FICTION_LITERARY_HUMANITIES_SCIENCE, 3),
+    FACE_01(ItemType.FACE, "안경", ItemUnlockCondition.FICTION_LITERARY_HUMANITIES, 3),
     FACE_02(ItemType.FACE, "순정만화 눈", ItemUnlockCondition.ART_COMICS, 5),
     CLOTHES_01(ItemType.CLOTHES, "넥타이", ItemUnlockCondition.BUSINESS_SOCIETY, 5),
     CLOTHES_02(ItemType.CLOTHES, "앞치마", ItemUnlockCondition.HOME_COOKING, 5),
