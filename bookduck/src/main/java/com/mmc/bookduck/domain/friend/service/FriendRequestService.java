@@ -9,7 +9,9 @@ import com.mmc.bookduck.domain.friend.entity.FriendRequestStatus;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
 import com.mmc.bookduck.domain.friend.repository.FriendRequestRepository;
 import com.mmc.bookduck.domain.item.service.UserItemService;
+import com.mmc.bookduck.domain.user.entity.UserSetting;
 import com.mmc.bookduck.domain.user.service.UserService;
+import com.mmc.bookduck.domain.user.service.UserSettingService;
 import com.mmc.bookduck.global.exception.CustomException;
 import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ public class FriendRequestService {
     private final UserService userService;
     private final UserItemService userItemService;
     private final AlarmByTypeService alarmByTypeService;
+    private final UserSettingService userSettingService;
 
     // 친구 요청 전송
     public void sendFriendRequest(FriendRequestDto requestDto) {
@@ -41,6 +44,11 @@ public class FriendRequestService {
         // 이미 친구인지 확인
         if (friendRepository.findFriendBetweenUsers(sender.getUserId(), receiver.getUserId()).isPresent()) {
             throw new CustomException(ErrorCode.FRIEND_ALREADY_EXISTS);
+        }
+        // receiver의 친구 요청 설정이 false면 친구 요청 보낼 수 없음
+        UserSetting receiverSetting = userSettingService.getUserSettingByUser(receiver);
+        if (!receiverSetting.isFriendRequestEnabled()) {
+            throw new CustomException(ErrorCode.FRIEND_REQUEST_DISABLED);
         }
         // 중복된 친구 요청 확인
         List<FriendRequest> existingRequests = friendRequestRepository.findAllFriendRequestsBetweenUsers(
