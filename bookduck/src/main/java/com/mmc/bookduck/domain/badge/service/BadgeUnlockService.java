@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class BadgeUnlockService {
     private final UserBadgeRepository userBadgeRepository;
@@ -34,6 +34,7 @@ public class BadgeUnlockService {
     private final AlarmByTypeService alarmByTypeService;
 
     // 유저 활동 가져오기
+    @Transactional(readOnly = true)
     public UserActivityDto getUserActivity(User user) {
         // 각 활동 데이터 조회
         long readCount = userBookRepository.countByUserAndReadStatus(user, ReadStatus.FINISHED);
@@ -81,6 +82,7 @@ public class BadgeUnlockService {
     }
 
     // 뱃지 획득조건 충족여부 확인
+    @Transactional(readOnly = true)
     private boolean isBadgeConditionMet(Badge badge, UserActivityDto activity) {
         int unlockValue = badgeService.getBadgeUnlockValue(badge);
 
