@@ -77,21 +77,21 @@ public class UserGrowthService {
     // 경험치 증가 메소드
     public void gainExpForFinishedBook(UserBook userBook) {
         if (!userBook.isFinishedExpGiven()) {
-            gainExpForUser(userBook.getUser(), 20);
+            gainExpForUser(userBook.getUser(), 5);
             userBook.markFinishedExpGiven();
         }
     }
 
     public void gainExpForArchive(UserBook userBook) {
         if (!userBook.isArchiveExpGiven()) {
-            gainExpForUser(userBook.getUser(), 30);
+            gainExpForUser(userBook.getUser(), 10);
             userBook.markArchiveExpGiven();
         }
     }
 
     public void gainExpForOneLine(UserBook userBook) {
         if (!userBook.isOneLineExpGiven()) {
-            gainExpForUser(userBook.getUser(), 50);
+            gainExpForUser(userBook.getUser(), 15);
             userBook.markOneLineExpGiven();
         }
     }
