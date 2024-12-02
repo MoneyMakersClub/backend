@@ -462,7 +462,9 @@ public class BookInfoService {
         Page<OneLineRatingUnitDto> dtoPage = oneLinePage.map(oneLine -> {
             Boolean isLiked = oneLine.getOneLineLikes().stream()
                     .anyMatch(like -> like.getUser().getUserId().equals(currentUser.getUserId()));
-            return new OneLineRatingUnitDto(oneLine, isLiked);
+            String nickname = oneLine.getUser().getNickname();
+            String safeNickname = nickname != null ? nickname : "알 수 없는 사용자";
+            return new OneLineRatingUnitDto(oneLine, isLiked, safeNickname);
         });
         return OneLineRatingListResponseDto.from(bookInfoId, dtoPage);
     }
