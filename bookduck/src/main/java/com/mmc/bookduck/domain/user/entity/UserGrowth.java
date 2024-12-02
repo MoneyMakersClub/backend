@@ -62,8 +62,8 @@ public class UserGrowth {
     }
 
     public long calculateExpThresholdForNextLevel(int level) {
-        if (level < 1) {
-            throw new IllegalArgumentException("레벨이 1 미만입니다.");
+        if (level < 1) { // 1이 되기 위한 경험치는 0
+            return 0;
         }
         // 등차수열 합
         int BASE_EXP = 10; // Lv.1->2
