@@ -84,14 +84,14 @@ public class UserGrowthService {
 
     public void gainExpForArchive(UserBook userBook) {
         if (!userBook.isArchiveExpGiven()) {
-            gainExpForUser(userBook.getUser(), 10);
+            gainExpForUser(userBook.getUser(), 15);
             userBook.markArchiveExpGiven();
         }
     }
 
     public void gainExpForOneLine(UserBook userBook) {
         if (!userBook.isOneLineExpGiven()) {
-            gainExpForUser(userBook.getUser(), 15);
+            gainExpForUser(userBook.getUser(), 25);
             userBook.markOneLineExpGiven();
         }
     }
