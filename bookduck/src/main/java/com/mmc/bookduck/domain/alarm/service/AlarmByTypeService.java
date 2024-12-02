@@ -96,7 +96,7 @@ public class AlarmByTypeService {
                 .build();
         alarm.readAlarm();
 
-        String description = String.format("%s을 달성하여\n%s 배지를 얻었어요.",
+        String description = String.format("%s를 달성하여<br>\n%s 배지를 얻었어요.",
                 MessageFormat.format(badgeType.getModalMessage(), userBadge.getBadge().getUnlockCondition()),
                 badgeType.getTitle());
         BadgeModalInfo badgeModalInfo = new BadgeModalInfo(badgeType, userBadge.getBadge().getBadgeName(), description);
