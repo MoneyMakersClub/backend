@@ -59,19 +59,21 @@ public class UserGrowthService {
     public UserGrowthInfoResponseDto getUserLevelInfo(Long userId) {
         User targetUser = userService.getActiveUserByUserId(userId);
         UserGrowth userGrowth = getUserGrowthByUser(targetUser);
-        long expInCurrentLevel = userGrowth.getCumulativeExp(); // 현재 레벨의 경험치
+        long cumulativeExp = userGrowth.getCumulativeExp(); // 누적 경험치
 
         int level = 1;
-        long expThreshold = userGrowth.calculateExpThresholdForNextLevel(level); // 첫 레벨의 경계값 계산
+        long nextLevelExp = userGrowth.calculateExpThresholdForNextLevel(level); // 첫 번째 레벨의 누적 경험치 요구량
 
-        // 레벨을 계산하고, 각 레벨마다 해당 경계값을 재계산
-        while (expInCurrentLevel >= expThreshold) {
+        // 누적 경험치 기준으로 레벨 계산
+        while (cumulativeExp >= nextLevelExp) {
             level++;
-            expInCurrentLevel -= expThreshold;
-            expThreshold = userGrowth.calculateExpThresholdForNextLevel(level);  // 다음 레벨에 맞는 경계값을 계산
+            nextLevelExp = userGrowth.calculateExpThresholdForNextLevel(level); // 다음 레벨의 누적 경험치 요구량
         }
 
-        return new UserGrowthInfoResponseDto(level, expInCurrentLevel, userGrowth.calculateExpThresholdForNextLevel(level));
+        // 현재 레벨에서의 진행 경험치와 다음 레벨까지 필요한 경험치 계산
+        long expForCurrentLevel = cumulativeExp - userGrowth.calculateExpThresholdForNextLevel(level - 1);
+        long expThresholdForNextLevel = nextLevelExp - userGrowth.calculateExpThresholdForNextLevel(level - 1);
+        return new UserGrowthInfoResponseDto(level, expForCurrentLevel, expThresholdForNextLevel);
     }
 
     // 경험치 증가 메소드
