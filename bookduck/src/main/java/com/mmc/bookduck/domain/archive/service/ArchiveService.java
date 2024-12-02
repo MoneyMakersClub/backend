@@ -14,11 +14,13 @@ import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ArchiveRepository;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
+import com.mmc.bookduck.domain.badge.service.BadgeUnlockService;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.friend.entity.Friend;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
+import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.common.PaginatedResponseDto;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -51,6 +53,8 @@ public class ArchiveService {
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
     private final FriendRepository friendRepository;
+    private final UserGrowthService userGrowthService;
+    private final BadgeUnlockService badgeUnlockService;
 
     // 생성
     public ArchiveResponseDto createArchive(ArchiveCreateRequestDto requestDto) {
@@ -72,7 +76,14 @@ public class ArchiveService {
                 .orElse(null);
         Archive archive = requestDto.toEntity(excerpt, review);
         archiveRepository.save(archive);
+        checkExpAndBadgeForArchive(userBook);
         return createArchiveResponseDto(archive, excerpt, review, userBook);
+    }
+
+    // 경험치 획득, ARCHIVE 뱃지 unlock 확인
+    public void checkExpAndBadgeForArchive(UserBook userBook) {
+        userGrowthService.gainExpForArchive(userBook);
+        badgeUnlockService.checkAndUnlockBadges(userBook.getUser());
     }
 
     // 조회

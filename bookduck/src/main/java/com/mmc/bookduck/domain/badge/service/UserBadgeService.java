@@ -1,17 +1,13 @@
 package com.mmc.bookduck.domain.badge.service;
 
-import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
-import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.badge.dto.common.UserBadgeUnitDto;
 import com.mmc.bookduck.domain.badge.dto.response.UserBadgeListResponseDto;
 import com.mmc.bookduck.domain.badge.entity.Badge;
 import com.mmc.bookduck.domain.badge.entity.BadgeType;
 import com.mmc.bookduck.domain.badge.entity.UserBadge;
 import com.mmc.bookduck.domain.badge.repository.UserBadgeRepository;
-import com.mmc.bookduck.domain.book.service.UserBookService;
-import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
+import com.mmc.bookduck.domain.badge.dto.common.UserActivityDto;
 import com.mmc.bookduck.domain.user.entity.User;
-import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,13 +23,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserBadgeService {
     private final UserBadgeRepository userBadgeRepository;
-    private final OneLineRepository oneLineRepository;
-    private final ReviewRepository reviewRepository;
-    private final ExcerptRepository excerptRepository;
     private final UserService userService;
     private final BadgeService badgeService;
-    private final UserBookService userBookService;
-    private final UserGrowthService userGrowthService;
+    private final BadgeUnlockService badgeUnlockService;
 
     @Transactional(readOnly = true)
     public UserBadgeListResponseDto getCurrentUserBadges() {
@@ -47,47 +39,32 @@ public class UserBadgeService {
         Map<Long, UserBadge> userBadgeMap = uniqueUserBadges.stream()
                 .collect(Collectors.toMap(badge -> badge.getBadge().getBadgeId(), badge -> badge));
 
-        // 모든 뱃지와 isOwned를 결합한 리스트 생성
+        // 사용자 상태 조회
+        UserActivityDto userActivityDto = badgeUnlockService.getUserActivity(user);
+
+        // 모든 뱃지와 사용자 상태를 결합한 리스트 생성
         List<UserBadgeUnitDto> allBadgesWithOwnership = allBadges.stream()
-                .map(badge -> UserBadgeUnitDto.from(badge, userBadgeMap.get(badge.getBadgeId()), getBadgeUnlockValue(badge)))
-                .collect(Collectors.toList());
+                .map(badge -> UserBadgeUnitDto.from(
+                        badge,
+                        userBadgeMap.get(badge.getBadgeId()),
+                        badgeService.getBadgeUnlockValue(badge)
+                ))
+                .toList();
 
-        // BadgeType별로 뱃지 리스트 나누기
-        List<UserBadgeUnitDto> readBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.READ);
-        List<UserBadgeUnitDto> archiveBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.ARCHIVE);
-        List<UserBadgeUnitDto> oneLineBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.ONELINE);
-        List<UserBadgeUnitDto> levelBadgeList = filterByBadgeType(allBadgesWithOwnership, BadgeType.LEVEL);
-
-        // 각 분야별 사용자 상태 가져오기
-        long currentReadCount = userBookService.countFinishedUserBooksByUser(user);
-        long currentArchiveCount = reviewRepository.countByUser(user) + excerptRepository.countByUser(user);
-        long currentOneLineCount = oneLineRepository.countAllByUser(user);
-        long currentLevel = userGrowthService.getUserGrowthByUserId(user.getUserId()).getLevel();
+        // BadgeType별로 필터링
+        Map<BadgeType, List<UserBadgeUnitDto>> badgesByType = allBadgesWithOwnership.stream()
+                .collect(Collectors.groupingBy(UserBadgeUnitDto::badgeType));
 
         return new UserBadgeListResponseDto(
-                currentReadCount,
-                currentArchiveCount,
-                currentOneLineCount,
-                currentLevel,
-                readBadgeList,
-                archiveBadgeList,
-                oneLineBadgeList,
-                levelBadgeList
+                userActivityDto.readCount(),
+                userActivityDto.archiveCount(),
+                userActivityDto.oneLineCount(),
+                userActivityDto.level(),
+                badgesByType.getOrDefault(BadgeType.READ, List.of()),
+                badgesByType.getOrDefault(BadgeType.ARCHIVE, List.of()),
+                badgesByType.getOrDefault(BadgeType.ONELINE, List.of()),
+                badgesByType.getOrDefault(BadgeType.LEVEL, List.of())
         );
-    }
-
-    private int getBadgeUnlockValue(Badge badge) {
-        try {
-            return Integer.parseInt(badge.getUnlockCondition());
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
-
-    private List<UserBadgeUnitDto> filterByBadgeType(List<UserBadgeUnitDto> allBadgesWithOwnership, BadgeType badgeType) {
-        return allBadgesWithOwnership.stream()
-                .filter(dto -> dto.badgeType().equals(badgeType))
-                .collect(Collectors.toList());
     }
 
     public List<UserBadge> deleteDuplicateUserBadges(List<UserBadge> userBadges) {
@@ -115,5 +92,4 @@ public class UserBadgeService {
     public void deleteUserBadgesByUser(User user) {
         userBadgeRepository.deleteAllByUser(user);
     }
-
 }

@@ -14,7 +14,7 @@ public record OneLineRatingUnitDto(
         Long userId,
         String userNickname
 ) {
-    public OneLineRatingUnitDto(OneLine oneLine, Boolean isLiked) {
+    public OneLineRatingUnitDto(OneLine oneLine, Boolean isLiked, String safeNickname) {
         this(
                 oneLine.getOneLineId(),
                 oneLine.getOneLineContent(),
@@ -23,7 +23,7 @@ public record OneLineRatingUnitDto(
                 isLiked,
                 oneLine.getCreatedTime(),
                 oneLine.getUser().getUserId(),
-                oneLine.getUser().getNickname()
+                safeNickname
         );
     }
 }

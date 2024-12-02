@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.oneline.service;
 
+import com.mmc.bookduck.domain.badge.service.BadgeUnlockService;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.homecard.dto.common.OneLineRatingWithBookInfoUnitDto;
@@ -8,6 +9,7 @@ import com.mmc.bookduck.domain.oneline.dto.request.OneLineUpdateRequestDto;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.common.PaginatedResponseDto;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -27,6 +29,8 @@ public class OneLineService {
     private final OneLineRepository oneLineRepository;
     private final UserService userService;
     private final UserBookService userBookService;
+    private final BadgeUnlockService badgeUnlockService;
+    private final UserGrowthService userGrowthService;
 
     // 생성
     public OneLine createOneLine(OneLineCreateRequestDto requestDto) {
@@ -34,7 +38,14 @@ public class OneLineService {
         UserBook userBook = userBookService.getUserBookById(requestDto.userBookId());
         userBookService.validateUserBookOwner(userBook);
         OneLine oneLine = requestDto.toEntity(user, userBook);
+        checkExpAndBadgeForOneLine(userBook);
         return oneLineRepository.save(oneLine);
+    }
+
+    // 경험치 획득, ONELINE 뱃지 unlock 확인
+    public void checkExpAndBadgeForOneLine(UserBook userBook) {
+        userGrowthService.gainExpForOneLine(userBook);
+        badgeUnlockService.checkAndUnlockBadges(userBook.getUser());
     }
 
     // 수정
