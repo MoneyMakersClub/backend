@@ -6,7 +6,7 @@ import com.mmc.bookduck.domain.badge.entity.Badge;
 import com.mmc.bookduck.domain.badge.entity.BadgeType;
 import com.mmc.bookduck.domain.badge.entity.UserBadge;
 import com.mmc.bookduck.domain.badge.repository.UserBadgeRepository;
-import com.mmc.bookduck.domain.badge.entity.UserActivity;
+import com.mmc.bookduck.domain.badge.dto.common.UserActivityDto;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class UserBadgeService {
                 .collect(Collectors.toMap(badge -> badge.getBadge().getBadgeId(), badge -> badge));
 
         // 사용자 상태 조회
-        UserActivity userActivity = badgeUnlockService.getUserActivity(user);
+        UserActivityDto userActivityDto = badgeUnlockService.getUserActivity(user);
 
         // 모든 뱃지와 사용자 상태를 결합한 리스트 생성
         List<UserBadgeUnitDto> allBadgesWithOwnership = allBadges.stream()
@@ -56,10 +56,10 @@ public class UserBadgeService {
                 .collect(Collectors.groupingBy(UserBadgeUnitDto::badgeType));
 
         return new UserBadgeListResponseDto(
-                userActivity.readCount(),
-                userActivity.archiveCount(),
-                userActivity.oneLineCount(),
-                userActivity.level(),
+                userActivityDto.readCount(),
+                userActivityDto.archiveCount(),
+                userActivityDto.oneLineCount(),
+                userActivityDto.level(),
                 badgesByType.getOrDefault(BadgeType.READ, List.of()),
                 badgesByType.getOrDefault(BadgeType.ARCHIVE, List.of()),
                 badgesByType.getOrDefault(BadgeType.ONELINE, List.of()),
