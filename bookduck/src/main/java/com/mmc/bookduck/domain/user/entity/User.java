@@ -34,6 +34,8 @@ public class User extends BaseTimeEntity {
     @NotNull
     private UserStatus userStatus;
 
+    // FCM 토큰 세팅
+    @Setter
     private String fcmToken;
 
     @NotNull
@@ -59,11 +61,6 @@ public class User extends BaseTimeEntity {
         this.nickname = nickname;
     }
 
-    // FCM 토큰 세팅
-    public void setFcmToken(String fcmToken) {
-        this.fcmToken = fcmToken;
-    }
-
     public void setIsAnnouncementChecked(boolean isAnnouncementChecked) {
         this.isAnnouncementChecked = isAnnouncementChecked;
     }
@@ -73,7 +70,7 @@ public class User extends BaseTimeEntity {
     }
 
     public void clearUserData() {
-        this.email = "[deleted]";
+        this.email = "[deleted] userId: " + userId;
         this.nickname = "알 수 없는 사용자";
         this.userStatus = UserStatus.DELETED;
         this.fcmToken = null;
