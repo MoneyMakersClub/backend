@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.oneline.service;
 
+import com.mmc.bookduck.domain.badge.service.UserBadgeService;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.homecard.dto.common.OneLineRatingWithBookInfoUnitDto;

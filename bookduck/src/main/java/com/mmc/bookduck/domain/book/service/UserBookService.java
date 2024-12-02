@@ -7,6 +7,8 @@ import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
+import com.mmc.bookduck.domain.badge.service.BadgeUnlockService;
+import com.mmc.bookduck.domain.badge.service.UserBadgeService;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
@@ -42,6 +44,7 @@ public class UserBookService {
     private final UserService userService;
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
+    private final BadgeUnlockService badgeUnlockService;
 
     //customBook 추가
     public UserBook createCustomBookEntity(CustomBookRequestDto requestDto) {
@@ -76,7 +79,7 @@ public class UserBookService {
 
         Optional<BookInfo> bookInfo = bookInfoService.findBookInfoByProviderId(requestDto.providerId());
 
-        if(bookInfo.isPresent()){
+        if (bookInfo.isPresent()){
             Optional<UserBook> userBook = userBookRepository.findByUserAndBookInfo(userService.getCurrentUser(), bookInfo.get());
 
             if(userBook.isPresent()){
@@ -85,7 +88,7 @@ public class UserBookService {
             UserBook newUserBook = requestDto.toEntity(userService.getCurrentUser(), bookInfo.get(), ReadStatus.valueOf(requestDto.readStatus()));
             return userBookRepository.save(newUserBook);
         }
-        else{
+        else {
             // bookInfo 없으면 먼저 bookInfo 저장
             BookInfo newBookInfo = bookInfoService.saveApiBookInfo(requestDto);
             UserBook newUserBook = requestDto.toEntity(userService.getCurrentUser(),newBookInfo, ReadStatus.valueOf(requestDto.readStatus()));
@@ -144,12 +147,13 @@ public class UserBookService {
         User user = userService.getCurrentUser();
 
         // 권한체크
-        if(userBook.getUser().getUserId().equals(user.getUserId())){
-            userBook.changeReadStatus(ReadStatus.valueOf(status));
-            return convertToUserBookResponseDto(userBook);
-        }else{
+        if (!userBook.getUser().getUserId().equals(user.getUserId())) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
+        userBook.changeReadStatus(ReadStatus.valueOf(status));
+
+        badgeUnlockService.checkAndUnlockBadges(user);
+        return convertToUserBookResponseDto(userBook);
     }
 
     @Transactional(readOnly = true)
