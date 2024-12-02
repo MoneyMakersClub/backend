@@ -1,7 +1,9 @@
 package com.mmc.bookduck.domain.user.service;
 
+import com.mmc.bookduck.domain.alarm.service.AlarmByTypeService;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
+import com.mmc.bookduck.domain.badge.service.BadgeUnlockService;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.friend.entity.Friend;
 import com.mmc.bookduck.domain.friend.service.FriendService;
@@ -30,6 +32,8 @@ public class UserGrowthService {
     private final ReviewRepository reviewRepository;
     private final UserService userService;
     private final UserRelationshipService userRelationshipService;
+    private final AlarmByTypeService alarmByTypeService;
+    private final BadgeUnlockService badgeUnlockService;
 
     @Transactional(readOnly = true)
     public UserGrowth getUserGrowthByUserId(Long userId)
@@ -52,7 +56,6 @@ public class UserGrowthService {
         UserRelationshipStatusDto userRelationshipStatusDto = userRelationshipService.getUserRelationshipStatus(currentUser, targetUser);
         return new UserInfoResponseDto(targetUser.getNickname(), bookCount, isOfficial, userRelationshipStatusDto);
     }
-
 
     @Transactional(readOnly = true)
     public UserGrowthInfoResponseDto getUserLevelInfo(Long userId) {
@@ -86,10 +89,14 @@ public class UserGrowthService {
     }
 
     private void gainExpForUser(UserBook userBook, int expToAdd, String experienceType) {
-        Long userId = userBook.getUser().getUserId();
-        UserGrowth userGrowth = getUserGrowthByUserId(userId);
-        userGrowth.gainExp(expToAdd);
-        // TODO: 레벨 상승 알림 추가
+        User user = userBook.getUser();
+        UserGrowth userGrowth = getUserGrowthByUserId(user.getUserId());
+
+        boolean isLevelUp = userGrowth.gainExp(expToAdd);
+        if (isLevelUp) {
+            alarmByTypeService.createLevelUpAlarm(user, userGrowth.getLevel());
+            badgeUnlockService.checkAndUnlockBadges(user);
+        }
         userGrowthRepository.save(userGrowth);
         markExpGiven(userBook, experienceType);
     }
