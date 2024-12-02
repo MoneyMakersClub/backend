@@ -15,13 +15,13 @@ public record AlarmUnitDto(
         String resourceName,
         Long resourceId
 ) {
-    public AlarmUnitDto(Alarm alarm) {
+    public AlarmUnitDto(Alarm alarm, String boldText) {
         this(
                 alarm.getAlarmId(),
                 alarm.isRead(),
                 alarm.getAlarmType(),
                 alarm.getCreatedTime(),
-                alarm.getAlarmType().extractBoldText(alarm),
+                boldText,
                 alarm.getResourceName(),
                 alarm.getResourceId()
         );
