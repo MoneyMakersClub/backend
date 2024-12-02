@@ -48,6 +48,7 @@ public enum ErrorCode {
 
     // 403 Forbidden
     FRIENDSHIP_REQUIRED(403, "친구 관계가 필요합니다."),
+    FRIEND_REQUEST_DISABLED(403, "친구 요청이 비활성화된 사용자입니다."),
     // 권한이 없는 요청을 보냄
     UNAUTHORIZED_REQUEST(403,"권한이 없습니다."),
 

@@ -29,14 +29,16 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long> {
                 CASE
                     WHEN e.excerpt_content = :keyword THEN 1
                     WHEN b.title = :keyword THEN 1
-                    ELSE 0 
+                    WHEN b.author = :keyword THEN 1
+                    ELSE 0
                 END AS exact_match
              FROM excerpt e
              LEFT JOIN user_book ub ON e.user_book_id = ub.user_book_id
              LEFT JOIN book_info b ON ub.book_info_id = b.book_info_id
              WHERE e.user_id = :userId 
                AND (e.excerpt_content LIKE CONCAT('%', :keyword, '%') 
-                    OR b.title LIKE CONCAT('%', :keyword, '%')))
+                    OR b.title LIKE CONCAT('%', :keyword, '%') 
+                    OR b.author LIKE CONCAT('%', :keyword, '%')))
             UNION ALL
             (SELECT 
                 'REVIEW' AS type,
@@ -51,6 +53,7 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long> {
                     WHEN r.review_title = :keyword THEN 1
                     WHEN r.review_content = :keyword THEN 1
                     WHEN b.title = :keyword THEN 1
+                    WHEN b.author = :keyword THEN 1
                     ELSE 0
                 END AS exact_match
              FROM review r
@@ -59,13 +62,14 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long> {
              WHERE r.user_id = :userId
                AND (r.review_title LIKE CONCAT('%', :keyword, '%') 
                     OR r.review_content LIKE CONCAT('%', :keyword, '%') 
-                    OR b.title LIKE CONCAT('%', :keyword, '%')))
+                    OR b.title LIKE CONCAT('%', :keyword, '%') 
+                    OR b.author LIKE CONCAT('%', :keyword, '%')))
         ) AS union_results
         ORDER BY 
             exact_match DESC,
             created_time DESC
         """,
-            countQuery = """
+                countQuery = """
         SELECT COUNT(*) FROM (
             (SELECT e.excerpt_id 
              FROM excerpt e
@@ -73,7 +77,8 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long> {
              LEFT JOIN book_info b ON ub.book_info_id = b.book_info_id
              WHERE e.user_id = :userId 
                AND (e.excerpt_content LIKE CONCAT('%', :keyword, '%') 
-                    OR b.title LIKE CONCAT('%', :keyword, '%')))
+                    OR b.title LIKE CONCAT('%', :keyword, '%') 
+                    OR b.author LIKE CONCAT('%', :keyword, '%')))
             UNION ALL
             (SELECT r.review_id 
              FROM review r
@@ -82,11 +87,13 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long> {
              WHERE r.user_id = :userId 
                AND (r.review_title LIKE CONCAT('%', :keyword, '%') 
                     OR r.review_content LIKE CONCAT('%', :keyword, '%') 
-                    OR b.title LIKE CONCAT('%', :keyword, '%')))
+                    OR b.title LIKE CONCAT('%', :keyword, '%') 
+                    OR b.author LIKE CONCAT('%', :keyword, '%')))
         ) AS results
         """,
-            nativeQuery = true)
+        nativeQuery = true)
     Page<Object[]> searchByAccuracy(@Param("userId") Long userId, @Param("keyword") String keyword, Pageable pageable);
+
 
     // 최신순
     @Query(value = """
@@ -105,7 +112,8 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long> {
              LEFT JOIN book_info b ON ub.book_info_id = b.book_info_id
              WHERE e.user_id = :userId 
                AND (e.excerpt_content LIKE CONCAT('%', :keyword, '%') 
-                    OR b.title LIKE CONCAT('%', :keyword, '%')))
+                    OR b.title LIKE CONCAT('%', :keyword, '%') 
+                    OR b.author LIKE CONCAT('%', :keyword, '%')))
             UNION ALL
             (SELECT 
                 'REVIEW' AS type,
@@ -122,11 +130,12 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long> {
              WHERE r.user_id = :userId
                AND (r.review_title LIKE CONCAT('%', :keyword, '%') 
                     OR r.review_content LIKE CONCAT('%', :keyword, '%') 
-                    OR b.title LIKE CONCAT('%', :keyword, '%')))
+                    OR b.title LIKE CONCAT('%', :keyword, '%') 
+                    OR b.author LIKE CONCAT('%', :keyword, '%')))
         ) AS union_results
         ORDER BY created_time DESC
         """,
-            countQuery = """
+                countQuery = """
         SELECT COUNT(*) FROM (
             (SELECT e.excerpt_id 
              FROM excerpt e
@@ -134,7 +143,8 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long> {
              LEFT JOIN book_info b ON ub.book_info_id = b.book_info_id
              WHERE e.user_id = :userId 
                AND (e.excerpt_content LIKE CONCAT('%', :keyword, '%') 
-                    OR b.title LIKE CONCAT('%', :keyword, '%')))
+                    OR b.title LIKE CONCAT('%', :keyword, '%') 
+                    OR b.author LIKE CONCAT('%', :keyword, '%')))
             UNION ALL
             (SELECT r.review_id 
              FROM review r
@@ -143,9 +153,11 @@ public interface ArchiveRepository extends JpaRepository<Archive, Long> {
              WHERE r.user_id = :userId 
                AND (r.review_title LIKE CONCAT('%', :keyword, '%') 
                     OR r.review_content LIKE CONCAT('%', :keyword, '%') 
-                    OR b.title LIKE CONCAT('%', :keyword, '%')))
+                    OR b.title LIKE CONCAT('%', :keyword, '%') 
+                    OR b.author LIKE CONCAT('%', :keyword, '%')))
         ) AS results
         """,
-            nativeQuery = true)
+        nativeQuery = true)
     Page<Object[]> searchByLatest(@Param("userId") Long userId, @Param("keyword") String keyword, Pageable pageable);
+
 }
