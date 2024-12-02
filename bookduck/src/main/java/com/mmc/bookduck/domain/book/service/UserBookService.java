@@ -44,7 +44,6 @@ public class UserBookService {
     private final UserService userService;
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
-    private final BadgeUnlockService badgeUnlockService;
 
     //customBook 추가
     public UserBook createCustomBookEntity(CustomBookRequestDto requestDto) {
@@ -152,7 +151,7 @@ public class UserBookService {
         }
         userBook.changeReadStatus(ReadStatus.valueOf(status));
         // 경험치, 뱃지
-        bookInfoService.checkExpAndBadge(user, userBook);
+        bookInfoService.checkExpAndBadgeForFinishedBook(userBook);
         return convertToUserBookResponseDto(userBook);
     }
 
