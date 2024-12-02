@@ -8,10 +8,14 @@ import com.mmc.bookduck.domain.badge.entity.UserActivity;
 import com.mmc.bookduck.domain.badge.entity.UserBadge;
 import com.mmc.bookduck.domain.badge.repository.UserBadgeRepository;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
+import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.repository.UserGrowthRepository;
 import com.mmc.bookduck.domain.user.service.UserGrowthService;
+import com.mmc.bookduck.global.exception.CustomException;
+import com.mmc.bookduck.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +32,7 @@ public class BadgeUnlockService {
     private final ExcerptRepository excerptRepository;
     private final OneLineRepository oneLineRepository;
     private final BadgeService badgeService;
-    private final UserGrowthService userGrowthService;
+    private final UserGrowthRepository userGrowthRepository;
     private final AlarmByTypeService alarmByTypeService;
 
     // 유저 활동 가져오기
@@ -37,7 +41,7 @@ public class BadgeUnlockService {
         long readCount = userBookRepository.countByUserAndReadStatus(user, ReadStatus.FINISHED);
         long archiveCount = reviewRepository.countByUser(user) + excerptRepository.countByUser(user);
         long oneLineCount = oneLineRepository.countAllByUser(user);
-        long level = userGrowthService.getUserGrowthByUser(user).getLevel();
+        long level = userGrowthRepository.findByUser(user).orElseThrow(()-> new CustomException(ErrorCode.USERGROWTH_NOT_FOUND)).getLevel();
 
         // 결과 반환
         return new UserActivity(readCount, archiveCount, oneLineCount, level);

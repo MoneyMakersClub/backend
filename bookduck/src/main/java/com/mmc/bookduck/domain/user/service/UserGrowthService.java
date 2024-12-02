@@ -102,6 +102,7 @@ public class UserGrowthService {
         boolean isLevelUp = userGrowth.gainExp(expToAdd);
         if (isLevelUp) {
             alarmByTypeService.createLevelUpAlarm(user, userGrowth.getLevel());
+            // LEVELUP 뱃지 unlock 확인
             badgeUnlockService.checkAndUnlockBadges(user);
         }
         userGrowthRepository.save(userGrowth);

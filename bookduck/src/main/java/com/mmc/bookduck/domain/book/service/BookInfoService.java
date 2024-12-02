@@ -10,6 +10,7 @@ import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
+import com.mmc.bookduck.domain.badge.service.BadgeUnlockService;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookUnitParseDto;
 import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineReadStatusDto;
@@ -38,6 +39,7 @@ import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingUnitDto;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.global.S3.S3Service;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -78,6 +80,8 @@ public class BookInfoService {
     private final OneLineRepository oneLineRepository;
     private final S3Service s3Service;
     private final FriendRepository friendRepository;
+    private final BadgeUnlockService badgeUnlockService;
+    private final UserGrowthService userGrowthService;
 
     // api 도서 목록 조회
     public BookListResponseDto<BookUnitResponseDto> searchBookList(String keyword, Long page, Long size) {
@@ -592,7 +596,14 @@ public class BookInfoService {
             UserBook userBook = requestDto.toEntity(user, newBookInfo, ReadStatus.valueOf(requestDto.readStatus()));
             savedUserBook = userBookRepository.save(userBook);
         }
+        checkExpAndBadgeForFinishedBook(savedUserBook);
         return new AddUserBookResponseDto(savedUserBook);
+    }
+
+    // 경험치 획득, READ 뱃지 unlock 확인
+    public void checkExpAndBadgeForFinishedBook(UserBook userBook) {
+        userGrowthService.gainExpForFinishedBook(userBook);
+        badgeUnlockService.checkAndUnlockBadges(userBook.getUser());
     }
 
     // 연관 추천 도서 조회

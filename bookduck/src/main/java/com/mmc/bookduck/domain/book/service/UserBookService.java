@@ -151,8 +151,8 @@ public class UserBookService {
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
         userBook.changeReadStatus(ReadStatus.valueOf(status));
-
-        badgeUnlockService.checkAndUnlockBadges(user);
+        // 경험치, 뱃지
+        bookInfoService.checkExpAndBadge(user, userBook);
         return convertToUserBookResponseDto(userBook);
     }
 
