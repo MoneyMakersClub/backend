@@ -608,7 +608,6 @@ public class BookInfoService {
     public void checkExpAndBadgeAndItemForFinishedBook(UserBook userBook) {
         userGrowthService.gainExpForFinishedBook(userBook);
         badgeUnlockService.checkAndUnlockBadges(userBook.getUser());
-        itemUnlockService.createUserItemForUnlockableItems(userBook.getUser());
     }
 
     // 연관 추천 도서 조회
