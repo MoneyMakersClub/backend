@@ -62,6 +62,10 @@ public class UserGrowth {
     }
 
     public long calculateExpThresholdForNextLevel(int level) {
-        return 50L + 50L * level;  // 레벨에 따라 증가
+        if (level < 1) {
+            throw new IllegalArgumentException("레벨이 1 미만입니다.");
+        }
+        long incrementBase = 10L; // 증가폭 기본값
+        return level * incrementBase;
     }
 }

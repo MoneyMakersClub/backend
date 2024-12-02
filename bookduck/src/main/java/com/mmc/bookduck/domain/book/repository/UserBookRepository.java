@@ -7,8 +7,7 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.user.entity.User;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -105,4 +104,6 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
     List<UserBook> findAllByBookInfoOrderByRatingDesc(BookInfo bookInfo);
 
     List<UserBook> findAllByCreatedTimeAfter(LocalDateTime createdTime);
+
+    List<UserBook> findAllByUserAndIsArchiveExpGivenTrue(User user);
 }

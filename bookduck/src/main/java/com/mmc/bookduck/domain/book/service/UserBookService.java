@@ -151,7 +151,7 @@ public class UserBookService {
         }
         userBook.changeReadStatus(ReadStatus.valueOf(status));
         // 경험치, 뱃지
-        bookInfoService.checkExpAndBadgeForFinishedBook(userBook);
+        bookInfoService.checkExpAndBadgeAndItemForFinishedBook(userBook);
         return convertToUserBookResponseDto(userBook);
     }
 

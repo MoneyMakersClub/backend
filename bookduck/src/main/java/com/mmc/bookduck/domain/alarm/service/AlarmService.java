@@ -4,6 +4,7 @@ import com.mmc.bookduck.domain.alarm.dto.request.AlarmReadRequestDto;
 import com.mmc.bookduck.domain.alarm.dto.common.AlarmUnitDto;
 import com.mmc.bookduck.domain.alarm.dto.ssedata.BadgeModalInfo;
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
+import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.entity.UserSetting;
@@ -63,8 +64,13 @@ public class AlarmService {
     public void createAlarm(Alarm alarm, User receiver) {
         // 알림 저장
         alarmRepository.save(alarm);
+
         // SSE 알림을 클라이언트로 전송
-        emitterService.sendToClientDefaultAlarm(receiver);
+        if (alarm.getAlarmType().equals(AlarmType.ITEM_UNLOCKED)) {
+            emitterService.sendToClientItemUnlockedAlarm(receiver);
+        } else {
+            emitterService.sendToClientDefaultAlarm(receiver);
+        }
         // 푸시 알림 전송
         sendPushNotificationIfEnabled(receiver, alarm);
     }
