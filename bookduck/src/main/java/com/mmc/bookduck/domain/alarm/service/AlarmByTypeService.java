@@ -1,8 +1,11 @@
 package com.mmc.bookduck.domain.alarm.service;
 
+import com.mmc.bookduck.domain.alarm.dto.ssedata.BadgeModalInfo;
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
 import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 import com.mmc.bookduck.domain.badge.entity.BadgeType;
+import com.mmc.bookduck.domain.badge.entity.UserBadge;
+import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,10 +48,11 @@ public class AlarmByTypeService {
                 .build();
         alarmService.createAlarm(alarm, receiver);
     }
+
     // 한줄평 좋아요 알림 생성
-    public void createOneLineLikeAlarm(User sender, User receiver, Long bookInfoId) {
+    public void createOneLineLikeAlarm(User sender, User receiver, BookInfo bookInfo) {
         AlarmType alarmType = AlarmType.ONELINELIKE_ADDED;
-        String message = MessageFormat.format(alarmType.getMessagePattern(), sender.getNickname());
+        String message = MessageFormat.format(alarmType.getMessagePattern(), bookInfo.getTitle());
 
         Alarm alarm = Alarm.builder()
                 .alarmType(alarmType)
@@ -56,13 +60,14 @@ public class AlarmByTypeService {
                 .receiver(receiver)
                 .message(message)
                 .resourceName("BookInfo")
-                .resourceId(bookInfoId)
+                .resourceId(bookInfo.getBookInfoId())
                 .build();
         alarmService.createAlarm(alarm, receiver);
     }
 
+    // 푸시 알림이 발생하지 않는 알림들
     // 레벨업 알림 생성
-    public void createLevelUpAlarm(User receiver, Long level) {
+    public void createLevelUpAlarm(User receiver, int level) {
         AlarmType alarmType = AlarmType.LEVEL_UP;
         String message = MessageFormat.format(alarmType.getMessagePattern(), level);
 
@@ -71,14 +76,16 @@ public class AlarmByTypeService {
                 .receiver(receiver)
                 .message(message)
                 .resourceName("UserGrowth")
-                .resourceValue(level.toString())
+                .resourceValue(String.valueOf(level))
                 .build();
-        alarmService.createAlarm(alarm, receiver);
+        alarm.readAlarm();
+        alarmService.createLevelUpAlarm(alarm, receiver, level);
     }
 
     // 뱃지 잠금해제 알림 생성
-    public void createBadgeUnlockAlarm(User receiver, BadgeType badgeType) {
+    public void createBadgeUnlockedAlarm(User receiver, UserBadge userBadge) {
         AlarmType alarmType = AlarmType.BADGE_UNLOCKED;
+        BadgeType badgeType =  userBadge.getBadge().getBadgeType();
         String message = MessageFormat.format(alarmType.getMessagePattern(), badgeType.getTitle());
 
         Alarm alarm = Alarm.builder()
@@ -87,6 +94,27 @@ public class AlarmByTypeService {
                 .message(message)
                 .resourceName("Badge")
                 .build();
+        alarm.readAlarm();
+
+        String description = String.format("%s을 달성하여\n%s 배지를 얻었어요.",
+                MessageFormat.format(badgeType.getModalMessage(), userBadge.getBadge().getUnlockCondition()),
+                badgeType.getTitle());
+        BadgeModalInfo badgeModalInfo = new BadgeModalInfo(badgeType, userBadge.getBadge().getBadgeName(), description);
+        alarmService.createBadgeUnlockedAlarm(alarm, receiver, badgeModalInfo);
+    }
+
+    // 레벨업 알림 생성
+    public void createItemUnlockedAlarm(User receiver) {
+        AlarmType alarmType = AlarmType.ITEM_UNLOCKED;
+        String message = alarmType.getMessagePattern();
+
+        Alarm alarm = Alarm.builder()
+                .alarmType(alarmType)
+                .receiver(receiver)
+                .message(message)
+                .resourceName("Item")
+                .build();
+        alarm.readAlarm();
         alarmService.createAlarm(alarm, receiver);
     }
 }

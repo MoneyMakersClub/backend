@@ -10,6 +10,7 @@ import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
+import com.mmc.bookduck.domain.badge.service.BadgeUnlockService;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookUnitParseDto;
 import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineReadStatusDto;
@@ -32,12 +33,13 @@ import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.BookInfoRepository;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
-import com.mmc.bookduck.domain.friend.service.FriendService;
+import com.mmc.bookduck.domain.friend.repository.FriendRepository;
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto;
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingUnitDto;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
 import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
+import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.global.S3.S3Service;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -62,6 +64,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.mmc.bookduck.domain.archive.entity.ArchiveType.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -75,7 +79,9 @@ public class BookInfoService {
     private final UserService userService;
     private final OneLineRepository oneLineRepository;
     private final S3Service s3Service;
-    private final FriendService friendService;
+    private final FriendRepository friendRepository;
+    private final BadgeUnlockService badgeUnlockService;
+    private final UserGrowthService userGrowthService;
 
     // api 도서 목록 조회
     public BookListResponseDto<BookUnitResponseDto> searchBookList(String keyword, Long page, Long size) {
@@ -252,6 +258,10 @@ public class BookInfoService {
 
     // api bookInfo 저장
     public BookInfo saveApiBookInfo (UserBookRequestDto dto) {
+        Optional<BookInfo> existingBookInfo = findBookInfoByProviderId(dto.providerId());
+        if(existingBookInfo.isPresent()){
+            throw new CustomException(ErrorCode.BOOK_ALREADY_EXISTS);
+        }
 
         String saveAuthor = dto.author();
         Genre genre = genreService.findGenreById(dto.genreId());
@@ -286,7 +296,7 @@ public class BookInfoService {
 
     // custom book 목록 검색
     @Transactional(readOnly = true)
-    public BookListResponseDto<CustomBookUnitDto> searchCustomBookList(String keyword, Long page, Long size) {
+    public BookListResponseDto<CustomBookUnitDto> searchCustomBookList(String keyword) {
 
         User user = userService.getCurrentUser();
         List<BookInfo> bookInfoList = bookInfoRepository.searchByCreatedUserIdAndKeyword(user.getUserId(), keyword);
@@ -330,14 +340,13 @@ public class BookInfoService {
         if(bookInfo.getCreatedUserId() == null){
             throw new CustomException(ErrorCode.CUSTOM_BOOKINFO_NOT_FOUND);
         }
-        UserBook userBook = getUserBookByUserAndBookInfo(bookInfo, user);
-
         User bookInfoCreaterUser = userService.getActiveUserByUserId(bookInfo.getCreatedUserId());
+        UserBook userBook = getUserBookByUserAndBookInfo(bookInfo, bookInfoCreaterUser);
 
         if(bookInfo.getCreatedUserId().equals(user.getUserId())){ // 내 customBook
             MyRatingOneLineReadStatusDto myRatingOneLine = getMyRatingOneLineReadStatus(bookInfo, user);
             return new CustomBookResponseDto(userBook, myRatingOneLine.myRating(),myRatingOneLine.oneLineId(), myRatingOneLine.myOneLine(), true);
-        }else if(friendService.isFriendWithCurrentUserOrNull(bookInfoCreaterUser)){ //친구 customBook
+        }else if(isFriend(user,bookInfoCreaterUser)){ //친구 customBook
             return new CustomBookResponseDto(userBook, false);
         }else{
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST); //내것도 아니고 친구것도 아닌 경우
@@ -463,6 +472,9 @@ public class BookInfoService {
 
         Map<Long, Integer> bookInfoCountMap = new HashMap<>();
         for (UserBook userBook : userBookList) {
+            if( userBook.getBookInfo().getCreatedUserId() != null){
+                continue;
+            }
             Long bookInfoId = userBook.getBookInfo().getBookInfoId();
             bookInfoCountMap.put(bookInfoId, bookInfoCountMap.getOrDefault(bookInfoId, 0) + 1);
         }
@@ -484,8 +496,9 @@ public class BookInfoService {
     @Transactional(readOnly = true)
     public UserArchiveResponseDto getAllUserBookArchive(Long bookInfoId, Long userId, Pageable pageable) {
         User bookUser = userService.getActiveUserByUserId(userId);
+        User currentUser = userService.getCurrentUser();
 
-        if(!friendService.isFriendWithCurrentUserOrNull(bookUser)){
+        if(!isFriend(currentUser,bookUser)){
             throw new CustomException(ErrorCode.FRIENDSHIP_REQUIRED);
         }
         BookInfo bookInfo = getBookInfoById(bookInfoId);
@@ -496,15 +509,20 @@ public class BookInfoService {
         List<Excerpt> excerpts = excerptRepository.findExcerptsByUserBookWithPublic(userBook);
         List<Review> reviews = reviewRepository.findReviewsByUserBookWithPublic(userBook);
         for(Excerpt excerpt : excerpts){
-            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor("EXCERPT", ExcerptResponseDto.from(excerpt)));
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor(EXCERPT, ExcerptResponseDto.from(excerpt)));
         }
         for(Review review : reviews){
-            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor("REVIEW", ReviewResponseDto.from(review)));
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor(REVIEW, ReviewResponseDto.from(review)));
         }
 
         List<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> sortedArchiveList = sortByCreatedTime(archiveList);
         Page<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> dtoPage = new PageImpl<>(sortedArchiveList, pageable, sortedArchiveList.size());
         return UserArchiveResponseDto.fromWithoutTitleAuthor(dtoPage);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isFriend(User currentUser, User otherUser){
+        return friendRepository.findFriendBetweenUsers(currentUser.getUserId(), otherUser.getUserId()).isPresent();
     }
 
     @Transactional(readOnly = true)
@@ -518,10 +536,10 @@ public class BookInfoService {
         List<Excerpt> excerpts = excerptRepository.findExcerptByUserBookOrderByCreatedTimeDesc(userBook);
         List<Review> reviews = reviewRepository.findReviewByUserBookOrderByCreatedTimeDesc(userBook);
         for(Excerpt excerpt : excerpts){
-            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor("EXCERPT", ExcerptResponseDto.from(excerpt)));
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor(EXCERPT, ExcerptResponseDto.from(excerpt)));
         }
         for(Review review : reviews){
-            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor("REVIEW", ReviewResponseDto.from(review)));
+            archiveList.add(new UserArchiveResponseDto.ArchiveWithoutTitleAuthor(REVIEW, ReviewResponseDto.from(review)));
         }
 
         List<UserArchiveResponseDto.ArchiveWithoutTitleAuthor> sortedArchiveList = sortByCreatedTime(archiveList);
@@ -560,6 +578,10 @@ public class BookInfoService {
 
         UserBook savedUserBook;
         if(bookInfo.isPresent()){
+            Optional<UserBook> existingUserBook = userBookRepository.findByUserAndBookInfo(user, bookInfo.get());
+            if(existingUserBook.isPresent()){
+                throw new CustomException(ErrorCode.USERBOOK_ALREADY_EXISTS);
+            }
             UserBook userBook = new UserBook(ReadStatus.NOT_STARTED, user, bookInfo.get());
             savedUserBook = userBookRepository.save(userBook);
         }
@@ -574,6 +596,36 @@ public class BookInfoService {
             UserBook userBook = requestDto.toEntity(user, newBookInfo, ReadStatus.valueOf(requestDto.readStatus()));
             savedUserBook = userBookRepository.save(userBook);
         }
+        checkExpAndBadgeForFinishedBook(savedUserBook);
         return new AddUserBookResponseDto(savedUserBook);
+    }
+
+    // 경험치 획득, READ 뱃지 unlock 확인
+    public void checkExpAndBadgeForFinishedBook(UserBook userBook) {
+        userGrowthService.gainExpForFinishedBook(userBook);
+        badgeUnlockService.checkAndUnlockBadges(userBook.getUser());
+    }
+
+    // 연관 추천 도서 조회
+    @Transactional(readOnly = true)
+    public BookListResponseDto<BookCoverImageUnitDto> getRelatedBooks(Long bookInfoId) {
+        List<BookInfo> relatedBooks = bookInfoRepository.findRelatedBooksByBookInfoId(bookInfoId);
+        List<BookCoverImageUnitDto> topSixBooks = relatedBooks.stream()
+                .limit(6)
+                .map(BookCoverImageUnitDto::from)
+                .collect(Collectors.toList());
+        return new BookListResponseDto<>(topSixBooks);
+    }
+
+    // 사용자 customBook 삭제
+    public void deleteUserCustomBook(User user) {
+        List<BookInfo> customBookList = bookInfoRepository.findCustomBookByCreatedUserId(user.getUserId());
+        for(BookInfo customBook : customBookList){
+            Optional<UserBook> customUserBook = userBookRepository.findByUserAndBookInfo(user, customBook);
+            if(customUserBook.isPresent()){
+                userBookRepository.delete(customUserBook.get());
+            }
+            bookInfoRepository.delete(customBook);
+        }
     }
 }

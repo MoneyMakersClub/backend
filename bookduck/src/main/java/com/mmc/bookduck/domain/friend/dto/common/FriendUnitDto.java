@@ -10,13 +10,15 @@ public record FriendUnitDto(
         Long friendId, // 친구 삭제 기능
         Long userId,
         String nickname,
+        Boolean isOfficial,
         List<ItemEquippedUnitDto> userItemEquipped
 ) {
-    public static FriendUnitDto from(Friend friend, User friendUser, List<ItemEquippedUnitDto> userItemEquipped) {
+    public static FriendUnitDto from(Friend friend, User friendUser, Boolean isOfficial, List<ItemEquippedUnitDto> userItemEquipped) {
         return new FriendUnitDto(
                 friend.getFriendId(),
                 friendUser.getUserId(),
                 friendUser.getNickname(),
+                isOfficial,
                 userItemEquipped
         );
     }

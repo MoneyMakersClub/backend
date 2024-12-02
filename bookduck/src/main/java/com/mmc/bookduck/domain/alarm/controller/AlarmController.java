@@ -36,10 +36,17 @@ public class AlarmController {
         return ResponseEntity.ok(alarmService.getCommonAlarms(pageable));
     }
 
-    @Operation(summary = "개별 알림 읽음 처리", description = "개별 알림을 읽음 처리합니다.")
+    @Operation(summary = "일반 알림 개별 읽음 처리", description = "일반 알림을 개별 읽음 처리합니다.")
     @PatchMapping("/common")
     public ResponseEntity<?> checkCommonAlarm(@RequestBody @Valid AlarmReadRequestDto requestDto) {
         alarmService.checkCommonAlarm(requestDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "일반 알림 모두 읽음 처리", description = "일반 알림을 모두 읽음 처리합니다.")
+    @PatchMapping("/common/all")
+    public ResponseEntity<?> checkAllCommonAlarm() {
+        alarmService.checkAllCommonAlarm();
         return ResponseEntity.ok().build();
     }
 

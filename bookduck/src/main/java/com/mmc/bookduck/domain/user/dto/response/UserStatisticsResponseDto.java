@@ -6,6 +6,9 @@ import com.mmc.bookduck.domain.user.dto.common.MonthlyBookCountUnitDto;
 import java.util.List;
 
 public record UserStatisticsResponseDto(
+        Boolean hasTopGenres,
+        Boolean hasMonthlyBookCounts,
+        Boolean hasMostReadAuthor,
         String nickname,
         String duckTitle,
         long bookRecordCount, // excerpt+review

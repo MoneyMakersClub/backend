@@ -21,7 +21,7 @@ public record AlarmUnitDto(
                 alarm.isRead(),
                 alarm.getAlarmType(),
                 alarm.getCreatedTime(),
-                alarm.getSender() != null ? alarm.getSender().getNickname() : alarm.getResourceValue(),
+                alarm.getAlarmType().extractBoldText(alarm),
                 alarm.getResourceName(),
                 alarm.getResourceId()
         );

@@ -14,11 +14,13 @@ import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ArchiveRepository;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
+import com.mmc.bookduck.domain.badge.service.BadgeUnlockService;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.friend.entity.Friend;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
+import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.common.PaginatedResponseDto;
 import com.mmc.bookduck.global.exception.CustomException;
@@ -34,6 +36,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static com.mmc.bookduck.domain.archive.entity.ArchiveType.*;
 import static com.mmc.bookduck.global.common.EscapeSpecialCharactersService.escapeSpecialCharacters;
 
 @Slf4j
@@ -49,6 +53,8 @@ public class ArchiveService {
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
     private final FriendRepository friendRepository;
+    private final UserGrowthService userGrowthService;
+    private final BadgeUnlockService badgeUnlockService;
 
     // 생성
     public ArchiveResponseDto createArchive(ArchiveCreateRequestDto requestDto) {
@@ -70,13 +76,20 @@ public class ArchiveService {
                 .orElse(null);
         Archive archive = requestDto.toEntity(excerpt, review);
         archiveRepository.save(archive);
+        checkExpAndBadgeForArchive(userBook);
         return createArchiveResponseDto(archive, excerpt, review, userBook);
+    }
+
+    // 경험치 획득, ARCHIVE 뱃지 unlock 확인
+    public void checkExpAndBadgeForArchive(UserBook userBook) {
+        userGrowthService.gainExpForArchive(userBook);
+        badgeUnlockService.checkAndUnlockBadges(userBook.getUser());
     }
 
     // 조회
     @Transactional(readOnly = true)
-    public ArchiveResponseDto getArchive(Long id, ArchiveType archiveType) {
-        Archive archive = findArchiveByType(id, archiveType);
+    public ArchiveResponseDto getArchive(Long archiveId) {
+        Archive archive = getArchiveById(archiveId);
         UserBook userBook = getUserBookFromExcerptOrReview(archive);
         // currentUser와 creatorUser 사이의 관계에 따른 response 필터링
         Long currentUserId = userService.getCurrentUser().getUserId();
@@ -116,8 +129,8 @@ public class ArchiveService {
     }
 
     // 수정
-    public ArchiveResponseDto updateArchive(Long id, ArchiveType archiveType, ArchiveUpdateRequestDto requestDto) {
-        Archive archive = findArchiveByType(id, archiveType);
+    public ArchiveResponseDto updateArchive(Long archiveId, ArchiveUpdateRequestDto requestDto) {
+        Archive archive = getArchiveById(archiveId);
         UserBook userBook = getUserBookFromExcerptOrReview(archive);
         // 생성자 검증
         userBookService.validateUserBookOwner(userBook);
@@ -202,15 +215,16 @@ public class ArchiveService {
         }
         List<UserArchiveResponseDto.ArchiveWithType> archiveList = new ArrayList<>();
         // 발췌 조회
-        if (archiveType == ArchiveType.EXCERPT || archiveType == ArchiveType.ALL) {
+        if (archiveType == EXCERPT || archiveType == ArchiveType.ALL) {
             List<Excerpt> excerpts = excerptRepository.findByUserId(userId);
             for (Excerpt excerpt : excerpts) {
                 if (!userId.equals(currentUserId) && excerpt.getVisibility() != Visibility.PUBLIC) {
                     continue;
                 }
+                Long archiveId = findArchiveByType(excerpt.getExcerptId(), EXCERPT).getArchiveId();
                 String title = excerpt.getUserBook().getBookInfo().getTitle();
                 String author = excerpt.getUserBook().getBookInfo().getAuthor();
-                archiveList.add(new UserArchiveResponseDto.ArchiveWithType("EXCERPT", ExcerptResponseDto.from(excerpt), title, author));
+                archiveList.add(new UserArchiveResponseDto.ArchiveWithType(EXCERPT, ExcerptResponseDto.from(excerpt), archiveId, title, author));
             }
         }
         // 리뷰 조회
@@ -220,9 +234,10 @@ public class ArchiveService {
                 if (!userId.equals(currentUserId) && review.getVisibility() != Visibility.PUBLIC) {
                     continue;
                 }
+                Long archiveId = findArchiveByType(review.getReviewId(), REVIEW).getArchiveId();
                 String title = review.getUserBook().getBookInfo().getTitle();
                 String author = review.getUserBook().getBookInfo().getAuthor();
-                archiveList.add(new UserArchiveResponseDto.ArchiveWithType("REVIEW", ReviewResponseDto.from(review), title, author));
+                archiveList.add(new UserArchiveResponseDto.ArchiveWithType(REVIEW, ReviewResponseDto.from(review), archiveId,title, author));
             }
         }
         // 데이터 합친 후 최신순 정렬
@@ -258,16 +273,22 @@ public class ArchiveService {
             String title = (String) row[3];
             Visibility visibility = Visibility.valueOf((String) row[4]);
             LocalDateTime createdTime = ((Timestamp) row[5]).toLocalDateTime();
+            String bookTitle = (String) row[6];
+            String bookAuthor = (String) row[7];
 
             if ("EXCERPT".equals(type)) {
                 return new ArchiveSearchListResponseDto.ResultWithType(
-                        "EXCERPT",
-                        new ExcerptSearchUnitDto(id, content, visibility, createdTime)
+                        EXCERPT,
+                        new ExcerptSearchUnitDto(id, content, visibility, createdTime),
+                        bookTitle,
+                        bookAuthor
                 );
             } else if ("REVIEW".equals(type)) {
                 return new ArchiveSearchListResponseDto.ResultWithType(
-                        "REVIEW",
-                        new ReviewSearchUnitDto(id, title, content, visibility, createdTime)
+                        REVIEW,
+                        new ReviewSearchUnitDto(id, title, content, visibility, createdTime),
+                        bookTitle,
+                        bookAuthor
                 );
             }
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);

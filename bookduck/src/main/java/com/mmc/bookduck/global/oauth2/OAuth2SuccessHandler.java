@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -20,6 +21,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final JwtUtil jwtUtil;
     private final CookieUtil cookieUtil;
     private static final String OAUTH_PATH = "/api/oauth";
+    private static final String DEPLOYED_REDIRECT_URL = "https://bookduck.vercel.app";
+    private static final List<String> ALLOWED_REDIRECT_URLS = List.of(
+            "http://localhost:3000",
+            "http://localhost:8080"
+    );
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -29,16 +35,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             String origin = request.getHeader("origin");
             String referer = request.getHeader("referer");
 
-            // origin이나 referer 헤더가 있는 경우 이를 기준으로 redirectUrl 설정
-            String baseRedirectUrl;
-            if (origin != null) {
-                baseRedirectUrl = origin;
-            } else if (referer != null) {
-                baseRedirectUrl = referer.split("/")[0] + "//" + referer.split("/")[2]; // 프로토콜 및 호스트만 사용
-            } else {
-                // 기본값을 로컬호스트로 설정
-                baseRedirectUrl = "http://localhost:3000";
-            }
+            String baseRedirectUrl = ALLOWED_REDIRECT_URLS.stream()
+                    .filter(url -> url.equals(origin) || (referer != null && referer.startsWith(url)))
+                    .findFirst()
+                    .orElse(DEPLOYED_REDIRECT_URL);
             String redirectUrl = baseRedirectUrl + OAUTH_PATH;
 
             // 액세스 토큰 및 리프레시 토큰 발급, 리프레시 토큰을 쿠키에 저장

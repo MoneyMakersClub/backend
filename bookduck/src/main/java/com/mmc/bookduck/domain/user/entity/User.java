@@ -34,11 +34,12 @@ public class User extends BaseTimeEntity {
     @NotNull
     private UserStatus userStatus;
 
+    // FCM 토큰 세팅
+    @Setter
     private String fcmToken;
 
+    @NotNull
     private Boolean isAnnouncementChecked;
-
-    private Boolean isItemUnlockedChecked;
     
     @ColumnDefault("false")
     private boolean isOfficial;
@@ -52,7 +53,6 @@ public class User extends BaseTimeEntity {
         this.role = role;
         this.userStatus = UserStatus.ACTIVE;
         this.isAnnouncementChecked = true;
-        this.isItemUnlockedChecked = true;
         this.isOfficial = isOfficial;
     }
 
@@ -61,16 +61,20 @@ public class User extends BaseTimeEntity {
         this.nickname = nickname;
     }
 
-    // FCM 토큰 세팅
-    public void setFcmToken(String fcmToken) {
-        this.fcmToken = fcmToken;
-    }
-
     public void setIsAnnouncementChecked(boolean isAnnouncementChecked) {
         this.isAnnouncementChecked = isAnnouncementChecked;
     }
 
-    public void setIsItemUnlockedChecked(boolean isItemUnlockedChecked) {
-        this.isItemUnlockedChecked = isItemUnlockedChecked;
+    public void updateStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    public void clearUserData() {
+        this.email = "[deleted] userId: " + userId;
+        this.nickname = "알 수 없는 사용자";
+        this.userStatus = UserStatus.DELETED;
+        this.fcmToken = null;
+        this.isOfficial = false;
+        this.isAnnouncementChecked = true;
     }
 }

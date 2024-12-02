@@ -22,7 +22,7 @@ public class GoogleBooksApiService {
     // 목록 검색
     public String searchBookList(String keyword, Long page, Long size) {
         try {
-            String url = "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&startIndex=" + (page - 1)
+            String url = "https://www.googleapis.com/books/v1/volumes?q=" + keyword + "&startIndex=" + (page * size)
                     + "&maxResults=" + size + "&key=" + apiKey;
 
             // API GET 요청

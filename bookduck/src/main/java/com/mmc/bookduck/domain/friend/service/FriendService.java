@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,7 +67,8 @@ public class FriendService {
                 .map(friend -> {
                     User friendUser = getFriendUser(friend, currentUser);
                     List<ItemEquippedUnitDto> userItemEquipped = userItemService.getUserItemEquippedListOfUser(friendUser);
-                    return FriendUnitDto.from(friend, friendUser, userItemEquipped);
+                    boolean isOfficial = friendUser.isOfficial();
+                    return FriendUnitDto.from(friend, friendUser, isOfficial, userItemEquipped);
                 })
                 .collect(Collectors.toList());
         return FriendListResponseDto.from(friendList);
@@ -87,13 +89,11 @@ public class FriendService {
         // 친구 요청 상태를 BREAKUP로 변경
         List<FriendRequest> requests = friendRequestRepository.findAllFriendRequestsBetweenUsers(
                 friend.getUser1().getUserId(), friend.getUser2().getUserId(), FriendRequestStatus.ACCEPTED);
-        if (requests.isEmpty()) {
-            throw new CustomException(ErrorCode.FRIEND_REQUEST_NOT_FOUND);
+        if (!requests.isEmpty()) {
+            FriendRequest request = requests.get(0);  // 여러 개가 있을 경우, 가장 최근 요청을 처리
+            request.setFriendRequestStatus(FriendRequestStatus.BREAKUP);
+            friendRequestRepository.save(request);
         }
-        FriendRequest request = requests.get(0);  // 여러 개가 있을 경우, 가장 최근 요청을 처리
-        request.setFriendRequestStatus(FriendRequestStatus.BREAKUP);
-        friendRequestRepository.save(request);
-
         friendRepository.delete(friend);
     }
 
@@ -107,7 +107,17 @@ public class FriendService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<Friend> getFriendBetweenUsers(User user, User otherUser) {
+        return friendRepository.findFriendBetweenUsers(user.getUserId(), otherUser.getUserId());
+    }
+
+    @Transactional(readOnly = true)
     public User getFriendUser(Friend friend, User currentUser) {
         return friend.getUser1().equals(currentUser) ? friend.getUser2() : friend.getUser1();
+    }
+
+    public void deleteFriendsOfUser(User user) {
+        friendRepository.deleteByUser1(user);
+        friendRepository.deleteByUser2(user);
     }
 }

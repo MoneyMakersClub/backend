@@ -36,7 +36,7 @@ public class OneLineLikeService {
         oneLine.addOneLineLike(oneLineLike);
         // 타 사용자일 떄만 알림 전송
         if (!currentUser.equals(oneLine.getUser()))
-            alarmByTypeService.createOneLineLikeAlarm(currentUser, oneLine.getUser(), oneLine.getUserBook().getBookInfo().getBookInfoId());
+            alarmByTypeService.createOneLineLikeAlarm(currentUser, oneLine.getUser(), oneLine.getUserBook().getBookInfo());
         oneLineLikeRepository.save(oneLineLike);
     }
 

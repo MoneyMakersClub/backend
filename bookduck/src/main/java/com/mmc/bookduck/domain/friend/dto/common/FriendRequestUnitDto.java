@@ -9,13 +9,15 @@ public record FriendRequestUnitDto(
         Long requestId,
         Long userId,
         String userNickname,
+        Boolean isOfficial,
         List<ItemEquippedUnitDto> userItemEquipped
 ) {
-    public static FriendRequestUnitDto from(FriendRequest friendRequest, Long userId, String userNickname, List<ItemEquippedUnitDto> userItemEquipped) {
+    public static FriendRequestUnitDto from(FriendRequest friendRequest, Long userId, String userNickname, Boolean isOfficial, List<ItemEquippedUnitDto> userItemEquipped) {
         return new FriendRequestUnitDto(
                 friendRequest.getRequestId(),
                 userId,
                 userNickname,
+                isOfficial,
                 userItemEquipped
         );
     }

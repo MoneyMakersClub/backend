@@ -34,7 +34,7 @@ public class ReviewService {
     public Review createReview(ReviewCreateRequestDto requestDto){
         User user = userService.getCurrentUser();
         UserBook userBook = userBookService.getUserBookById(requestDto.getUserBookId());
-        String color = requestDto.getColor() != null ? requestDto.getColor() : "#FFFFFF";
+        String color = requestDto.getColor() != null ? requestDto.getColor() : "#ABABAB";
         Visibility visibility = requestDto.getVisibility() != null ? requestDto.getVisibility() : Visibility.PUBLIC;
         boolean isSystemGenerated = false;
         // 제목 생성 로직

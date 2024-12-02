@@ -82,22 +82,25 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
     List<Object[]> findMostReadAuthorByUser(@Param("user") User user);
 
     @Query("SELECT ub.bookInfo.author " +
-                    "FROM UserBook ub " +
-                    "WHERE ub.user = :user " +
-                    "AND ub.createdTime BETWEEN :startDate AND :endDate " +
-                    "GROUP BY ub.bookInfo.author " +
-                    "ORDER BY COUNT(ub) DESC")
-    String findTopAuthorByUserAndCreatedTimeBetween(@Param("user") User user, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
-
+            "FROM UserBook ub " +
+            "WHERE ub.user = :user " +
+            "AND YEAR(ub.createdTime) = YEAR(CURRENT_DATE) " +  // 올해 데이터만
+            "AND ub.createdTime BETWEEN :startDate AND :endDate " +  // 주어진 기간
+            "GROUP BY ub.bookInfo.author " +
+            "ORDER BY COUNT(ub) DESC")
+    String findTopAuthorByUserAndCreatedTimeBetween(@Param("user") User user,
+                                                    @Param("startDate") LocalDateTime startDate,
+                                                    @Param("endDate") LocalDateTime endDate);
     // BookInfo의 작가명으로 UserBook top3찾기
     List<UserBook> findTop3ByBookInfo_AuthorOrderByCreatedTimeDesc(String author);
 
     // 유저의 UserBook들 올해 상반기/하반기별로 조회
-    @Query("SELECT ub FROM UserBook ub WHERE ub.user = :user AND " +
-            "((:isFirstHalf = true AND MONTH(ub.createdTime) BETWEEN 1 AND 6) OR " +
-            "(:isFirstHalf = false AND MONTH(ub.createdTime) BETWEEN 7 AND 12))")
-    List<UserBook> findAllByUserAndCreatedInHalf(@Param("user") User user,
-                                                               @Param("isFirstHalf") boolean isFirstHalf);
+    @Query("SELECT ub FROM UserBook ub " +
+            "WHERE ub.user = :user " +
+            "AND YEAR(ub.createdTime) = :year " +
+            "AND ((:isFirstHalf = true AND MONTH(ub.createdTime) BETWEEN 1 AND 6) " +
+            "OR (:isFirstHalf = false AND MONTH(ub.createdTime) BETWEEN 7 AND 12))")
+    List<UserBook> findAllByUserAndCreatedInYearAndHalf(@Param("user") User user, @Param("year") int year, @Param("isFirstHalf") boolean isFirstHalf);
 
     List<UserBook> findAllByBookInfoOrderByRatingDesc(BookInfo bookInfo);
 

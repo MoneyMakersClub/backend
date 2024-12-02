@@ -33,4 +33,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT e FROM Review e WHERE e.user.userId = :userId")
     List<Review> findByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT COUNT(r) FROM Review r " +
+            "WHERE r.user = :user " +
+            "AND YEAR(r.createdTime) = :year " +
+            "AND ((:isFirstHalf = true AND MONTH(r.createdTime) BETWEEN 1 AND 6) " +
+            "OR (:isFirstHalf = false AND MONTH(r.createdTime) BETWEEN 7 AND 12))")
+    long countByUserAndCreatedInYearAndHalf(@Param("user") User user, @Param("year") int year, @Param("isFirstHalf") boolean isFirstHalf);
 }

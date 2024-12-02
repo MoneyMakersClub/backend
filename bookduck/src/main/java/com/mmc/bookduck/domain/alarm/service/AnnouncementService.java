@@ -18,13 +18,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class AnnouncementService {
     private final AnnouncementRepository announcementRepository;
     private final UserService userService;
+    private final EmitterService emitterService;
 
-    @Transactional(readOnly = true)
     public PaginatedResponseDto<AnnouncementUnitDto> getRecentAnnouncements(Pageable pageable) {
         // user가 공지 읽음으로 표시
         User user = userService.getCurrentUser();
-        user.setIsAnnouncementChecked(true);
-
+        // 공지를 안 읽었던 경우만, 상태 업데이트 및 SSE 알림 전송
+        if (!user.getIsAnnouncementChecked()) {
+            user.setIsAnnouncementChecked(true);
+            emitterService.sendToClientDefaultAlarm(user);
+        }
         Page<Announcement> announcementPage = announcementRepository.findByOrderByCreatedTimeDesc(pageable);
         Page<AnnouncementUnitDto> annoucementUnitDtos = announcementPage.map(AnnouncementUnitDto::new);
         return PaginatedResponseDto.from(annoucementUnitDtos);

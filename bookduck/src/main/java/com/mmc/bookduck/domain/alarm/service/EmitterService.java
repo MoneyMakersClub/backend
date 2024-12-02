@@ -1,7 +1,8 @@
 package com.mmc.bookduck.domain.alarm.service;
 
-import com.mmc.bookduck.domain.alarm.dto.ssedata.AlarmBadgeUnlockedDataDto;
 import com.mmc.bookduck.domain.alarm.dto.ssedata.AlarmDefaultDataDto;
+import com.mmc.bookduck.domain.alarm.dto.ssedata.BadgeModalInfo;
+import com.mmc.bookduck.domain.alarm.entity.Alarm;
 import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
 import com.mmc.bookduck.domain.alarm.repository.EmitterRepository;
@@ -23,7 +24,7 @@ public class EmitterService {
     private final AlarmRepository alarmRepository;
     private final UserService userService;
 
-    private static final Long DEFAULT_TIMEOUT = 5L * 60 * 1000;  // 5분
+    private static final Long DEFAULT_TIMEOUT = 3L * 60 * 1000;  // 3분
 
     public SseEmitter subscribe() {
         User user = userService.getCurrentUser();
@@ -33,31 +34,40 @@ public class EmitterService {
         SseEmitter emitter = Optional.ofNullable(emitterRepository.get(userId))
                 .orElseGet(() -> registerEmitter(userId));
 
-        sendToClientIfNewAlarmExists(user);
+        sendToClientDefaultAlarm(user);
         return emitter;
     }
 
-    private void sendToClientIfNewAlarmExists(User user) {
-        Boolean isMissedAlarms = alarmRepository.existsByReceiverAndIsReadFalse(user);
-        Boolean isAnnouncementChecked = user.getIsAnnouncementChecked();
-        Boolean isItemUnlockedChecked = user.getIsItemUnlockedChecked();
-        String messsage;
-
-        if (isMissedAlarms || isAnnouncementChecked || isItemUnlockedChecked) {
-            messsage = "new sse alarm exists";
-        } else {
-            messsage = "new sse alarm doesn't exists";
-        }
-        sendToClient(user.getUserId(), AlarmDefaultDataDto.from(!isMissedAlarms, isAnnouncementChecked, isItemUnlockedChecked), messsage);
+    // 기본 알림 전송
+    public void sendToClientDefaultAlarm(User user) {
+        boolean isCommonAlarmChecked = !alarmRepository.existsByReceiverAndIsReadFalse(user);
+        AlarmDefaultDataDto alarmDataDto = AlarmDefaultDataDto
+                .fromDefault(isCommonAlarmChecked, user.getIsAnnouncementChecked(), true);
+        sendToClient(user.getUserId(), alarmDataDto, "new sse alarm exists");
     }
 
-    private void sendToClientIfBadgeUnlockedAlarmExists(User user) {
-        Boolean isBadgeUnlocked = alarmRepository.existsByReceiverAndIsReadFalseAndAlarmType(user, AlarmType.BADGE_UNLOCKED);
-        if (isBadgeUnlocked.equals(true)) {
-            sendToClient(user.getUserId(), AlarmBadgeUnlockedDataDto.from(false), "new badge alarm exists");
-        } else {
-            sendToClient(user.getUserId(), AlarmBadgeUnlockedDataDto.from(true), "new badge alarm doesn't exists");
-        }
+    // 아이템 획득 알림 전송
+    public void sendToClientItemUnlockedAlarm(User user) {
+        boolean isCommonAlarmChecked = !alarmRepository.existsByReceiverAndIsReadFalse(user);
+        AlarmDefaultDataDto alarmDataDto = AlarmDefaultDataDto
+                .fromDefault(isCommonAlarmChecked, user.getIsAnnouncementChecked(), false);
+        sendToClient(user.getUserId(), alarmDataDto, "item unlocked alarm exists");
+    }
+
+    // 레벨업 알림 전송
+    public void sendToClientLevelUpAlarm(User user, int level) {
+        boolean isCommonAlarmChecked = !alarmRepository.existsByReceiverAndIsReadFalse(user);
+        AlarmDefaultDataDto alarmDataDto = AlarmDefaultDataDto
+                .fromLevelUp(isCommonAlarmChecked, user.getIsAnnouncementChecked(), level);
+        sendToClient(user.getUserId(), alarmDataDto, "level up alarm exists");
+    }
+
+    // 뱃지 획득 알림 전송
+    public void sendToClientBadgeUnlockedAlarm(User user, BadgeModalInfo badgeModalInfo) {
+        boolean isCommonAlarmChecked = !alarmRepository.existsByReceiverAndIsReadFalse(user);
+        AlarmDefaultDataDto alarmDataDto = AlarmDefaultDataDto
+                .fromBadgeUnlocked(isCommonAlarmChecked, user.getIsAnnouncementChecked(), badgeModalInfo);
+        sendToClient(user.getUserId(), alarmDataDto, "badge unlocked alarm exists");
     }
 
     private SseEmitter registerEmitter(Long memberId) {

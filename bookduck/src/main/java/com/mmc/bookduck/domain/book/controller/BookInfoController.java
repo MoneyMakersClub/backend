@@ -62,10 +62,8 @@ public class BookInfoController {
 
     @Operation(summary = "사용자가 직접 추가한 도서 목록 검색", description = "현재 사용자가 직접 추가한 도서 중에서 특정 키워드에 해당하는 도서 목록을 검색합니다.")
     @GetMapping("/search/custom")
-    public ResponseEntity<BookListResponseDto<CustomBookUnitDto>> searchCustomBookList(@RequestParam(name = "keyword") final String keyword,
-                                                                                       @RequestParam final Long page,
-                                                                                       @RequestParam final Long size){
-        return ResponseEntity.ok(bookInfoService.searchCustomBookList(keyword, page, size));
+    public ResponseEntity<BookListResponseDto<CustomBookUnitDto>> searchCustomBookList(@RequestParam(name = "keyword") final String keyword){
+        return ResponseEntity.ok(bookInfoService.searchCustomBookList(keyword));
     }
 
 
@@ -113,5 +111,12 @@ public class BookInfoController {
                                                                         @PageableDefault(size = 20) final Pageable pageable){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(bookInfoService.getAllUserBookArchive(bookinfoId,userId, pageable));
+    }
+
+    @Operation(summary = "연관 추천 도서 조회", description = "이 책을 읽은 사용자들이 많이 읽은 도서를 6권 조회합니다.")
+    @GetMapping("/{bookinfoId}/explore")
+    public ResponseEntity<?> getRelatedBooks(@PathVariable("bookinfoId") final Long bookInfoId) {
+        BookListResponseDto<BookCoverImageUnitDto> responseDto = bookInfoService.getRelatedBooks(bookInfoId);
+        return ResponseEntity.ok(responseDto);
     }
 }

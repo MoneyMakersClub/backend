@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface HomeCardRepository extends JpaRepository<HomeCard, Long> {
     List<HomeCard> findAllByUserOrderByCardIndexAsc(User user);
+    List<HomeCard> findAllByUser(User user);
+    void deleteAllByUser(User user);
 }

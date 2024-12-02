@@ -2,6 +2,7 @@ package com.mmc.bookduck.domain.friend.repository;
 
 import com.mmc.bookduck.domain.friend.entity.FriendRequest;
 import com.mmc.bookduck.domain.friend.entity.FriendRequestStatus;
+import com.mmc.bookduck.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,4 +15,7 @@ public interface FriendRequestRepository extends JpaRepository<FriendRequest, Lo
     List<FriendRequest> findAllFriendRequestsBetweenUsers(@Param("userId1") Long userId1, @Param("userId2") Long userId2, @Param("status") FriendRequestStatus status);
     List<FriendRequest> findAllByReceiverUserIdAndFriendRequestStatus(Long receiverId, FriendRequestStatus status);
     List<FriendRequest> findAllBySenderUserIdAndFriendRequestStatus(Long receiverId, FriendRequestStatus status);
+
+    void deleteBySender(User sender);
+    void deleteByReceiver(User receiver);
 }

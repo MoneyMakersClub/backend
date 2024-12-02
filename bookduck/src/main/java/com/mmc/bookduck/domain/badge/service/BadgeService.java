@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class BadgeService {
     private final BadgeRepository badgeRepository;
@@ -28,5 +27,14 @@ public class BadgeService {
     @Transactional(readOnly = true)
     public List<Badge> getAllBadges() {
         return badgeRepository.findAll();
+    }
+
+    // 뱃지 잠금해제 조건을 int로 가져옴
+    public int getBadgeUnlockValue(Badge badge) {
+        try {
+            return Integer.parseInt(badge.getUnlockCondition());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }

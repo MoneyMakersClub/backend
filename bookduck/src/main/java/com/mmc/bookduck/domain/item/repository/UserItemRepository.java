@@ -9,4 +9,6 @@ import java.util.List;
 public interface UserItemRepository extends JpaRepository<UserItem, Long> {
     List<UserItem> findAllByUserAndIsEquippedTrue(User user);
     List<UserItem> findAllByUser(User user);
+
+    void deleteAllByUser(User user);
 }

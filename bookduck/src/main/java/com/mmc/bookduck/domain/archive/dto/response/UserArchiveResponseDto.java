@@ -2,6 +2,8 @@ package com.mmc.bookduck.domain.archive.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
+
+import com.mmc.bookduck.domain.archive.entity.ArchiveType;
 import org.springframework.data.domain.Page;
 
 
@@ -15,14 +17,15 @@ public record UserArchiveResponseDto(
         List<ArchiveWithoutTitleAuthor> userBookArchiveList
 ) {
     public record ArchiveWithType(
-            String type, // EXCERPT, REVIEW
+            ArchiveType type, // EXCERPT, REVIEW
             Object data, // ExcerptResponseDto, ReviewResponseDto
+            Long archiveId,
             String title,
             String author
     ) {}
     public record ArchiveWithoutTitleAuthor(
-            String type, // EXCERPT, REVIEW
-            Object data// ExcerptResponseDto, ReviewResponseDto
+            ArchiveType type, // EXCERPT, REVIEW
+            Object data // ExcerptResponseDto, ReviewResponseDto
     ) {}
     public static UserArchiveResponseDto from(Page<ArchiveWithType> archivePage) {
         return new UserArchiveResponseDto(
