@@ -1,5 +1,6 @@
 package com.mmc.bookduck.domain.item.service;
 
+import com.mmc.bookduck.domain.alarm.service.AlarmByTypeService;
 import com.mmc.bookduck.domain.book.entity.Genre;
 import com.mmc.bookduck.domain.book.entity.GenreName;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
@@ -27,6 +28,7 @@ public class ItemUnlockService {
     private final UserBookRepository userBookRepository;
     private final ItemRepository itemRepository;
     private final UserItemRepository userItemRepository;
+    private final AlarmByTypeService alarmByTypeService;
 
     // 사용자가 획득할 수 있는 아이템을 UserItem으로 생성하는 메서드
     public void createUserItemForUnlockableItems(User user) {
@@ -42,6 +44,8 @@ public class ItemUnlockService {
 
             // UserItem 저장
             userItemRepository.save(userItem);
+            // 아이템 획득 알림 생성
+            alarmByTypeService.createItemUnlockedAlarm(user);
         }
     }
 
