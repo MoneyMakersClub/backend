@@ -34,6 +34,7 @@ import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.BookInfoRepository;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
+import com.mmc.bookduck.domain.item.service.ItemUnlockService;
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingListResponseDto;
 import com.mmc.bookduck.domain.oneline.dto.response.OneLineRatingUnitDto;
 import com.mmc.bookduck.domain.oneline.entity.OneLine;
@@ -82,6 +83,7 @@ public class BookInfoService {
     private final FriendRepository friendRepository;
     private final BadgeUnlockService badgeUnlockService;
     private final UserGrowthService userGrowthService;
+    private final ItemUnlockService itemUnlockService;
 
     // api 도서 목록 조회
     public BookListResponseDto<BookUnitResponseDto> searchBookList(String keyword, Long page, Long size) {
@@ -596,14 +598,15 @@ public class BookInfoService {
             UserBook userBook = requestDto.toEntity(user, newBookInfo, ReadStatus.valueOf(requestDto.readStatus()));
             savedUserBook = userBookRepository.save(userBook);
         }
-        checkExpAndBadgeForFinishedBook(savedUserBook);
+        checkExpAndBadgeAndItemForFinishedBook(savedUserBook);
         return new AddUserBookResponseDto(savedUserBook);
     }
 
     // 경험치 획득, READ 뱃지 unlock 확인
-    public void checkExpAndBadgeForFinishedBook(UserBook userBook) {
+    public void checkExpAndBadgeAndItemForFinishedBook(UserBook userBook) {
         userGrowthService.gainExpForFinishedBook(userBook);
         badgeUnlockService.checkAndUnlockBadges(userBook.getUser());
+        itemUnlockService.createUserItemForUnlockableItems(userBook.getUser());
     }
 
     // 연관 추천 도서 조회

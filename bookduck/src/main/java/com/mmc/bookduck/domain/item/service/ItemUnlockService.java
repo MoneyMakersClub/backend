@@ -1,8 +1,9 @@
 package com.mmc.bookduck.domain.item.service;
 
+import com.mmc.bookduck.domain.book.entity.Genre;
 import com.mmc.bookduck.domain.book.entity.GenreName;
+import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
-import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.item.entity.Item;
 import com.mmc.bookduck.domain.item.entity.UserItem;
 import com.mmc.bookduck.domain.item.repository.ItemRepository;
@@ -10,6 +11,7 @@ import com.mmc.bookduck.domain.item.repository.UserItemRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,14 +19,31 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ItemUnlockService {
-
     private final UserService userService;
     private final UserBookRepository userBookRepository;
     private final ItemRepository itemRepository;
-    private final UserItemRepository userItemRepository;  // UserItemRepository 추가
+    private final UserItemRepository userItemRepository;
+
+    // 사용자가 획득할 수 있는 아이템을 UserItem으로 생성하는 메서드
+    public void createUserItemForUnlockableItems(User user) {
+        List<Item> unlockableItems = getUnlockableItemsForUser();
+
+        for (Item item : unlockableItems) {
+            // UserItem 생성
+            UserItem userItem = UserItem.builder()
+                    .user(user)
+                    .item(item)
+                    .isEquipped(false)  // 기본값으로 미장착 설정
+                    .build();
+
+            // UserItem 저장
+            userItemRepository.save(userItem);
+        }
+    }
 
     // 사용자 아이템 획득 조건 확인 및 새로 획득할 수 있는 아이템 목록 반환
     public List<Item> getUnlockableItemsForUser() {
@@ -33,7 +52,7 @@ public class ItemUnlockService {
         // 사용자가 이미 획득한 아이템 목록
         List<Long> alreadyOwnedItemIds = userItemRepository.findAllByUser(user).stream()
                 .map(userItem -> userItem.getItem().getItemId())
-                .collect(Collectors.toList());
+                .toList();
 
         // 모든 아이템 가져오기
         List<Item> allItems = itemRepository.findAll();
@@ -53,6 +72,7 @@ public class ItemUnlockService {
         try {
             requiredCount = Integer.parseInt(conditionParts[1]);
         } catch (NumberFormatException e) {
+            log.info("item 테이블에 requireCount를 확인해주세요.");
         }
 
         Map<GenreName, Integer> userBookCountByGenre = getUserBookCountByGenre(user);
@@ -67,31 +87,13 @@ public class ItemUnlockService {
         return totalReadCount >= requiredCount;
     }
 
-    // 사용자 책 데이터를 가져와서 장르별로 그룹화
+    // 현시점 기준 사용자가 완독한 UserBok만 가져와서 장르별로 그룹화
     private Map<GenreName, Integer> getUserBookCountByGenre(User user) {
-        // isArchiveExpGiven이 true인 책만 가져옴
-        return userBookRepository.findAllByUserAndIsArchiveExpGivenTrue(user).stream()
+        return userBookRepository.findByUserAndReadStatus(user, ReadStatus.FINISHED).stream()
                 .map(userBook -> userBook.getBookInfo().getGenre())
                 .collect(Collectors.groupingBy(
-                        genre -> genre.getGenreName(),
+                        Genre::getGenreName,
                         Collectors.summingInt(genre -> 1)
                 ));
-    }
-
-    // 사용자가 획득할 수 있는 아이템을 UserItem으로 생성하는 메서드
-    public void createUserItemForUnlockableItems(User user) {
-        List<Item> unlockableItems = getUnlockableItemsForUser();
-
-        for (Item item : unlockableItems) {
-            // UserItem 생성
-            UserItem userItem = UserItem.builder()
-                    .user(user)
-                    .item(item)
-                    .isEquipped(false)  // 기본값으로 미장착 설정
-                    .build();
-
-            // UserItem 저장
-            userItemRepository.save(userItem);
-        }
     }
 }
