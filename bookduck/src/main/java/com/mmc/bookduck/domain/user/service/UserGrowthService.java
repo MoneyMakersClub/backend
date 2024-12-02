@@ -46,13 +46,13 @@ public class UserGrowthService {
         User targetUser = userService.getActiveUserByUserId(userId);
         long reviewCount = reviewRepository.countByUser(targetUser);
         long excerptCount = excerptRepository.countByUser(targetUser);
-        long bookCount = (reviewCount + excerptCount);
+        long bookRecordCount = (reviewCount + excerptCount);
         boolean isOfficial = targetUser.isOfficial();
         User currentUser = userService.getCurrentUserOrNull();
 
         // 유저와의 관계 상태
         UserRelationshipStatusDto userRelationshipStatusDto = userRelationshipService.getUserRelationshipStatus(currentUser, targetUser);
-        return new UserInfoResponseDto(targetUser.getNickname(), bookCount, isOfficial, userRelationshipStatusDto);
+        return new UserInfoResponseDto(targetUser.getNickname(), bookRecordCount, isOfficial, userRelationshipStatusDto);
     }
 
     @Transactional(readOnly = true)
@@ -84,14 +84,14 @@ public class UserGrowthService {
 
     public void gainExpForArchive(UserBook userBook) {
         if (!userBook.isArchiveExpGiven()) {
-            gainExpForUser(userBook.getUser(), 10);
+            gainExpForUser(userBook.getUser(), 15);
             userBook.markArchiveExpGiven();
         }
     }
 
     public void gainExpForOneLine(UserBook userBook) {
         if (!userBook.isOneLineExpGiven()) {
-            gainExpForUser(userBook.getUser(), 15);
+            gainExpForUser(userBook.getUser(), 25);
             userBook.markOneLineExpGiven();
         }
     }

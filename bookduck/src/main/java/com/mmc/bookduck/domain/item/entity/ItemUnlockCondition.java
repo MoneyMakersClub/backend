@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ItemUnlockCondition {
-    FICTION_LITERARY_HUMANITIES_SCIENCE("FICTION+LITERARY+HUMANITIES+SCIENCE"),
+    FICTION_LITERARY_HUMANITIES("FICTION+LITERARY+HUMANITIES"),
     SCIENCE("SCIENCE"),
     ART_COMICS("ART+COMICS"),
     TRAVEL("TRAVEL"),
