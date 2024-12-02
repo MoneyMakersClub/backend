@@ -34,8 +34,6 @@ public class ReviewService {
     public Review createReview(ReviewCreateRequestDto requestDto){
         User user = userService.getCurrentUser();
         UserBook userBook = userBookService.getUserBookById(requestDto.getUserBookId());
-        String color = requestDto.getColor() != null ? requestDto.getColor() : "#ABABAB";
-        Visibility visibility = requestDto.getVisibility() != null ? requestDto.getVisibility() : Visibility.PUBLIC;
         boolean isSystemGenerated = false;
         // 제목 생성 로직
         String reviewTitle = requestDto.getReviewTitle();
@@ -44,7 +42,7 @@ public class ReviewService {
             reviewTitle = generateUniqueTitle(user, dateTitle);
             isSystemGenerated = true;
         }
-        Review review = requestDto.toEntity(user, userBook, color, visibility);
+        Review review = requestDto.toEntity(user, userBook);
         review.setReviewTitle(reviewTitle);
         review.setIsSystemGenerated(isSystemGenerated);
         return reviewRepository.save(review);
