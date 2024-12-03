@@ -582,7 +582,7 @@ public class BookInfoService {
             BookInfo newBookInfo = additional.toEntity(providerId, requestDto, genre);
             bookInfoRepository.save(newBookInfo);
 
-            UserBook userBook = requestDto.toEntity(user, newBookInfo, ReadStatus.valueOf(requestDto.readStatus()));
+            UserBook userBook = requestDto.toEntity(user, newBookInfo, ReadStatus.NOT_STARTED);
             savedUserBook = userBookRepository.save(userBook);
         }
         checkExpAndBadgeForFinishedBook(savedUserBook);
