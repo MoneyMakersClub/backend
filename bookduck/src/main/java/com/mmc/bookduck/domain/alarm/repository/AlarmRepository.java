@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.alarm.repository;
 
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
+import com.mmc.bookduck.domain.alarm.entity.AlarmType;
 import com.mmc.bookduck.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,4 +23,6 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     void deleteByCreatedTimeBefore(LocalDateTime createdTime);
 
     List<Alarm> findAllByReceiverAndIsReadFalse(User user);
+
+    void deleteByAlarmTypeAndSenderAndReceiver(AlarmType alarmType, User sender, User receiver);
 }

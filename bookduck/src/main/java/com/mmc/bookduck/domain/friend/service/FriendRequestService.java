@@ -1,6 +1,7 @@
 package com.mmc.bookduck.domain.friend.service;
 
 import com.mmc.bookduck.domain.alarm.service.AlarmByTypeService;
+import com.mmc.bookduck.domain.alarm.service.AlarmService;
 import com.mmc.bookduck.domain.friend.dto.common.FriendRequestUnitDto;
 import com.mmc.bookduck.domain.friend.dto.request.FriendRequestDto;
 import com.mmc.bookduck.domain.friend.dto.response.FriendRequestListResponseDto;
@@ -72,7 +73,10 @@ public class FriendRequestService {
             throw new CustomException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
 
+        // 친구 요청 삭제
         friendRequestRepository.delete(request);
+        // 친구 요청 알림 삭제
+        alarmByTypeService.deleteFriendRequestAlarm(request.getSender(), request.getReceiver());
     }
 
     // 받은 친구 요청 목록 조회
@@ -122,6 +126,8 @@ public class FriendRequestService {
 
         request.setFriendRequestStatus(FriendRequestStatus.REJECTED);
         friendRequestRepository.save(request);
+        // 친구 요청 알림 삭제
+        alarmByTypeService.deleteFriendRequestAlarm(request.getSender(), request.getReceiver());
     }
 
     @Transactional(readOnly = true)

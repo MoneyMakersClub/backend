@@ -55,7 +55,10 @@ public class FriendService {
         friendRepository.save(friend);
         request.setFriendRequestStatus(FriendRequestStatus.ACCEPTED);
         friendRequestRepository.save(request);
+        // 친구 알림 생성
         alarmByTypeService.createFriendApprovedAlarm(currentUser, sender);
+        // 친구 요청 알림 삭제
+        alarmByTypeService.deleteFriendRequestAlarm(request.getSender(), request.getReceiver());
     }
 
     // 친구 목록 조회
