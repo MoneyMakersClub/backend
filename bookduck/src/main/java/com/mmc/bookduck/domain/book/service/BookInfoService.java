@@ -183,7 +183,7 @@ public class BookInfoService {
         }
         else{
             BookUnitDto bookUnitDto = parseBookBasic(responseBody);
-            return BookInfoBasicResponseDto.from(bookUnitDto, additional);
+            return BookInfoBasicResponseDto.from(providerId, bookUnitDto, additional);
         }
     }
 
@@ -326,9 +326,9 @@ public class BookInfoService {
         BookUnitDto bookUnitDto = BookUnitDto.from(bookInfo, my);
 
         if(userBook.isPresent()){
-            return BookInfoBasicResponseDto.from(bookUnitDto, getRatingAverage(bookInfo),my.oneLineId(), my.myOneLine(), additional);
+            return BookInfoBasicResponseDto.from(bookInfo.getProviderId(), bookUnitDto, getRatingAverage(bookInfo),my.oneLineId(), my.myOneLine(), additional);
         }else{
-            return new BookInfoBasicResponseDto(bookUnitDto, getRatingAverage(bookInfo), null,null, additional);
+            return new BookInfoBasicResponseDto(bookInfo.getProviderId(), bookUnitDto, getRatingAverage(bookInfo), null,null, additional);
         }
     }
 
