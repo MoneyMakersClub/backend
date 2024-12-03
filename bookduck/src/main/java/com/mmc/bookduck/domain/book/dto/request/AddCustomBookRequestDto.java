@@ -5,7 +5,7 @@ import com.mmc.bookduck.domain.book.entity.Genre;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.web.multipart.MultipartFile;
 
-public record CustomBookRequestDto(
+public record AddCustomBookRequestDto(
         @NotBlank(message = "title은 필수입니다. title은 공백일 수 없습니다.") String title,
         @NotBlank(message = "author은 필수입니다. author은 공백일 수 없습니다.") String author,
         MultipartFile coverImage

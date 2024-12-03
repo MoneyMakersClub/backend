@@ -1,9 +1,8 @@
 package com.mmc.bookduck.domain.book.controller;
 
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
-import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
+import com.mmc.bookduck.domain.book.dto.request.AddCustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
-import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.CustomBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.RatingResponseDto;
@@ -85,7 +84,7 @@ public class UserBookController {
 
     @Operation(summary = "책 직접 등록", description = "사용자가 책을 직접 등록합니다.")
     @PostMapping(value = "/custom", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<CustomBookResponseDto> createCustomBook(@Valid @ModelAttribute final CustomBookRequestDto requestDto) {
+    public ResponseEntity<CustomBookResponseDto> createCustomBook(@Valid @ModelAttribute final AddCustomBookRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body((userBookService.createCustomBook(requestDto)));
     }

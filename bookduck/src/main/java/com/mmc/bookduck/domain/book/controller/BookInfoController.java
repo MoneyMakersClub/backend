@@ -56,7 +56,8 @@ public class BookInfoController {
     @PostMapping("/{providerId}/add")
     public ResponseEntity<AddUserBookResponseDto> addBookByProviderId(@PathVariable(name = "providerId") final String providerId,
                                                                       @Valid @RequestBody final AddUserBookRequestDto requestDto){
-        return ResponseEntity.ok(bookInfoService.addBookByProviderId(providerId, requestDto));
+        AddUserBookResponseDto responseDto = bookInfoService.convertToAddUserBookResponseDto(providerId, requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 
 
