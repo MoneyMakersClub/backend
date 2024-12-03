@@ -21,7 +21,6 @@ import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.friend.entity.Friend;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
 import com.mmc.bookduck.domain.item.service.ItemUnlockService;
-import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.common.PaginatedResponseDto;
@@ -62,7 +61,7 @@ public class ArchiveService {
     // 생성
     public ArchiveResponseDto createArchive(ArchiveCreateRequestDto requestDto) {
         // UserBook 결정(createExcerpt,Review의 findById때문에)
-        UserBook userBook = userBookService.getUserBookOrAdd(requestDto.getExcerpt(), requestDto.getReview(), requestDto, requestDto.getProviderId(), requestDto.getUserBook());
+        UserBook userBook = userBookService.getUserBookOrAdd(requestDto.getExcerpt(), requestDto.getReview(), requestDto, requestDto.getProviderId());
         // Excerpt 생성 시 결정된 UserBook 사용
         Excerpt excerpt = Optional.ofNullable(requestDto.getExcerpt())
                 .map(dto -> {

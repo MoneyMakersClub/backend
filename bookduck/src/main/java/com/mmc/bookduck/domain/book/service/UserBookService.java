@@ -58,7 +58,7 @@ public class UserBookService {
         return new UserBookResponseDto(userBook, isCustomBook);
     }
 
-    public UserBook getUserBookOrAdd(ExcerptCreateRequestDto excerptDto, ReviewCreateRequestDto reviewDto, ArchiveCreateRequestDto archiveDto, String providerId, AddUserBookRequestDto userBookDto) {
+    public UserBook getUserBookOrAdd(ExcerptCreateRequestDto excerptDto, ReviewCreateRequestDto reviewDto, ArchiveCreateRequestDto archiveDto, String providerId) {
         // ExcerptDto 또는 ReviewDto에서 userBookId를 확인
         Long userBookId = (excerptDto != null && excerptDto.getUserBookId() != null)
                 ? excerptDto.getUserBookId()
@@ -66,11 +66,8 @@ public class UserBookService {
         if (userBookId != null) {
             return getUserBookById(userBookId);
         }
-        if (providerId != null && userBookDto != null) {
-            return bookInfoService.addBookByProviderId(providerId, userBookDto);
-        }
         if (archiveDto.getUserBook() != null && providerId != null) {
-            return bookInfoService.addBookByProviderId(providerId, userBookDto);
+            return bookInfoService.addBookByProviderId(providerId, archiveDto.getUserBook());
         } else if (archiveDto.getCustomBook() != null) {
             return createCustomBookEntity(archiveDto.getCustomBook());
         } else {
