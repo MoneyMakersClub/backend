@@ -70,7 +70,7 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
             "AND ub.createdTime BETWEEN :startDate AND :endDate " +
             "GROUP BY g.genreName " +
             "ORDER BY COUNT(ub) DESC")
-    GenreName findTopGenreByUserAndCreatedTimeBetween(@Param("user") User user, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
+    List<GenreName> findTopGenreByUserAndCreatedTimeBetween(@Param("user") User user, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     // 유저가 가장 많이 읽은 작가들
     @Query(value = "SELECT b.author, COUNT(ub) AS bookCount FROM UserBook ub " +
@@ -87,7 +87,7 @@ public interface UserBookRepository extends JpaRepository<UserBook, Long> {
             "AND ub.createdTime BETWEEN :startDate AND :endDate " +  // 주어진 기간
             "GROUP BY ub.bookInfo.author " +
             "ORDER BY COUNT(ub) DESC")
-    String findTopAuthorByUserAndCreatedTimeBetween(@Param("user") User user,
+    List<String> findTopAuthorByUserAndCreatedTimeBetween(@Param("user") User user,
                                                     @Param("startDate") LocalDateTime startDate,
                                                     @Param("endDate") LocalDateTime endDate);
     // BookInfo의 작가명으로 UserBook top3찾기
