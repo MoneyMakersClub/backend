@@ -257,20 +257,6 @@ public class BookInfoService {
         }
     }
 
-//    // api bookInfo 저장
-//    public BookInfo saveApiBookInfo (UserBookRequestDto dto) {
-//        Optional<BookInfo> existingBookInfo = findBookInfoByProviderId(dto.providerId());
-//        if(existingBookInfo.isPresent()){
-//            throw new CustomException(ErrorCode.BOOK_ALREADY_EXISTS);
-//        }
-//
-//        String saveAuthor = dto.author();
-//        Genre genre = genreService.findGenreById(dto.genreId());
-//
-//        BookInfo bookInfo = dto.toEntity(saveAuthor,genre);
-//        return bookInfoRepository.save(bookInfo);
-//    }
-
     @Transactional(readOnly = true)
     public Optional<BookInfo> findBookInfoByProviderId(String providerId) {
         return bookInfoRepository.findByProviderId(providerId);
