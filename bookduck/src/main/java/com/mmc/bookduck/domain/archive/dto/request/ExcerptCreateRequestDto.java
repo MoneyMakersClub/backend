@@ -15,7 +15,7 @@ public class ExcerptCreateRequestDto {
     @NotNull private String excerptContent;
     @NotNull private Long pageNumber;
     @NotNull private Visibility visibility;
-    @NotNull private Long userBookId;
+    private Long userBookId;
 
     public void setUserBookId(Long userBookId) {
         this.userBookId = userBookId;

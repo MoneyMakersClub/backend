@@ -20,7 +20,7 @@ public class ReviewCreateRequestDto {
     @NotNull private String reviewContent;
     @NotNull private String color;
     @NotNull private Visibility visibility;
-    @NotNull private Long userBookId;
+    private Long userBookId;
 
     public void setUserBookId(Long userBookId) {
         this.userBookId = userBookId;
