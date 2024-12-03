@@ -15,11 +15,10 @@ import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
 import com.mmc.bookduck.domain.book.dto.common.BookUnitParseDto;
 import com.mmc.bookduck.domain.book.dto.common.MyRatingOneLineReadStatusDto;
 import com.mmc.bookduck.domain.book.dto.request.AddUserBookRequestDto;
-import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
+import com.mmc.bookduck.domain.book.dto.request.AddCustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.CustomBookUpdateDto;
 import com.mmc.bookduck.domain.book.dto.response.AddUserBookResponseDto;
 import com.mmc.bookduck.domain.book.dto.common.BookUnitDto;
-import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.common.BookInfoDetailDto;
 import com.mmc.bookduck.domain.book.dto.response.BookInfoBasicResponseDto;
 import com.mmc.bookduck.domain.book.dto.response.BookListResponseDto;
@@ -258,20 +257,6 @@ public class BookInfoService {
         }
     }
 
-    // api bookInfo 저장
-    public BookInfo saveApiBookInfo (UserBookRequestDto dto) {
-        Optional<BookInfo> existingBookInfo = findBookInfoByProviderId(dto.providerId());
-        if(existingBookInfo.isPresent()){
-            throw new CustomException(ErrorCode.BOOK_ALREADY_EXISTS);
-        }
-
-        String saveAuthor = dto.author();
-        Genre genre = genreService.findGenreById(dto.genreId());
-
-        BookInfo bookInfo = dto.toEntity(saveAuthor,genre);
-        return bookInfoRepository.save(bookInfo);
-    }
-
     @Transactional(readOnly = true)
     public Optional<BookInfo> findBookInfoByProviderId(String providerId) {
         return bookInfoRepository.findByProviderId(providerId);
@@ -286,7 +271,7 @@ public class BookInfoService {
         bookInfoRepository.delete(bookInfo);
     }
 
-    public BookInfo saveCustomBookInfo (CustomBookRequestDto dto, User user) {
+    public BookInfo saveCustomBookInfo (AddCustomBookRequestDto dto, User user) {
         String imgPath = null;
         if(dto.coverImage() != null){
             imgPath = s3Service.uploadFile(dto.coverImage());
@@ -576,7 +561,7 @@ public class BookInfoService {
                 .orElseThrow(()-> new CustomException(ErrorCode.USERBOOK_NOT_FOUND));
     }
 
-    public AddUserBookResponseDto addBookByProviderId(String providerId, AddUserBookRequestDto requestDto) {
+    public UserBook addBookByProviderId(String providerId, AddUserBookRequestDto requestDto) {
         User user = userService.getCurrentUser();
         Optional<BookInfo> bookInfo = findBookInfoByProviderId(providerId);
 
@@ -597,17 +582,22 @@ public class BookInfoService {
             BookInfo newBookInfo = additional.toEntity(providerId, requestDto, genre);
             bookInfoRepository.save(newBookInfo);
 
-            UserBook userBook = requestDto.toEntity(user, newBookInfo, ReadStatus.valueOf(requestDto.readStatus()));
+            UserBook userBook = requestDto.toEntity(user, newBookInfo, ReadStatus.NOT_STARTED);
             savedUserBook = userBookRepository.save(userBook);
         }
         checkExpAndBadgeForFinishedBook(savedUserBook);
-        return new AddUserBookResponseDto(savedUserBook);
+        return savedUserBook;
     }
 
     // 경험치 획득, READ 뱃지 unlock 확인
     public void checkExpAndBadgeForFinishedBook(UserBook userBook) {
         userGrowthService.gainExpForFinishedBook(userBook);
         badgeUnlockService.checkAndUnlockBadges(userBook.getUser());
+    }
+
+    public AddUserBookResponseDto convertToAddUserBookResponseDto(String providerId, AddUserBookRequestDto requestDto) {
+        UserBook userBook = addBookByProviderId(providerId, requestDto);
+        return new AddUserBookResponseDto(userBook);
     }
 
     // 연관 추천 도서 조회
