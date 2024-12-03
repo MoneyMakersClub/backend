@@ -78,8 +78,10 @@ public class ExportService {
         long reviewCount = reviewRepository.countByUserAndCreatedTimeBetween(
                 user, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
         // 선호하는 작가, 선호하는 장르, 기록 키드
-        GenreName mostReadGenre = userBookRepository.findTopGenreByUserAndCreatedTimeBetween(user, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
-        String mostReadAuthor = userBookRepository.findTopAuthorByUserAndCreatedTimeBetween(user, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+        List<GenreName> genres = userBookRepository.findTopGenreByUserAndCreatedTimeBetween(user, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+        GenreName mostReadGenre = genres.get(0);
+        List<String> authors = userBookRepository.findTopAuthorByUserAndCreatedTimeBetween(user, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+        String mostReadAuthor = authors.get(0);
         UserKeywordResponseDto keywordResponse = userReadingReportService.getUserKeywordWithLimit(user.getUserId(), 1);
         return new ExportStatsResponseDto(
                 nickname,
