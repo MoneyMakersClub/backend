@@ -3,10 +3,12 @@ package com.mmc.bookduck.domain.alarm.service;
 import com.mmc.bookduck.domain.alarm.dto.ssedata.BadgeModalInfo;
 import com.mmc.bookduck.domain.alarm.entity.Alarm;
 import com.mmc.bookduck.domain.alarm.entity.AlarmType;
+import com.mmc.bookduck.domain.alarm.repository.AlarmRepository;
 import com.mmc.bookduck.domain.badge.entity.BadgeType;
 import com.mmc.bookduck.domain.badge.entity.UserBadge;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.user.entity.User;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import java.text.MessageFormat;
 @Transactional
 @RequiredArgsConstructor
 public class AlarmByTypeService {
+    private final AlarmRepository alarmRepository;
     private final AlarmService alarmService;
 
     // 친구 요청 알림 생성
@@ -118,5 +121,9 @@ public class AlarmByTypeService {
                 .build();
         alarm.readAlarm();
         alarmService.createAlarm(alarm, receiver);
+    }
+
+    public void deleteFriendRequestAlarm(@NotNull User sender, @NotNull User receiver) {
+        alarmRepository.deleteByAlarmTypeAndSenderAndReceiver(AlarmType.FRIEND_REQUEST, sender, receiver);
     }
 }

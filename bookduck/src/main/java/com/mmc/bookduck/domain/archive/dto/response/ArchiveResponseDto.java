@@ -8,11 +8,12 @@ public record ArchiveResponseDto(
         ExcerptResponseDto excerpt,
         ReviewResponseDto review,
         Long bookInfoId,
+        Boolean isCustom,
         String title,
         String author,
         String imgPath
 ) {
-    public static ArchiveResponseDto from(Archive archive, Long creatorUserId, ExcerptResponseDto excerpt, ReviewResponseDto review, Long bookInfoId, String title, String author, String imgPath) {
-        return new ArchiveResponseDto(archive.getArchiveId(), creatorUserId, excerpt, review, bookInfoId, title, author, imgPath);
+    public static ArchiveResponseDto from(Archive archive, Long creatorUserId, ExcerptResponseDto excerpt, ReviewResponseDto review, Long bookInfoId, boolean isCustom, String title, String author, String imgPath) {
+        return new ArchiveResponseDto(archive.getArchiveId(), creatorUserId, excerpt, review, bookInfoId, isCustom, title, author, imgPath);
     }
 }

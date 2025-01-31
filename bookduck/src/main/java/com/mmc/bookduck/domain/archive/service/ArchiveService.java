@@ -20,6 +20,7 @@ import com.mmc.bookduck.domain.book.service.UserBookService;
 import com.mmc.bookduck.domain.common.Visibility;
 import com.mmc.bookduck.domain.friend.entity.Friend;
 import com.mmc.bookduck.domain.friend.repository.FriendRepository;
+import com.mmc.bookduck.domain.item.service.ItemUnlockService;
 import com.mmc.bookduck.domain.user.service.UserGrowthService;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.common.PaginatedResponseDto;
@@ -55,11 +56,12 @@ public class ArchiveService {
     private final FriendRepository friendRepository;
     private final UserGrowthService userGrowthService;
     private final BadgeUnlockService badgeUnlockService;
+    private final ItemUnlockService itemUnlockService;
 
     // 생성
     public ArchiveResponseDto createArchive(ArchiveCreateRequestDto requestDto) {
         // UserBook 결정(createExcerpt,Review의 findById때문에)
-        UserBook userBook = userBookService.getUserBookOrAdd(requestDto.getExcerpt(), requestDto.getReview(), requestDto);
+        UserBook userBook = userBookService.getUserBookOrAdd(requestDto.getExcerpt(), requestDto.getReview(), requestDto, requestDto.getProviderId());
         // Excerpt 생성 시 결정된 UserBook 사용
         Excerpt excerpt = Optional.ofNullable(requestDto.getExcerpt())
                 .map(dto -> {
@@ -76,7 +78,9 @@ public class ArchiveService {
                 .orElse(null);
         Archive archive = requestDto.toEntity(excerpt, review);
         archiveRepository.save(archive);
+
         checkExpAndBadgeForArchive(userBook);
+        itemUnlockService.createUserItemForUnlockableItems(userBook.getUser());
         return createArchiveResponseDto(archive, excerpt, review, userBook);
     }
 
@@ -303,6 +307,7 @@ public class ArchiveService {
     public ArchiveResponseDto createArchiveResponseDto(Archive archive, Excerpt excerpt, Review review, UserBook userBook) {
         Long creatorUserId = userBook.getUser().getUserId();
         Long bookInfoId = userBook.getBookInfo().getBookInfoId();
+        boolean isCustom = userBook.getBookInfo().getCreatedUserId() != null;
         String title = userBook.getBookInfo().getTitle();
         String author = userBook.getBookInfo().getAuthor();
         String imgPath = userBook.getBookInfo().getImgPath();
@@ -312,6 +317,7 @@ public class ArchiveService {
                 excerpt != null ? ExcerptResponseDto.from(excerpt) : null,
                 review != null ? ReviewResponseDto.from(review) : null,
                 bookInfoId,
+                isCustom,
                 title,
                 author,
                 imgPath

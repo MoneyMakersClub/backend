@@ -7,18 +7,15 @@ import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
-import com.mmc.bookduck.domain.badge.service.BadgeUnlockService;
-import com.mmc.bookduck.domain.badge.service.UserBadgeService;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
-import com.mmc.bookduck.domain.book.dto.request.CustomBookRequestDto;
+import com.mmc.bookduck.domain.book.dto.request.AddUserBookRequestDto;
+import com.mmc.bookduck.domain.book.dto.request.AddCustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
-import com.mmc.bookduck.domain.book.dto.request.UserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.response.*;
 import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
-import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
@@ -32,8 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -46,22 +41,16 @@ public class UserBookService {
     private final ReviewRepository reviewRepository;
 
     //customBook 추가
-    public UserBook createCustomBookEntity(CustomBookRequestDto requestDto) {
+    public UserBook createCustomBookEntity(AddCustomBookRequestDto requestDto) {
         User user = userService.getCurrentUser();
         BookInfo bookInfo = bookInfoService.saveCustomBookInfo(requestDto, user);
         UserBook userBook = new UserBook(ReadStatus.NOT_STARTED, user, bookInfo);
         return userBookRepository.save(userBook);
     }
 
-    public CustomBookResponseDto createCustomBook(CustomBookRequestDto requestDto) {
+    public CustomBookResponseDto createCustomBook(AddCustomBookRequestDto requestDto) {
         UserBook userBook = createCustomBookEntity(requestDto);
         return new CustomBookResponseDto(userBook, 0.0,null, null, true);
-    }
-
-    // 서재에 책 추가
-    public UserBookResponseDto addUserBook(UserBookRequestDto requestDto) {
-        UserBook savedUserBook = addUserBookEntity(requestDto);
-        return convertToUserBookResponseDto(savedUserBook);
     }
 
     private UserBookResponseDto convertToUserBookResponseDto(UserBook userBook) {
@@ -69,33 +58,7 @@ public class UserBookService {
         return new UserBookResponseDto(userBook, isCustomBook);
     }
 
-    public UserBook addUserBookEntity(UserBookRequestDto requestDto) {
-        try {
-            ReadStatus.valueOf(requestDto.readStatus());
-        } catch (IllegalArgumentException e) {
-            throw new CustomException(ErrorCode.INVALID_ENUM_VALUE);
-        }
-
-        Optional<BookInfo> bookInfo = bookInfoService.findBookInfoByProviderId(requestDto.providerId());
-
-        if (bookInfo.isPresent()){
-            Optional<UserBook> userBook = userBookRepository.findByUserAndBookInfo(userService.getCurrentUser(), bookInfo.get());
-
-            if(userBook.isPresent()){
-                throw new CustomException(ErrorCode.USERBOOK_ALREADY_EXISTS);
-            }
-            UserBook newUserBook = requestDto.toEntity(userService.getCurrentUser(), bookInfo.get(), ReadStatus.valueOf(requestDto.readStatus()));
-            return userBookRepository.save(newUserBook);
-        }
-        else {
-            // bookInfo 없으면 먼저 bookInfo 저장
-            BookInfo newBookInfo = bookInfoService.saveApiBookInfo(requestDto);
-            UserBook newUserBook = requestDto.toEntity(userService.getCurrentUser(),newBookInfo, ReadStatus.valueOf(requestDto.readStatus()));
-            return userBookRepository.save(newUserBook);
-        }
-    }
-
-    public UserBook getUserBookOrAdd(ExcerptCreateRequestDto excerptDto, ReviewCreateRequestDto reviewDto, ArchiveCreateRequestDto archiveDto) {
+    public UserBook getUserBookOrAdd(ExcerptCreateRequestDto excerptDto, ReviewCreateRequestDto reviewDto, ArchiveCreateRequestDto archiveDto, String providerId) {
         // ExcerptDto 또는 ReviewDto에서 userBookId를 확인
         Long userBookId = (excerptDto != null && excerptDto.getUserBookId() != null)
                 ? excerptDto.getUserBookId()
@@ -103,8 +66,8 @@ public class UserBookService {
         if (userBookId != null) {
             return getUserBookById(userBookId);
         }
-        if (archiveDto.getUserBook() != null) {
-            return addUserBookEntity(archiveDto.getUserBook());
+        if (archiveDto.getUserBook() != null && providerId != null) {
+            return bookInfoService.addBookByProviderId(providerId, archiveDto.getUserBook());
         } else if (archiveDto.getCustomBook() != null) {
             return createCustomBookEntity(archiveDto.getCustomBook());
         } else {
@@ -151,7 +114,7 @@ public class UserBookService {
         }
         userBook.changeReadStatus(ReadStatus.valueOf(status));
         // 경험치, 뱃지
-        bookInfoService.checkExpAndBadgeAndItemForFinishedBook(userBook);
+        bookInfoService.checkExpAndBadgeForFinishedBook(userBook);
         return convertToUserBookResponseDto(userBook);
     }
 

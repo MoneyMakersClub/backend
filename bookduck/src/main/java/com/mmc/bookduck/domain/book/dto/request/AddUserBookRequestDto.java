@@ -10,7 +10,6 @@ import jakarta.validation.constraints.NotNull;
 public record AddUserBookRequestDto(
         @NotBlank(message = "title은 필수입니다. title은 공백일 수 없습니다.") String title,
         @NotNull(message = "author은 필수입니다.") String author,
-        @NotBlank(message = "readStatus는 필수입니다.") String readStatus,
         String imgPath
 ) {
 

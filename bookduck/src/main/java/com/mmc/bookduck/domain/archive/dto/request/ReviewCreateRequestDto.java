@@ -18,15 +18,15 @@ import lombok.NoArgsConstructor;
 public class ReviewCreateRequestDto {
     private String reviewTitle;
     @NotNull private String reviewContent;
-    private String color;
-    private Visibility visibility;
+    @NotNull private String color;
+    @NotNull private Visibility visibility;
     private Long userBookId;
 
     public void setUserBookId(Long userBookId) {
         this.userBookId = userBookId;
     }
 
-    public Review toEntity(User user, UserBook userBook, String color, Visibility visibility) {
+    public Review toEntity(User user, UserBook userBook) {
         return Review.builder()
                 .reviewTitle(reviewTitle)
                 .reviewContent(reviewContent)
