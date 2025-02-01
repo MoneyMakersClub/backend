@@ -48,6 +48,14 @@ public class FolderBookService {
         folderBookRepository.delete(folderBook);
     }
 
+    public void deleteFolderBookByUserBook(UserBook userBook){
+        List<FolderBook> folderBookList = folderBookRepository.findAllByUserBook(userBook);
+
+        if (folderBookList != null && !folderBookList.isEmpty()) {
+            folderBookRepository.deleteAll(folderBookList);
+        }
+    }
+
     public boolean existsByUserBookAndFolder(UserBook userBook, Folder folder) {
         return folderBookRepository.existsByUserBookAndFolder(userBook,folder);
     }
