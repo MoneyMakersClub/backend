@@ -21,7 +21,7 @@ public record BookInfoDetailDto(
         this (
                 bookInfo.getPublisher(),
                 bookInfo.getPublishDate(),
-                bookInfo.getDescription(),
+                (bookInfo.getDescription() != null) ? bookInfo.getDescription() : "-",
                 bookInfo.getPageCount(),
                 null,
                 bookInfo.getGenre().getGenreId(),
