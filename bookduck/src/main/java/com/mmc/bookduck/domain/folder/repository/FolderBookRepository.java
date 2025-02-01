@@ -10,4 +10,6 @@ public interface FolderBookRepository extends JpaRepository<FolderBook, Long> {
     boolean existsByUserBookAndFolder(UserBook userBook, Folder folder);
 
     List<FolderBook> findByFolderOrderByBookOrderAsc(Folder folder);
+
+    List<FolderBook> findAllByUserBook(UserBook userBook);
 }

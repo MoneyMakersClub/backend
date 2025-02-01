@@ -52,4 +52,6 @@ public interface ExcerptRepository extends JpaRepository<Excerpt, Long> {
             "AND ((:isFirstHalf = true AND MONTH(e.createdTime) BETWEEN 1 AND 6) " +
             "OR (:isFirstHalf = false AND MONTH(e.createdTime) BETWEEN 7 AND 12))")
     long countByUserAndCreatedInYearAndHalf(@Param("user") User user, @Param("year") int year, @Param("isFirstHalf") boolean isFirstHalf);
+
+    List<Excerpt> findAllByUserBook(UserBook userBook);
 }

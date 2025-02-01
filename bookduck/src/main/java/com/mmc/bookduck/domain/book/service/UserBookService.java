@@ -3,12 +3,13 @@ package com.mmc.bookduck.domain.book.service;
 import com.mmc.bookduck.domain.archive.dto.request.ArchiveCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.request.ExcerptCreateRequestDto;
 import com.mmc.bookduck.domain.archive.dto.request.ReviewCreateRequestDto;
+import com.mmc.bookduck.domain.archive.entity.Archive;
 import com.mmc.bookduck.domain.archive.entity.Excerpt;
 import com.mmc.bookduck.domain.archive.entity.Review;
+import com.mmc.bookduck.domain.archive.repository.ArchiveRepository;
 import com.mmc.bookduck.domain.archive.repository.ExcerptRepository;
 import com.mmc.bookduck.domain.archive.repository.ReviewRepository;
 import com.mmc.bookduck.domain.book.dto.common.BookCoverImageUnitDto;
-import com.mmc.bookduck.domain.book.dto.request.AddUserBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.AddCustomBookRequestDto;
 import com.mmc.bookduck.domain.book.dto.request.RatingRequestDto;
 import com.mmc.bookduck.domain.book.dto.response.*;
@@ -16,6 +17,11 @@ import com.mmc.bookduck.domain.book.entity.BookInfo;
 import com.mmc.bookduck.domain.book.entity.ReadStatus;
 import com.mmc.bookduck.domain.book.entity.UserBook;
 import com.mmc.bookduck.domain.book.repository.UserBookRepository;
+import com.mmc.bookduck.domain.folder.service.FolderBookService;
+import com.mmc.bookduck.domain.oneline.entity.OneLine;
+import com.mmc.bookduck.domain.oneline.repository.OneLineRepository;
+import com.mmc.bookduck.domain.onelineLike.entity.OneLineLike;
+import com.mmc.bookduck.domain.onelineLike.repository.OneLineLikeRepository;
 import com.mmc.bookduck.domain.user.entity.User;
 import com.mmc.bookduck.domain.user.service.UserService;
 import com.mmc.bookduck.global.common.BaseTimeEntity;
@@ -24,6 +30,7 @@ import com.mmc.bookduck.global.exception.ErrorCode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,6 +46,10 @@ public class UserBookService {
     private final UserService userService;
     private final ExcerptRepository excerptRepository;
     private final ReviewRepository reviewRepository;
+    private final FolderBookService folderBookService;
+    private final ArchiveRepository archiveRepository;
+    private final OneLineRepository oneLineRepository;
+    private final OneLineLikeRepository oneLineLikeRepository;
 
     //customBook 추가
     public UserBook createCustomBookEntity(AddCustomBookRequestDto requestDto) {
@@ -85,6 +96,36 @@ public class UserBookService {
 
             BookInfo bookInfo = userBook.getBookInfo();
             Long createdUserId = bookInfo.getCreatedUserId();
+
+            //폴더북 삭제
+            folderBookService.deleteFolderBookByUserBook(userBook);
+
+            //review 삭제
+            List<Review> reviewList = reviewRepository.findAllByUserBook(userBook);
+            for(Review review : reviewList){
+                Optional<Archive> archive = archiveRepository.findByReview_ReviewId(review.getReviewId());
+                archive.ifPresent(archiveRepository::delete);
+                reviewRepository.delete(review);
+            }
+            //excerpt 삭제
+            List<Excerpt> excerptList = excerptRepository.findAllByUserBook(userBook);
+            for(Excerpt excerpt : excerptList){
+                Optional<Archive> archive = archiveRepository.findByExcerpt_ExcerptId(excerpt.getExcerptId());
+                archive.ifPresent(archiveRepository::delete);
+                excerptRepository.delete(excerpt);
+            }
+
+            //한줄평 삭제
+            Optional<OneLine> oneLine = oneLineRepository.findByUserBook(userBook);
+            oneLine.ifPresent(line -> {
+                List<OneLineLike> oneLineLikes = oneLineLikeRepository.findAllByOneLine(line);
+
+                if (!oneLineLikes.isEmpty()) {
+                    oneLineLikeRepository.deleteAll(oneLineLikes); // 좋아요 삭제
+                }
+
+                oneLineRepository.delete(line);
+            });
 
             userBookRepository.delete(userBook);
             // 사용자가 직접 등록한 책이면 bookInfo도 같이 삭제

@@ -40,4 +40,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "AND ((:isFirstHalf = true AND MONTH(r.createdTime) BETWEEN 1 AND 6) " +
             "OR (:isFirstHalf = false AND MONTH(r.createdTime) BETWEEN 7 AND 12))")
     long countByUserAndCreatedInYearAndHalf(@Param("user") User user, @Param("year") int year, @Param("isFirstHalf") boolean isFirstHalf);
+
+    List<Review> findAllByUserBook(UserBook userBook);
 }
