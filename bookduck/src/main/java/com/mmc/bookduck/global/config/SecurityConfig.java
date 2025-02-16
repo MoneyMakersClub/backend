@@ -97,13 +97,14 @@ public class SecurityConfig {
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 요청 권한 설정 TODO: 수정할 것
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(AUTH_WHITELIST).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/archives/share/{id}").permitAll()
-                        .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
-                        .requestMatchers("/users/{userId:[0-9]+}/{section:statistics|keywords|growth|badges}").authenticated()
-                        .requestMatchers("/users/{userId:[0-9]+}/{section:readingspace|character}").permitAll()
-                        .requestMatchers("/users/{userId:[0-9]+}").permitAll()
-                        .anyRequest().authenticated()
+                                .anyRequest().permitAll() // TODO: 개발을 위한 임시 허용이므로 실배포 전 수정 필요
+//                        .requestMatchers(AUTH_WHITELIST).permitAll()
+//                        .requestMatchers(HttpMethod.GET, "/archives/share/{id}").permitAll()
+//                        .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
+//                        .requestMatchers("/users/{userId:[0-9]+}/{section:statistics|keywords|growth|badges}").authenticated()
+//                        .requestMatchers("/users/{userId:[0-9]+}/{section:readingspace|character}").permitAll()
+//                        .requestMatchers("/users/{userId:[0-9]+}").permitAll()
+//                        .anyRequest().authenticated()
                 )
                 // X-Frame-Options: SAME ORIGIN으로 설정
                 .headers(header -> header
